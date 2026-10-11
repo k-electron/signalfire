@@ -1,0 +1,19 @@
+schema: spec-driven
+
+context: |
+  Read docs/PHILOSOPHY.md and docs/horizontals/01-constitution.md before writing any artifact.
+  Docs (docs/verticals, docs/horizontals) are design intent; openspec/specs is current truth.
+  TypeScript strict. Logic is test-first (constitution C4).
+
+rules:
+  proposal:
+    - List the philosophy principles served (P1–P13).
+    - List the vertical and horizontal docs implemented.
+    - State any departure from the docs and how it is resolved.
+    - Name and justify any new runtime dependency (C7).
+    - Include a "Constitution check" confirming C1–C10.
+  specs:
+    - Requirements use SHALL; every requirement has WHEN/THEN scenarios.
+  tasks:
+    - For logic domains, test tasks come before implementation tasks.
+    - Visual and feel tasks end with a playtest-checklist task.

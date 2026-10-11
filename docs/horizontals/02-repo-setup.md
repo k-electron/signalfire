@@ -57,7 +57,9 @@ How the repository is hosted, laid out, licensed, and worked in.
 ├── public/                   Static files served as-is
 ├── e2e/                      End-to-end tests (unit tests sit next to the code)
 ├── .github/                  Workflows, issue templates, pull request template
-├── .claude/                  Claude Code settings and OpenSpec-installed skills and commands
+├── .agents/                  OpenSpec skills and workflows; .openspec-target names the owner
+├── .claude/                  Claude Code slash commands and OpenSpec skills
+├── .cursor/                  Cursor slash commands and OpenSpec skills
 ├── package.json
 ├── pnpm-lock.yaml
 ├── tsconfig.json
@@ -176,7 +178,7 @@ Instructions work for any coding agent (constitution C8).
 | `docs/AGENTS.md` | Governing files, decision record template, doc review tests |
 | `CLAUDE.md` (next to each) | `@AGENTS.md` only |
 
-`.claude/` holds the Claude Code formatting hook (Dev Tooling horizontal) and the skills and commands OpenSpec installs. Other agents get the same OpenSpec workflows through their own tool folders.
+`.agents/`, `.claude/`, and `.cursor/` hold the skills and slash commands OpenSpec installs. `.agents/skills/.openspec-target` is `codex`, the owner of the shared skill tree. The Claude Code formatting hook arrives with Dev Tooling, in `.claude/settings.json`. Other agents get the same workflows through their own tool folders when those tools are selected.
 
 ## README
 
