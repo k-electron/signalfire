@@ -125,8 +125,8 @@ Every pull request that changes rendering, effects, animation, audio, or layout 
 6. **Independent review:** for non-trivial changes, a fresh-context agent that didn't write the code reviews the diff and tests against the spec and docs (constitution C10).
 7. **Pull request:** with the template filled (Repo Setup horizontal).
 8. **Review:** CI green, then Karim reviews; feel changes are played.
-9. **Merge:** squash merge.
-10. **Archive:** `/opsx:archive` merges spec deltas into `openspec/specs/`.
+9. **Archive:** `/opsx:archive` merges spec deltas into `openspec/specs/`.
+10. **Merge:** squash merge.
 
 ### Definition of done
 
@@ -137,8 +137,9 @@ A change is done when:
 - `pnpm check` passes in CI;
 - code, tests, config, comments, docs, and specs all match (constitution C9);
 - non-trivial changes have had an independent review, with every finding fixed or answered (constitution C10);
-- the pull request is approved and merged;
-- the change is archived.
+- the pull request is approved;
+- the change is archived;
+- the pull request is squash-merged.
 
 ### Working habits for agents
 

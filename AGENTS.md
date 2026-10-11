@@ -53,7 +53,7 @@ Also check `docs/decisions/` for records covering the area, and `openspec/specs/
 3. **Stop. Karim approves the proposal before you apply it.**
 4. Apply on branch `change/<name>`. Logic is test-first.
 5. Open a pull request with the template filled. Karim reviews; CI must be green.
-6. After merge, archive the change.
+6. Archive the change (`/opsx:archive`), then squash-merge.
 
 Exempt from proposals (pull request only, branch `fix/<slug>`): typo and wording fixes, formatting, dependency patch updates.
 
