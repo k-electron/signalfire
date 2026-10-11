@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+# Ladle output
+build/
+.vite/
+*.tsbuildinfo
+
+# Tests
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# Environment and secrets (the game has none, but keep it that way)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Local agent files (shared ones like .claude/settings.json stay tracked)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Scratch
+.tmp/
