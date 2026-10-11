@@ -25,7 +25,7 @@
 ## 6. Review and pull request
 
 - [x] 6.1 Run `openspec validate bootstrap-openspec` and verify it passes. Have a fresh-context review of the diff against this change, the constitution (C1–C10), and repo-setup. Verify each finding is fixed or answered in the pull request
-- [ ] 6.2 Open the pull request from `change/bootstrap-openspec` with title `chore(openspec): initialize OpenSpec`. Verify the body says `pnpm check` does not exist yet and does not claim it passed. Do not merge
+- [x] 6.2 Open the pull request from `change/bootstrap-openspec` with title `chore(openspec): initialize OpenSpec`. Verify the body says `pnpm check` does not exist yet and does not claim it passed. Do not merge
 
 ## Workflow follow-up
 
