@@ -1,0 +1,35 @@
+name: Bug report
+description: Something in the game or the repo broke.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Say what went wrong. You can attach a file on "What happened" if you have one. The in-game export is not in the game yet.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see? You can attach a file here.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: The game is for a desktop or laptop with a US QWERTY keyboard.
+      placeholder: Chrome on macOS
+    validations:
+      required: false

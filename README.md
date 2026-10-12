@@ -17,7 +17,7 @@ Not deployed yet. The game will be hosted on Cloudflare Pages; the link will app
 
 ## Status
 
-Pre-alpha. The design docs are written; development of a walking skeleton is next.
+Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) has not exited.
 
 ## How this project is built
 
@@ -48,14 +48,12 @@ pnpm dev
 
 ## Contributing
 
-- **Issues and Discussions are open:** bug reports, ideas, and reports of a wrong or offensive word in a typing list.
-- **Pull requests from outside contributors** open once the walking skeleton is in place. They'll follow the same OpenSpec process as everything else.
-- To report a bug, use Settings → Data → Export bug report in the game and attach the file to an issue.
+[Bug reports](https://github.com/k-electron/signalfire/issues/new?template=01-bug-report.yml), [ideas](https://github.com/k-electron/signalfire/issues/new?template=02-idea.yml), and [typing-content reports](https://github.com/k-electron/signalfire/issues/new?template=03-typing-content-report.yml) are open. Pull requests from outside contributors are not accepted yet. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Privacy
 
-Your typing data stays on your device, or in your own Puter account if you sign in. The game counts a few anonymous events (such as levels completed) without cookies; you can turn this off in Settings. The full list is in [CI/CD and Hosting](docs/horizontals/10-ci-cd-and-hosting.md#analytics).
+Your typing data stays on your device.
 
 ## License
 
-[MIT](LICENSE), covering code and game content. Third-party notices are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The license doesn't grant rights to the project's name.
+[MIT](LICENSE), covering code and game content. The license does not grant rights to the project's name.

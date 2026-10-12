@@ -1,0 +1,31 @@
+name: Typing-content report
+description: A word or phrase in a typing list that is offensive or wrong.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Name the word and say whether it is offensive, wrong, or both.
+  - type: input
+    id: word
+    attributes:
+      label: Word or phrase
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong with it?
+      options:
+        - Offensive
+        - Wrong
+        - Both
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where did it appear?
+      description: A level id or list name, if you know it.
+      placeholder: level:1.7
+    validations:
+      required: false

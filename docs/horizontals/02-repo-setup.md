@@ -8,7 +8,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 |---|---|
 | Hosting | GitHub, public |
 | License | MIT for code and creative content |
-| Contributions | Issues and Discussions open now; pull requests from outside contributors open after the walking skeleton |
+| Contributions | Issues open now (bug report, idea, typing-content report). Discussions stay off until that GitHub setting is on. Pull requests from outside contributors open after the walking skeleton |
 | Shape | Single app package with clear internal folders |
 | Package manager | pnpm, version pinned |
 | Lint and format | Biome |
@@ -28,7 +28,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Contributions
 
-- **Now:** Issues (bug reports, ideas) and Discussions are open. `CONTRIBUTING.md` explains that outside pull requests are not yet accepted and why.
+- **Now:** Issues are open: bug report, idea, and typing-content report. `CONTRIBUTING.md` explains that outside pull requests are not yet accepted and why, and how to open each issue type. Discussions stay off until the GitHub setting is turned on. Until then, ideas use the idea issue.
 - **After the walking skeleton:** pull requests open to outside contributors, who follow the same OpenSpec propose → apply flow and the constitution.
 - Issue templates: bug report, idea, typing-content report (for an offensive or wrong word in a list).
 
@@ -194,9 +194,9 @@ Short and public-facing:
 - Where to play (link to the hosted game) and the project status.
 - How the project is built (docs, OpenSpec, AI agents), with links.
 - How to run locally (`pnpm install`, `pnpm dev`).
-- How to contribute and report bugs.
-- A short privacy note.
-- License and third-party notices.
+- How to contribute and report bugs, linking `CONTRIBUTING.md`.
+- A short privacy note. Until analytics is counting, it says typing data stays on the device. Once counting exists, it links the event list in horizontal 10.
+- License, and third-party notices once `THIRD_PARTY_NOTICES.md` exists.
 
 ## Sources
 

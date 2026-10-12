@@ -1,0 +1,20 @@
+name: Idea
+description: A change you want in the game or the project.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For something that is broken, use Bug report.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What is the idea?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would this help?
+    validations:
+      required: false
