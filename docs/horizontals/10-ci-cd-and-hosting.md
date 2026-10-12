@@ -8,7 +8,7 @@ How changes are checked, deployed, released, and observed.
 |---|---|
 | Hosting | Cloudflare Pages, connected directly to the GitHub repo |
 | Deploys | Cloudflare builds and deploys every merge to `main`; every pull request branch gets a preview URL |
-| CI | GitHub Actions runs all checks on every pull request, including end-to-end tests |
+| CI | GitHub Actions runs every blocking check on every pull request and every push to main, including end-to-end tests. Pending rows are not run. |
 | Releases | Continuous deploy from `main`, plus periodic semver tags with release notes from Conventional Commits |
 | Analytics | Cookieless, anonymous counts of coarse game events; never typing data |
 | Error reports | Opt-in: players export a bug report and attach it to a GitHub issue |
@@ -21,18 +21,17 @@ Runs on every pull request and on every push to `main`.
 |---|---|---|
 | Install | `pnpm install --frozen-lockfile` | yes |
 | Types | `pnpm typecheck` | yes |
-| Lint and format | `pnpm lint` | yes |
-| Layer boundaries | dependency-boundary check (Architecture) | yes |
+| Lint | `pnpm lint` (Biome, then the layer-boundary fixture proof) | yes |
 | Unit and component tests | `pnpm test` (Vitest, including browser mode) | yes |
-| Content | `pnpm content:check` | yes |
+| Content | `pnpm content:check` | pending; the command does not exist |
 | Build | `pnpm build` | yes |
-| Bundle | Production bundle contains no dev-only modules (Dev Tooling) | yes |
+| Bundle | No command yet. The production bundle must contain no dev-only modules (Dev Tooling) | pending |
 | End-to-end | `pnpm test:e2e` against the production build | yes |
-| Pull request title | Conventional Commits format | yes |
+| Pull request title | Conventional Commits, via `tools/check-commit-msg.mjs`, on pull requests | yes |
 
 - Node version comes from `devEngines.runtime` in `package.json`; pnpm from the `packageManager` field.
 - The pnpm store and Playwright browsers are cached between runs.
-- Branch protection on `main` requires all checks above and Karim's approval (constitution C3).
+- Branch protection on `main` requires every check in this table that blocks merge, and Karim's approval (constitution C3). Pending rows are not required until a later change adds their commands to the workflow.
 
 ## Hosting (Cloudflare Pages)
 
@@ -60,7 +59,8 @@ A `_headers` file in `public/` sets:
 
 ### Dependency updates
 
-- Dependabot opens grouped weekly pull requests.
+- Dependabot opens grouped weekly pull requests for npm dependencies and for GitHub Actions.
+- Those pull request titles use the `chore` type and a `deps` or `deps-dev` scope, so they pass the pull request title check.
 - Patch updates are exempt from OpenSpec proposals (constitution C1). Minor and major updates of runtime dependencies go through a proposal.
 
 ## Analytics
