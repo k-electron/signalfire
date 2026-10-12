@@ -82,7 +82,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Scripts
 
-Agents and humans use the same commands. `AGENTS.md` lists them. `test`, `test:e2e`, `content:check`, `content:words`, `content:hash`, `tokens`, and `ladle` arrive with later tasks.
+Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check`, `content:words`, `content:hash`, `tokens`, and `ladle` arrive with later tasks.
 
 | Script | Does |
 |---|---|
@@ -92,7 +92,12 @@ Agents and humans use the same commands. `AGENTS.md` lists them. `test`, `test:e
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | Biome lint and format check |
 | `pnpm format` | Biome format and safe fixes |
-| `pnpm check` | Typecheck, lint, and build |
+| `pnpm test` | Vitest Node and browser projects |
+| `pnpm test:unit` | Vitest Node project (pre-push) |
+| `pnpm test <pattern>` | Run matching tests only |
+| `pnpm browsers:install` | Install Chromium inside the repo |
+| `pnpm test:e2e` | Playwright against the production build |
+| `pnpm check` | Typecheck, lint, test, and build |
 
 ## TypeScript settings
 
@@ -120,7 +125,9 @@ Beyond `strict`:
 | Types and interfaces | PascalCase | `KeyRecord` |
 | Functions and variables | camelCase | `computeConfidence` |
 | Constants | camelCase, or SCREAMING_SNAKE for fixed tuning values | `MAX_COMBO_TIER` |
-| Unit tests | Next to the code, `*.test.ts` | `star-rating.test.ts` |
+| Unit and property tests | Next to the code, `*.test.ts` | `star-rating.test.ts` |
+| Component tests | Next to the component, `*.browser.test.tsx` | `app.browser.test.tsx` |
+| End-to-end tests | `e2e/*.spec.ts` | `e2e/harness-smoke.spec.ts` |
 | Content files | kebab-case, ID-prefixed where ordered | `content/levels/2-4-reach-words.json` |
 
 ## Git workflow
@@ -158,8 +165,9 @@ Conventional Commits: `type(scope): summary`.
 |---|---|
 | `pre-commit` | Biome check with safe fixes on staged files, then typecheck |
 | `commit-msg` | Conventional Commits format check |
+| `pre-push` | Node unit tests (`pnpm test:unit`) |
 
-`pre-push` (unit tests) arrives with task 0.2. Hooks are a fast local safety net. CI is the authority.
+Hooks are a fast local safety net. CI is the authority.
 
 ## Agent files
 

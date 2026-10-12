@@ -151,7 +151,7 @@ A change is done when:
 
 ## Sources
 
-- [Vitest 4 browser mode (InfoQ)](https://www.infoq.com/news/2025/12/vitest-4-browser-mode)
+- [Vitest browser mode](https://vitest.dev/guide/browser/)
 - [Vitest visual testing (Argos)](https://argos-ci.com/blog/vitest-visual-testing)
 - [Canvas and WebGL testing with Playwright](https://github.com/testdino-hq/playwright-skill/blob/main/core/canvas-and-webgl.md)
 - [Playwright clock](https://qaskills.sh/blog/playwright-clock-install-fakers-guide)
