@@ -79,6 +79,9 @@ How the repository is hosted, laid out, licensed, and worked in.
 - **pnpm:** pinned with the `packageManager` field in `package.json`.
 - Dependency versions are locked by `pnpm-lock.yaml`; CI installs with a frozen lockfile.
 - Project tooling (build, lint, test, dev servers, browsers) is installed in this repo and run through pnpm scripts or `pnpm exec`. Do not install it globally. The OpenSpec CLI is the exception: it is installed globally, outside this repo, and is not a `package.json` dependency.
+  - Use `pnpm`, not `npm` or `npx`. npm refuses to run in this repo because `devEngines` is set.
+  - Run tests and browsers through the pnpm scripts (`pnpm test`, `pnpm test:e2e`, `pnpm browsers:install`). They set `PLAYWRIGHT_BROWSERS_PATH=0` so Chromium installs inside `node_modules`. Do not run `playwright` or `vitest` directly through `pnpm exec` for browser work.
+  - Hermetic is a guideline, not an audit. Install through pnpm into this repo and don't install tools globally. Don't scan or inventory the home directory.
 
 ## Scripts
 
