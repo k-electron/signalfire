@@ -1,0 +1,13 @@
+pre-commit:
+  jobs:
+    - name: biome
+      priority: 1
+      stage_fixed: true
+      run: pnpm exec biome check --write --staged --no-errors-on-unmatched
+    - name: typecheck
+      priority: 2
+      run: pnpm typecheck
+commit-msg:
+  jobs:
+    - name: conventional
+      run: pnpm exec node tools/check-commit-msg.mjs {1}

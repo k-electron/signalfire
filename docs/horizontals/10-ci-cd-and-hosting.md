@@ -30,7 +30,7 @@ Runs on every pull request and on every push to `main`.
 | End-to-end | `pnpm test:e2e` against the production build | yes |
 | Pull request title | Conventional Commits format | yes |
 
-- Node version comes from `.nvmrc`; pnpm from the `packageManager` field.
+- Node version comes from `devEngines.runtime` in `package.json`; pnpm from the `packageManager` field.
 - The pnpm store and Playwright browsers are cached between runs.
 - Branch protection on `main` requires all checks above and Karim's approval (constitution C3).
 

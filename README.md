@@ -37,14 +37,14 @@ Start with the philosophy, then the [constitution](docs/horizontals/01-constitut
 
 ## Run locally
 
-Requires Node (version in `.nvmrc`) and pnpm (version in `package.json`).
+Requires Node (pinned by `devEngines.runtime` in `package.json`) and pnpm (pinned by `packageManager` in `package.json`).
 
 ```
 pnpm install
 pnpm dev
 ```
 
-`pnpm check` runs everything CI runs. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
+`pnpm check` runs typecheck, lint, and build. Later tasks add tests, content checks, and end-to-end tests. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
 
 ## Contributing
 

@@ -1,0 +1,6 @@
+storeDir: .pnpm-store
+cacheDir: .pnpm-cache
+strictDepBuilds: true
+minimumReleaseAge: 1440
+allowBuilds:
+  lefthook: true

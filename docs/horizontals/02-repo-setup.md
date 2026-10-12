@@ -60,26 +60,29 @@ How the repository is hosted, laid out, licensed, and worked in.
 ├── .agents/                  OpenSpec skills and workflows; .openspec-target names the owner
 ├── .claude/                  Claude Code slash commands and OpenSpec skills
 ├── .cursor/                  Cursor slash commands and OpenSpec skills
+├── .gitignore
+├── index.html
 ├── package.json
 ├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
 ├── tsconfig.json
 ├── vite.config.ts
 ├── biome.json
 ├── lefthook.yml
-└── .nvmrc
 ```
 
 `content/` is separate from `src/` so game data can be validated, reviewed, and edited without touching code.
 
 ## Toolchain pins
 
-- **Node:** the current Active LTS (Node 24 at time of writing), pinned in `.nvmrc` and `engines`.
+- **Node:** Node 26, pinned with `devEngines.runtime` in `package.json` (`onFail: download`), so pnpm downloads that runtime for the project. The [Node.js release schedule](https://github.com/nodejs/Release/blob/main/README.md) starts Active LTS for Node 26 on 2026-10-28.
 - **pnpm:** pinned with the `packageManager` field in `package.json`.
 - Dependency versions are locked by `pnpm-lock.yaml`; CI installs with a frozen lockfile.
+- Project tooling (build, lint, test, dev servers, browsers) is installed in this repo and run through pnpm scripts or `pnpm exec`. Do not install it globally. The OpenSpec CLI is the exception: it is installed globally, outside this repo, and is not a `package.json` dependency.
 
 ## Scripts
 
-Agents and humans use the same commands. `AGENTS.md` lists them.
+Agents and humans use the same commands. `AGENTS.md` lists them. `test`, `test:e2e`, `content:check`, `content:words`, `content:hash`, `tokens`, and `ladle` arrive with later tasks.
 
 | Script | Does |
 |---|---|
@@ -89,14 +92,7 @@ Agents and humans use the same commands. `AGENTS.md` lists them.
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | Biome lint and format check |
 | `pnpm format` | Biome format and safe fixes |
-| `pnpm test` | Unit and integration tests |
-| `pnpm test:e2e` | End-to-end tests |
-| `pnpm content:check` | Content validators (keys, blocklist, coverage) |
-| `pnpm content:words` | Build candidate word lists from SCOWL |
-| `pnpm content:hash` | Print level content hashes |
-| `pnpm tokens` | Regenerate CSS variables from design tokens |
-| `pnpm ladle` | Component workbench |
-| `pnpm check` | Everything CI runs, in one command |
+| `pnpm check` | Typecheck, lint, and build |
 
 ## TypeScript settings
 
@@ -111,7 +107,7 @@ Beyond `strict`:
 
 ## Biome settings
 
-- Recommended rule set, with `noExplicitAny` as an error (constitution C5).
+- Recommended rule set (`preset` set to `recommended`), with `noExplicitAny` as an error (constitution C5).
 - Biome's default formatting (no custom style debates).
 - Import sorting on.
 
@@ -158,13 +154,12 @@ Conventional Commits: `type(scope): summary`.
 
 ### Hooks (Lefthook)
 
-| Hook | Runs (in parallel) |
+| Hook | Runs |
 |---|---|
-| `pre-commit` | Biome check with safe fixes on staged files; typecheck |
+| `pre-commit` | Biome check with safe fixes on staged files, then typecheck |
 | `commit-msg` | Conventional Commits format check |
-| `pre-push` | Unit tests |
 
-Hooks are a fast local safety net. CI is the authority.
+`pre-push` (unit tests) arrives with task 0.2. Hooks are a fast local safety net. CI is the authority.
 
 ## Agent files
 
