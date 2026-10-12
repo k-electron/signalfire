@@ -10,7 +10,7 @@ test("harness smoke: heading is visible", async () => {
 	const root = createRoot(container);
 	root.render(<App />);
 	await expect
-		.element(page.getByRole("heading", { name: "Not Signalfire" }))
+		.element(page.getByRole("heading", { name: "Signalfire" }))
 		.toBeVisible();
 	root.unmount();
 });
