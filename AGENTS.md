@@ -82,7 +82,7 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 | `pnpm build` | Production build |
 | `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` / `pnpm format` | Biome check / Biome fix |
+| `pnpm lint` / `pnpm format` | Biome check, then the layer-boundary fixture proof / Biome fix |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |
 | `pnpm test <pattern>` | Run matching tests only |
@@ -103,7 +103,7 @@ Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. 
 ## Code rules
 
 - TypeScript strict. No `any`. No `@ts-ignore`. `@ts-expect-error` only with a comment giving the reason and a link to an issue or decision record.
-- Layers: `src/core` imports only itself and Zod. `src/engine` and `src/platform` import `core`. `src/app` imports everything. CI enforces this.
+- Layers: `src/core` imports only itself, Zod, and verzod. `src/engine` and `src/platform` import only `core` from `src`. `src/engine` does not import React or stores. `src/app` imports `core`, `engine`, and `platform`. The dependency-boundary check enforces this.
 - `src/core` is pure and deterministic: no DOM, timers, `Math.random`, `Date.now`, or `performance.now`.
 - React never runs per frame or holds simulation state.
 - Validate all data from storage, cloud, or content files with Zod.

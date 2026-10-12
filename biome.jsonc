@@ -1,0 +1,350 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["**", "!tools/layer-boundaries/fixtures"]
+	},
+	"formatter": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"suspicious": {
+				"noExplicitAny": "error"
+			}
+		}
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["src/core/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											":PACKAGE:",
+											":NODE:",
+											":PACKAGE_WITH_PROTOCOL:",
+											":BUN:",
+											":URL:",
+											":ALIAS:",
+											"!zod",
+											"!zod/**",
+											"!verzod",
+											"!verzod/**"
+										],
+										"message": "core may import only core, zod, and verzod."
+									},
+									{
+										"group": [
+											"./**/app",
+											"./**/app/**",
+											"../**/app",
+											"../**/app/**",
+											"./**/engine",
+											"./**/engine/**",
+											"../**/engine",
+											"../**/engine/**",
+											"./**/platform",
+											"./**/platform/**",
+											"../**/platform",
+											"../**/platform/**",
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "core may not import another layer or a src-root module."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		// Test overrides repeat the path group. A later `patterns` array replaces the earlier one.
+		{
+			"includes": ["src/core/**/*.test.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											":PACKAGE:",
+											":NODE:",
+											":PACKAGE_WITH_PROTOCOL:",
+											":BUN:",
+											":URL:",
+											":ALIAS:",
+											"!zod",
+											"!zod/**",
+											"!verzod",
+											"!verzod/**",
+											"!vitest",
+											"!fast-check",
+											"!@fast-check/vitest"
+										],
+										"message": "core tests may import zod, verzod, vitest, fast-check, and @fast-check/vitest."
+									},
+									{
+										"group": [
+											"./**/app",
+											"./**/app/**",
+											"../**/app",
+											"../**/app/**",
+											"./**/engine",
+											"./**/engine/**",
+											"../**/engine",
+											"../**/engine/**",
+											"./**/platform",
+											"./**/platform/**",
+											"../**/platform",
+											"../**/platform/**",
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "core may not import another layer or a src-root module."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/core/**/*.browser.test.tsx"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											":PACKAGE:",
+											":NODE:",
+											":PACKAGE_WITH_PROTOCOL:",
+											":BUN:",
+											":URL:",
+											":ALIAS:",
+											"!zod",
+											"!zod/**",
+											"!verzod",
+											"!verzod/**",
+											"!vitest",
+											"!vitest/browser",
+											"!fast-check",
+											"!@fast-check/vitest"
+										],
+										"message": "core browser tests may also import vitest/browser."
+									},
+									{
+										"group": [
+											"./**/app",
+											"./**/app/**",
+											"../**/app",
+											"../**/app/**",
+											"./**/engine",
+											"./**/engine/**",
+											"../**/engine",
+											"../**/engine/**",
+											"./**/platform",
+											"./**/platform/**",
+											"../**/platform",
+											"../**/platform/**",
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "core may not import another layer or a src-root module."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/engine/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"react",
+											"react/**",
+											"react-dom",
+											"react-dom/**",
+											"zustand",
+											"zustand/**",
+											"xstate",
+											"xstate/**"
+										],
+										"message": "engine may not import react, react-dom, zustand, or xstate."
+									},
+									{
+										"group": [
+											"./**/app",
+											"./**/app/**",
+											"../**/app",
+											"../**/app/**",
+											"./**/platform",
+											"./**/platform/**",
+											"../**/platform",
+											"../**/platform/**",
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "engine may import only core from src."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/platform/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"./**/app",
+											"./**/app/**",
+											"../**/app",
+											"../**/app/**",
+											"./**/engine",
+											"./**/engine/**",
+											"../**/engine",
+											"../**/engine/**",
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "platform may import only core from src."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/app/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"./**/main",
+											"./**/main.*",
+											"../**/main",
+											"../**/main.*",
+											"./**/harness-smoke.test",
+											"./**/harness-smoke.test.*",
+											"../**/harness-smoke.test",
+											"../**/harness-smoke.test.*",
+											"./**/harness-smoke.property.test",
+											"./**/harness-smoke.property.test.*",
+											"../**/harness-smoke.property.test",
+											"../**/harness-smoke.property.test.*"
+										],
+										"message": "app may not import a src-root module."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

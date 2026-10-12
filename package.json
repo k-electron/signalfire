@@ -16,7 +16,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"typecheck": "tsc --noEmit",
-		"lint": "biome check",
+		"lint": "biome check && node tools/layer-boundaries/check-fixtures.mjs",
 		"format": "biome check --write",
 		"test": "PLAYWRIGHT_BROWSERS_PATH=0 vitest run",
 		"test:unit": "vitest run --project unit",

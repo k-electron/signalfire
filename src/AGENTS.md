@@ -1,6 +1,6 @@
 # src
 
-Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports everything; `engine` and `platform` import only `core`; `core` imports only itself and Zod. CI enforces this.
+Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports `core`, `engine`, and `platform`; `engine` and `platform` import only `core` from `src`; `engine` does not import React or stores; `core` imports only itself, Zod, and verzod. The dependency-boundary check enforces this.
 
 ## core
 
