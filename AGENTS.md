@@ -79,9 +79,14 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 | `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` / `pnpm format` | Biome check / Biome fix |
-| `pnpm check` | Typecheck, lint, and build |
+| `pnpm test` | Vitest Node and browser projects |
+| `pnpm test:unit` | Vitest Node project (pre-push) |
+| `pnpm test -- <pattern>` | Run matching tests only |
+| `pnpm browsers:install` | Install Chromium inside the repo |
+| `pnpm test:e2e` | Playwright against the production build |
+| `pnpm check` | Typecheck, lint, test, and build |
 
-`test`, `test:e2e`, `content:check`, `tokens`, and `ladle` arrive with later tasks.
+Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check`, `tokens`, and `ladle` arrive with later tasks.
 
 ## Before you say "done"
 
@@ -102,7 +107,7 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 - IDs (`level:2.4`, `char:e`, `medal:flawless`) are permanent: never rename or reuse them.
 - Never lose player progress: no change may remove stars, medals, mods, or Keylings.
 - IMPORTANT: typing data (keystrokes, timings, WPM, accuracy) never leaves the device except to the player's own Puter account. Don't add network destinations.
-- Files and folders kebab-case; components PascalCase; tests `*.test.ts` next to the code.
+- Files and folders kebab-case; components PascalCase; logic tests `*.test.ts` and component tests `*.browser.test.tsx`, next to the code. End-to-end tests are `e2e/*.spec.ts`.
 
 ## Tests
 

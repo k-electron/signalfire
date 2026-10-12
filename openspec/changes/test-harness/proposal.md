@@ -40,11 +40,12 @@ The working tree this proposal was written from is one commit behind `origin/mai
 | `vitest` | 5.0.3 | 2026-09-30 | MIT |
 | `@vitest/browser-playwright` | 5.0.3 | 2026-09-30 | MIT |
 | `playwright` | 1.64.0 | 2026-10-07 | Apache-2.0 |
+| `playwright-core` | 1.64.0 | 2026-10-07 | Apache-2.0 |
 | `@playwright/test` | 1.64.0 | 2026-10-07 | Apache-2.0 |
 | `fast-check` | 4.10.2 | 2026-09-19 | MIT |
 | `@fast-check/vitest` | 0.5.0 | 2026-09-11 | MIT |
 
-`vitest` 5.0.3 engines are `^22.12.0 || ^24.0.0 || >=26.0.0`, which accepts the pinned Node 26. It peers Vite `^6.4.0 || ^7.0.0 || ^8.0.0` (this repo has Vite 8.3.4). Vite is a peer of Vitest 5, not a dependency of it, and this repo already depends on Vite. `@fast-check/vitest` 0.5.0 peers Vitest `^4.1.0 || ^5.0.0` and depends on fast-check `^3 || ^4`. `@vitest/browser-playwright` 5.0.3 peers `vitest@5.0.3` and `playwright: *`. Playwright 1.64.0 engines are `node: >=20`. The registry documents no lifecycle `scripts` on `playwright@1.64.0` or `playwright-core@1.64.0`. Apply still confirms `pnpm install` does not need a new `allowBuilds` entry. If it does, the pull request names the package and why. Do not allow a Playwright postinstall to download browsers; `pnpm browsers:install` is the only download.
+`vitest` 5.0.3 engines are `^22.12.0 || ^24.0.0 || >=26.0.0`, which accepts the pinned Node 26. It peers Vite `^6.4.0 || ^7.0.0 || ^8.0.0` (this repo has Vite 8.3.4). Vite is a peer of Vitest 5, not a dependency of it, and this repo already depends on Vite. `@fast-check/vitest` 0.5.0 peers Vitest `^4.1.0 || ^5.0.0` and depends on fast-check `^3 || ^4`. `@vitest/browser-playwright` 5.0.3 peers `vitest@5.0.3` and `playwright: *`. `playwright-core` is a direct dependency at the same version as `playwright`, because pnpm does not hoist it and the browser binaries have to land at `node_modules/playwright-core/.local-browsers`. Playwright 1.64.0 engines are `node: >=20`. The registry documents no lifecycle `scripts` on `playwright@1.64.0` or `playwright-core@1.64.0`. Apply still confirms `pnpm install` does not need a new `allowBuilds` entry. If it does, the pull request names the package and why. Do not allow a Playwright postinstall to download browsers; `pnpm browsers:install` is the only download.
 
 ## Principles served
 

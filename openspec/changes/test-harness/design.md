@@ -65,7 +65,7 @@ Apply reads the `pnpm install` log. If `ERR_PNPM_IGNORED_BUILDS` names a package
 
 ### Hermetic browser path
 
-Playwright's hermetic install (`PLAYWRIGHT_BROWSERS_PATH=0`) writes to `node_modules/playwright-core/.local-browsers`. The path is read when a browser launches, and `playwright install` reads it from the environment. It does not read our Playwright config.
+Playwright's hermetic install (`PLAYWRIGHT_BROWSERS_PATH=0`) writes to `node_modules/playwright-core/.local-browsers`. pnpm does not hoist a transitive `playwright-core`, so that package is also a direct dev dependency at the same version as `playwright`. The browsers then sit on the path the spec names. The path is read when a browser launches, and `playwright install` reads it from the environment. It does not read our Playwright config.
 
 Set the variable in three places:
 

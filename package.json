@@ -18,7 +18,11 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check",
 		"format": "biome check --write",
-		"check": "pnpm typecheck && pnpm lint && pnpm build"
+		"test": "PLAYWRIGHT_BROWSERS_PATH=0 vitest run",
+		"test:unit": "vitest run --project unit",
+		"browsers:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
+		"test:e2e": "pnpm build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+		"check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
 	},
 	"dependencies": {
 		"react": "19.3.0",
@@ -26,11 +30,18 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
+		"@fast-check/vitest": "0.5.0",
+		"@playwright/test": "1.64.0",
 		"@types/react": "19.3.0",
 		"@types/react-dom": "19.3.0",
 		"@vitejs/plugin-react": "6.1.2",
+		"@vitest/browser-playwright": "5.0.3",
+		"fast-check": "4.10.2",
 		"lefthook": "2.2.1",
+		"playwright": "1.64.0",
+		"playwright-core": "1.64.0",
 		"typescript": "7.0.2",
-		"vite": "8.3.4"
+		"vite": "8.3.4",
+		"vitest": "5.0.3"
 	}
 }

@@ -11,3 +11,7 @@ commit-msg:
   jobs:
     - name: conventional
       run: pnpm exec node tools/check-commit-msg.mjs {1}
+pre-push:
+  jobs:
+    - name: unit
+      run: pnpm test:unit
