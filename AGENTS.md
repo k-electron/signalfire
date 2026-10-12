@@ -65,21 +65,23 @@ Never push to `main`, merge your own pull request, force-push shared branches, o
 - **Decide yourself** on implementation details. List every assumption in the proposal or pull request.
 - **Never invent** facts, APIs, library behavior, or numbers. Check the source or docs. If you can't verify something, say so.
 
+## Toolchain
+
+Project tooling (build, lint, test, dev servers, browsers) is installed in this repo and run through pnpm scripts or `pnpm exec`. Do not install it globally. The OpenSpec CLI is the exception: it is installed globally, outside this repo, and is not a `package.json` dependency.
+
 ## Commands
 
 | Command | Does |
 |---|---|
 | `pnpm install` | Install (CI uses `--frozen-lockfile`) |
-| `pnpm dev` | Dev server with debug tools |
-| `pnpm check` | Everything CI runs: typecheck, lint, tests, content checks, build |
+| `pnpm dev` | Dev server |
+| `pnpm build` | Production build |
+| `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` / `pnpm format` | Biome check / Biome fix |
-| `pnpm test` | Vitest (logic in Node, components in browser mode) |
-| `pnpm test -- <pattern>` | Run matching tests only |
-| `pnpm test:e2e` | Playwright end-to-end |
-| `pnpm content:check` | Validate all content |
-| `pnpm tokens` | Regenerate CSS from design tokens |
-| `pnpm ladle` | Component workbench |
+| `pnpm check` | Typecheck, lint, and build |
+
+`test`, `test:e2e`, `content:check`, `tokens`, and `ladle` arrive with later tasks.
 
 ## Before you say "done"
 

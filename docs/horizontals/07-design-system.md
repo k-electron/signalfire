@@ -28,7 +28,7 @@ src/core/theme/tokens.ts ──build step──▶ src/app/theme/tokens.css
 ```
 
 - `tokens.ts` is the only place colors, radii, shadows, and motion values are defined.
-- `pnpm tokens` regenerates `tokens.css`; it also runs in `pnpm dev` and `pnpm build`.
+- `pnpm tokens` regenerates `tokens.css`. Once the token generator exists, `pnpm dev` and `pnpm build` run it. The Stage 0 scaffold does not include that step.
 - No component or renderer hardcodes a color or duration.
 
 ## Color tokens
