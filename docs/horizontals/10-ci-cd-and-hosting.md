@@ -91,13 +91,14 @@ Cloudflare Web Analytics was considered; it counts page views only and has no cu
 ### Player control
 
 - Settings → Data shows exactly which events are counted, with a switch to turn counting off.
-- The privacy note links to this list.
+- Once analytics is counting, the privacy note links to this list. Until then, the README note only says typing data stays on the device.
 
 ## Bug reports
 
 - Settings → Data → **Export bug report** downloads one file with recent errors, the most recent run logs, and the player's documents.
 - The file is never uploaded automatically. The player attaches it to a GitHub issue using the bug-report template (Repo Setup horizontal).
 - A run log in a bug report can be replayed exactly in the Level Lab (Dev Tooling horizontal).
+- Until Settings → Data → Export bug report exists, the bug-report template takes a written report. A file attachment is optional.
 
 ## Open question
 

@@ -1,0 +1,19 @@
+# Tasks
+
+## 1. Templates and pages
+
+- [x] 1.1 Branch `change/contribution-files` from current `main`. Add `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/01-bug-report.yml`, `.github/ISSUE_TEMPLATE/02-idea.yml`, and `.github/ISSUE_TEMPLATE/03-typing-content-report.yml` from design.md. Verify the pull request template has the six headings (OpenSpec change, Constitution check, Test evidence, Visual evidence, Docs updated, Assumptions) and tells a C1 exemption to write `none`. Verify the bug form requires What happened, What did you expect, and Steps to reproduce, asks for Browser with `required: false`, and has no `upload` field. Verify the idea form requires only What is the idea, and Why would this help is `required: false`. Verify the typing-content form requires Word or phrase and a dropdown whose options are Offensive, Wrong, and Both, asks Where did it appear with `required: false`, and sets no `labels`. Verify there is no `.github/ISSUE_TEMPLATE/config.yml`.
+- [x] 1.2 Add `CONTRIBUTING.md` from design.md. Verify it says outside pull requests are not accepted until Roadmap stage 2 exits, because the walking skeleton is not in place and that is when the OpenSpec flow opens, and that it links `01-bug-report.yml`, `02-idea.yml`, and `03-typing-content-report.yml`.
+- [x] 1.3 Update the README Status, Contributing, Privacy, and License sections from design.md. Leave the opening, Play, How this project is built, and Run locally. Verify Status says pre-alpha and that Stage 0 has not exited; Contributing names bug reports, ideas, and typing-content reports, says outside pull requests are not accepted yet, and links `CONTRIBUTING.md`; Privacy says typing data stays on the device; License says MIT, covering code and game content, and that the name is not covered. Verify the README no longer tells people to use Export bug report, no longer says the game counts anonymous events, no longer says Discussions are open, and no longer links `THIRD_PARTY_NOTICES.md`.
+- [x] 1.4 Update `docs/horizontals/02-repo-setup.md` and `docs/horizontals/10-ci-cd-and-hosting.md` from design.md. Verify the Contributions decision cell, the Now bullet, and the last three README bullets in horizontal 02. Verify horizontal 10's privacy-note sentence and the new bug-report sentence. Do not edit `docs/ROADMAP.md`, `AGENTS.md`, or `LICENSE`. Do not add `THIRD_PARTY_NOTICES.md`.
+
+## 2. Pull request
+
+- [ ] 2.1 Push `change/contribution-files` and open the pull request with title `docs(repo): add contribution templates`. Write the body by hand: OpenSpec link, constitution check, test evidence `none` (not a logic domain; no Vitest test and no playtest checklist), visual evidence `none`, docs updated, and the proposal assumptions. Say the GitHub render check waits until these files are on `main`. Verify the existing CI checks pass.
+- [ ] 2.2 Ask a fresh-context agent that did not write the files to review the diff against this change, horizontals 02 and 10, and the constitution. Verify each finding is fixed or answered in the pull request.
+
+## Workflow follow-up
+
+- Archive this change (`/opsx:archive`) on the branch after Karim's review requirements are satisfied and before the squash-merge, so the delta lands in `openspec/specs/contribution-intake/`.
+- Leave `docs/ROADMAP.md` status "Not started".
+- After the squash-merge, open these URLs and do not submit them: `https://github.com/k-electron/signalfire/issues/new?template=01-bug-report.yml`, the same path with `02-idea.yml`, and the same path with `03-typing-content-report.yml`. Confirm the fields in `specs/contribution-intake/spec.md`. From a scratch branch off `main`, open a draft pull request titled `docs(repo): template check`, confirm the six headings, close it, and delete the branch. Comment that result on the merged pull request.
