@@ -1,0 +1,211 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  install:
+    name: Install
+    if: github.event_name == 'push' || github.event.action != 'edited'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check Node runtime
+        run: |
+          set -euo pipefail
+          locked="$(node -e '
+            const fs = require("fs");
+            const text = fs.readFileSync("pnpm-lock.yaml", "utf8");
+            const versions = new Set();
+            for (const line of text.split("\n")) {
+              const match = /^  node@runtime:([^:]+):$/.exec(line);
+              if (match) versions.add(match[1]);
+            }
+            if (versions.size !== 1) {
+              console.error("expected one node@runtime package, found " + [...versions].join(", "));
+              process.exit(1);
+            }
+            process.stdout.write([...versions][0]);
+          ')"
+          actual="$(pnpm exec node --version)"
+          actual="${actual#v}"
+          actual="${actual//$'\n'/}"
+          if [[ "$actual" != "$locked" ]]; then
+            echo "node $actual does not match lockfile node@runtime:$locked" >&2
+            exit 1
+          fi
+          exec_path="$(pnpm exec node -p "process.execPath")"
+          case "$exec_path" in
+            "$GITHUB_WORKSPACE"/node_modules/*) ;;
+            *)
+              echo "node execPath is outside workspace node_modules: $exec_path" >&2
+              exit 1
+              ;;
+          esac
+          echo "node $actual at $exec_path"
+      - name: Install Chromium
+        run: |
+          set -euo pipefail
+          pnpm browsers:install
+          if [[ ! -d node_modules/playwright-core/.local-browsers ]] || [[ -z "$(ls -A node_modules/playwright-core/.local-browsers)" ]]; then
+            echo "Chromium is missing under node_modules/playwright-core/.local-browsers" >&2
+            exit 1
+          fi
+
+  types:
+    name: Types
+    needs: install
+    if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+
+  lint:
+    name: Lint
+    needs: install
+    if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+
+  tests:
+    name: Tests
+    needs: install
+    if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm browsers:install
+      - name: Test
+        run: pnpm test
+
+  build:
+    name: Build
+    needs: install
+    if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+
+  e2e:
+    name: End-to-end
+    needs: [install, build]
+    if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/pnpm
+      - uses: actions/cache@v6
+        with:
+          path: |
+            .pnpm-store
+            node_modules/playwright-core/.local-browsers
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+          fail-on-cache-miss: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm browsers:install
+      - name: End-to-end
+        run: pnpm test:e2e
+
+  title:
+    name: Pull request title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check pull request title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$TITLE" > "$RUNNER_TEMP/pr-title.txt"
+          node tools/check-commit-msg.mjs "$RUNNER_TEMP/pr-title.txt"
