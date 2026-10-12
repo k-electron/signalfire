@@ -14,7 +14,7 @@
 - [x] 2.1 The pull request is https://github.com/k-electron/signalfire/pull/9. The Worker is named `signalfire`. Build command is `pnpm build`. Deploy command is `pnpm exec wrangler deploy`, not `npx wrangler deploy`. `PNPM_VERSION` is `12.11.2` for production and preview. Verify the pull request has a Workers preview URL.
 - [x] 2.2 On that preview, verify the build log shows pnpm `12.11.2` and Node `26.11.1`. Request `/` and one file under `/assets/`. Verify `/` shows Signalfire and no other visible text, and the response matches the static-hosting document scenario (`Content-Security-Policy` with `default-src 'self'`, `script-src 'self'`, `style-src 'self'`, and `connect-src 'self'`; `X-Content-Type-Options: nosniff`; `Referrer-Policy: no-referrer`; `Permissions-Policy` disabling camera, microphone, and geolocation; `Cache-Control: no-cache`). Verify the asset `Cache-Control` is `public, max-age=31536000, immutable`. Record the preview URL and the header output in the pull request. Do not use `vite preview` as the header check. Do not fill the playtest checklist.
 - [x] 2.3 Set Stage 0 status to Done in `docs/ROADMAP.md`. Verify that status cell is Done.
-- [ ] 2.4 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 10, the constitution, and `openspec/specs/ci-pipeline` and `hermetic-toolchain`. Verify each finding is fixed or answered in the pull request.
+- [x] 2.4 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 10, the constitution, and `openspec/specs/ci-pipeline` and `hermetic-toolchain`. Verify each finding is fixed or answered in the pull request.
 
 ## Workflow follow-up
 

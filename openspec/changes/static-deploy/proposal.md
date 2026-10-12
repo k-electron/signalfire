@@ -21,13 +21,13 @@ Stage 0 is not done until a merge to `main` deploys the empty page. CI is alread
 
 ### Modified Capabilities
 
-- None. `ci-pipeline` and `hermetic-toolchain` keep their requirements. This change uses the pins and the `pnpm build` script they already define.
+- `contribution-intake`: the README status section says Stage 0 has exited. It stays pre-alpha. The play section still says the game is not deployed yet.
 
 ## Impact
 
 - New: `public/_headers`, a same-origin stylesheet linked from `index.html`, `wrangler.jsonc`.
 - Dev dependency: `wrangler@4.149.0`. Its install needs `esbuild` and `workerd` build scripts, allowed in `pnpm-workspace.yaml`.
-- Edited: `index.html`, `docs/horizontals/10-ci-cd-and-hosting.md`, `docs/ROADMAP.md`.
+- Edited: `index.html`, `docs/horizontals/10-ci-cd-and-hosting.md`, `docs/ROADMAP.md`, `README.md`.
 - Dashboard, not files: the Pages project, the Git connection, production branch `main`, build command, output directory, and `PNPM_VERSION`.
 - Unchanged: GitHub Actions, Dependabot, `package.json` pins, Vite config.
 - No new runtime dependency. `wrangler` is a dev dependency.

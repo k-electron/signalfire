@@ -13,11 +13,11 @@ Built for desktop and laptop computers with a US QWERTY keyboard.
 
 ## Play
 
-Not deployed yet. The game will be hosted on Cloudflare Pages; the link will appear here.
+Not deployed yet. The game will be hosted on Cloudflare Workers; the link will appear here.
 
 ## Status
 
-Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) has not exited.
+Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) has exited.
 
 ## How this project is built
 
