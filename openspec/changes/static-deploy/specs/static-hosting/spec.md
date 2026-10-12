@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Cloudflare Pages serves the built app from `main`, gives each pull request a preview URL, and sends the security and cache headers.
+Cloudflare Workers serves the built app from `main`, gives each pull request a preview URL, and sends the security and cache headers.
 
 ## ADDED Requirements
 
@@ -44,7 +44,7 @@ A built file under `/assets/` SHALL be cached for one year and marked immutable.
 
 ### Requirement: The build uses the pinned pnpm and Node
 
-A Pages build SHALL run on pnpm 12.11.2 and Node 26.11.1.
+A Cloudflare build SHALL run on pnpm 12.11.2 and Node 26.11.1.
 
 #### Scenario: A preview build runs
 

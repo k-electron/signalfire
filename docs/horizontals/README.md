@@ -13,4 +13,4 @@ Cross-cutting foundations that connect the verticals. Each one becomes a develop
 | 07 | [Design System](07-design-system.md) | Token pipeline, colors, fonts, motion, components, Ladle |
 | 08 | [Testing and Dev Practices](08-testing-and-dev-practices.md) | Outcome-based testing, fast-check, e2e, feel evidence, workflow, definition of done |
 | 09 | [Dev Tooling](09-dev-tooling.md) | Debug overlay, command palette, Level Lab, Tweakpane, content scripts, agent hook |
-| 10 | [CI/CD and Hosting](10-ci-cd-and-hosting.md) | GitHub Actions, Cloudflare Pages, releases, analytics, bug reports |
+| 10 | [CI/CD and Hosting](10-ci-cd-and-hosting.md) | GitHub Actions, Cloudflare Workers, releases, analytics, bug reports |

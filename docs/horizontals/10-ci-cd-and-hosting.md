@@ -6,7 +6,7 @@ How changes are checked, deployed, released, and observed.
 
 | Topic | Decision |
 |---|---|
-| Hosting | Cloudflare Pages, connected directly to the GitHub repo |
+| Hosting | Cloudflare Workers static assets, connected directly to the GitHub repo |
 | Deploys | Cloudflare builds and deploys every merge to `main`; every pull request branch gets a preview URL |
 | CI | GitHub Actions runs every blocking check on every pull request and every push to main, including end-to-end tests. Pending rows are not run. |
 | Releases | Continuous deploy from `main`, plus periodic semver tags with release notes from Conventional Commits |
@@ -33,9 +33,10 @@ Runs on every pull request and on every push to `main`.
 - The pnpm store and Playwright browsers are cached between runs.
 - Branch protection on `main` requires every check in this table that blocks merge, and Karim's approval (constitution C3). Pending rows are not required until a later change adds their commands to the workflow.
 
-## Hosting (Cloudflare Pages)
+## Hosting (Cloudflare Workers)
 
-- Connected to the GitHub repo through Cloudflare's Git integration. Cloudflare builds with `pnpm build` and serves `dist/`. The Pages project sets `PNPM_VERSION` from `packageManager`, and Node is the `devEngines.runtime` lockfile entry.
+- Connected to the GitHub repo through Cloudflare's Git integration. The build command is `pnpm build`. The deploy command is `pnpm exec wrangler deploy`. `wrangler.jsonc` uploads `dist/`.
+- `PNPM_VERSION` is the `packageManager` version. Node for project commands is the `devEngines.runtime` lockfile entry. The deploy command goes through pnpm, because `npx` uses npm, and npm rejects `devEngines.runtime` when the build image's Node is older than that pin.
 - **Production:** the `main` branch. Because `main` only accepts merges that passed CI and review, every production deploy has passed every check.
 - **Previews:** every pull request branch gets its own URL, posted on the pull request. Agents use it for screenshots and recordings; Karim uses it to play changes before merge (Testing horizontal).
 - No server code and no environment secrets: the game is fully static, and puter.js runs in the browser.
