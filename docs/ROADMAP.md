@@ -15,7 +15,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 
 | # | Stage | Status |
 |---|---|---|
-| 0 | Scaffold | Not started |
+| 0 | Scaffold | Done |
 | 1 | Core foundations | Not started |
 | 2 | Walking skeleton | Not started |
 | 3 | Thin pass across every system | Not started |
