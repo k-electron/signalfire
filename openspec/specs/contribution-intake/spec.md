@@ -71,12 +71,12 @@ The README play section SHALL say the game is not deployed yet.
 
 ### Requirement: The README states Stage 0
 
-The README status section SHALL say the project is pre-alpha and that Stage 0 has not exited.
+The README status section SHALL say the project is pre-alpha and that Stage 0 has exited.
 
 #### Scenario: A visitor reads the status
 
 - **WHEN** a visitor reads the README status section
-- **THEN** it says pre-alpha and that Stage 0 has not exited
+- **THEN** it says pre-alpha and that Stage 0 has exited
 
 ### Requirement: The README says how the project is built
 
