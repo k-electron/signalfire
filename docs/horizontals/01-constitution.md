@@ -1,6 +1,6 @@
 # Horizontal 01: Constitution
 
-**Version 1.2.0 · Amended 2026-10-11**
+**Version 1.3.0 · Amended 2026-10-12**
 
 The rules for how this project is built. [PHILOSOPHY.md](../PHILOSOPHY.md) defines what we build and why; this document defines how. Every OpenSpec proposal, task, and pull request must comply.
 
@@ -59,7 +59,9 @@ Logic is built test-first: tests are written and failing before the implementati
 - data model migrations
 - persistence and sync
 
-Every scenario in an OpenSpec spec maps to at least one test.
+Every scenario in a logic-domain spec maps to at least one test.
+
+Tooling, CI, and docs are checked by running the command. A green run is the evidence. A scratch commit is for a bug under fix. Do not add a test or a scratch commit whose only job is to prove something was not done.
 
 **Visual and game-feel work** (rendering, effects, animation, audio, layout) is verified by a playtest checklist and screenshots or recordings attached to the pull request, not by unit tests.
 
@@ -130,6 +132,9 @@ rules:
     - Include a "Constitution check" confirming C1–C10.
   specs:
     - Requirements use SHALL; every requirement has WHEN/THEN scenarios.
+    - State what the command or the player does. Out of scope stays in the proposal.
+    - Do not add a SHALL NOT requirement, or a scenario whose only check is that a job, file, or directory is missing.
+    - For tooling and CI, one happy-path scenario per command.
   tasks:
     - For logic domains, test tasks come before implementation tasks.
     - Visual and feel tasks end with a playtest-checklist task.

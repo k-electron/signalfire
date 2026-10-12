@@ -71,7 +71,7 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 
 - Use `pnpm`, not `npm` or `npx`. npm refuses to run in this repo because `devEngines` is set.
 - Run tests and browsers through the pnpm scripts (`pnpm test`, `pnpm test:e2e`, `pnpm browsers:install`). They set `PLAYWRIGHT_BROWSERS_PATH=0` so Chromium installs inside `node_modules`. Do not run `playwright` or `vitest` directly through `pnpm exec` for browser work.
-- Hermetic is a guideline, not an audit. Install through pnpm into this repo and don't install tools globally. Don't scan or inventory the home directory.
+- Hermetic is a guideline, not an audit. Install through pnpm into this repo and don't install tools globally. Checking the path the script wrote is enough. Don't scan or inventory the home directory, global caches, or PATH.
 
 ## Commands
 
@@ -95,7 +95,7 @@ Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. 
 ## Before you say "done"
 
 - `pnpm check` passes. Paste the relevant output; don't just claim it passed.
-- Every OpenSpec scenario you implemented has a passing test.
+- Every logic-domain scenario you implemented has a passing test. Tooling and CI scenarios have one green run of the command.
 - Visual or feel changes: attach screenshots or a recording (preview URL or local run) and the filled playtest checklist from `docs/horizontals/08-testing-and-dev-practices.md`.
 - Docs, specs, config, and `tasks.md` match the code.
 - Non-trivial changes: independent review done (principle 7); each finding fixed or answered in the pull request.

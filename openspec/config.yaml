@@ -14,6 +14,9 @@ rules:
     - Include a "Constitution check" confirming C1–C10.
   specs:
     - Requirements use SHALL; every requirement has WHEN/THEN scenarios.
+    - State what the command or the player does. Out of scope stays in the proposal.
+    - Do not add a SHALL NOT requirement, or a scenario whose only check is that a job, file, or directory is missing.
+    - For tooling and CI, one happy-path scenario per command.
   tasks:
     - For logic domains, test tasks come before implementation tasks.
     - Visual and feel tasks end with a playtest-checklist task.

@@ -133,7 +133,9 @@ Every pull request that changes rendering, effects, animation, audio, or layout 
 A change is done when:
 
 - its OpenSpec tasks are complete and checked off;
-- every spec scenario has a passing test, or visual evidence for visual scenarios;
+- every logic-domain scenario has a passing test;
+- tooling and CI scenarios have one green run of the command;
+- visual scenarios have visual evidence;
 - `pnpm check` passes in CI;
 - code, tests, config, comments, docs, and specs all match (constitution C9);
 - non-trivial changes have had an independent review, with every finding fixed or answered (constitution C10);
