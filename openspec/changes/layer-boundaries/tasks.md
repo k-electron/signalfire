@@ -16,8 +16,8 @@
 
 - [x] 3.1 Run `pnpm check`. Verify typecheck, lint (including the fixture script), both Vitest projects, and build pass. Verify the output does not run `pnpm test:e2e`. Verify `git status` shows no `src/core`, `src/engine`, or `src/platform`.
 - [x] 3.2 Run `pnpm test:e2e`. Verify the production page still shows the heading Signalfire. Do not fill the playtest checklist: the heading text is unchanged.
-- [ ] 3.3 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 04, horizontal 05 (Risk), and the constitution. Verify each finding is fixed or answered in the pull request.
-- [ ] 3.4 Open the pull request from `change/layer-boundaries` with title `feat(layers): check import boundaries`. Verify the body includes the OpenSpec link, the constitution check, the assumptions from the proposal (segment names, src-root basenames, `require()`, template-literal `import()`, no second TypeScript), and that no `allowBuilds` entry was added. Do not merge.
+- [x] 3.3 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 04, horizontal 05 (Risk), and the constitution. Verify each finding is fixed or answered in the pull request.
+- [x] 3.4 Open the pull request from `change/layer-boundaries` with title `feat(layers): check import boundaries`. Verify the body includes the OpenSpec link, the constitution check, the assumptions from the proposal (segment names, src-root basenames, `require()`, template-literal `import()`, no second TypeScript), and that no `allowBuilds` entry was added. Do not merge.
 
 ## Workflow follow-up
 
