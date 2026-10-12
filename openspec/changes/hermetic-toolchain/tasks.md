@@ -31,7 +31,7 @@
 - [x] 4.3 Run `pnpm dev` and open the page in an automated browser. Confirm the visible text is Signalfire and nothing else. Stop the server. Verify with a screenshot from that run attached to the pull request.
 - [x] 4.4 Fill the playtest checklist from `docs/horizontals/08-testing-and-dev-practices.md`. Mark gameplay, audio, focus, and "matches the relevant vertical doc" as not applicable: this change implements horizontals 02 and 03, not a vertical. Do not check the vertical item. Verify the filled list is in the pull request.
 - [x] 4.5 Ask a fresh-context agent that did not write the code to review the diff against this change, repo-setup, and the constitution. Verify each finding is fixed or answered in the pull request.
-- [ ] 4.6 Open the pull request from `change/hermetic-toolchain` with title `chore: scaffold hermetic toolchain`. Verify the body includes the OpenSpec link, constitution check, the hermetic path list, hook results, the screenshot, and a statement that CI does not exist so `pnpm check` was not run in CI. Do not merge.
+- [x] 4.6 Open the pull request from `change/hermetic-toolchain` with title `chore: scaffold hermetic toolchain`. Verify the body includes the OpenSpec link, constitution check, the hermetic path list, hook results, the screenshot, and a statement that CI does not exist so `pnpm check` was not run in CI. Do not merge.
 
 ## Workflow follow-up
 
