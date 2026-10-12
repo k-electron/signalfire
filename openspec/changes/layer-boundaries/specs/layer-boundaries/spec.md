@@ -107,7 +107,7 @@ A module under `src/app` SHALL pass the boundary check when it imports `core`, `
 
 ### Requirement: Type-only imports follow the layer rules
 
-The boundary check SHALL apply the same allow and deny rules to type-only imports and type-only re-exports as to value imports.
+The boundary check SHALL apply the same allow and deny rules to type-only imports and type-only re-exports as to value imports. A type-position `import("mod")` or `typeof import("mod")` is not part of this requirement.
 
 #### Scenario: Core type-imports a forbidden package
 
@@ -121,7 +121,7 @@ The boundary check SHALL apply the same allow and deny rules to type-only import
 
 ### Requirement: Dynamic imports follow the layer rules
 
-The boundary check SHALL apply the same allow and deny rules to a string-literal `import()` as to a static import.
+The boundary check SHALL apply the same allow and deny rules to a string-literal `import()` call as to a static import. A type-position `import()` is not part of this requirement.
 
 #### Scenario: Core dynamically imports a forbidden package
 

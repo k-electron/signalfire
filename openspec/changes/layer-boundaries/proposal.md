@@ -24,7 +24,7 @@ Stage 0's exit needs a dependency-boundary check before any game logic lands. Ta
 
 ## Impact
 
-- Edited: `src/main.tsx`, `package.json` (`lint` runs the fixture script after `biome check`), `biome.json`, `AGENTS.md`, `src/AGENTS.md`, `docs/horizontals/04-architecture.md`, `docs/horizontals/02-repo-setup.md` (the `pnpm lint` row).
+- Edited: `src/main.tsx`, `package.json` (`lint` runs the fixture script after `biome check`), `biome.json` renamed to `biome.jsonc` so the override note can be a comment, `AGENTS.md`, `src/AGENTS.md`, `docs/horizontals/04-architecture.md`, `docs/horizontals/02-repo-setup.md` (the `pnpm lint` row).
 - Moved: `src/app.tsx` to `src/app/app.tsx`; `src/app.browser.test.tsx` to `src/app/app.browser.test.tsx`.
 - New: `tools/layer-boundaries/check-fixtures.mjs` and fixture trees under `tools/layer-boundaries/fixtures/`. Those trees are outside `src/` and are excluded from Biome's file set, so a forbidden fixture does not fail `biome check` by sitting in the repo.
 - Unchanged: the Signalfire heading, game logic, `src/core`, `src/engine`, `src/platform`, GitHub Actions, Cloudflare, roadmap status, `openspec/config.yaml`, the Vitest include, `allowBuilds`.
@@ -55,7 +55,7 @@ Stage 0's exit needs a dependency-boundary check before any game logic lands. Ta
 - Engine and platform "May import: `core`" in horizontal 04 means other layers. Engine may import external packages except `react`, `react-dom`, `zustand`, and `xstate`, including subpaths (`react/jsx-runtime`, `react-dom/client`). Platform and app may import other external packages. `node:` builtins are forbidden in `core` only.
 - The only modules at the `src` root are `main.tsx`, `harness-smoke.test.ts`, and `harness-smoke.property.test.ts`. The check rejects those basenames from every layer. A new `src`-root file is not rejected until its basename is added to the patterns.
 - A specifier is rejected when a path segment is exactly a forbidden layer name. A same-layer file whose segment is `app`, `engine`, `platform`, or `core` is rejected too. `engine-helper` and `approach` are not.
-- The rules match string-literal specifiers: static import, side-effect import, `export ... from`, `export type ... from`, `import type`, inline `type` modifiers, and `import("...")`. A template-literal `import()` is not detected. `require()` is not detected by Biome pattern groups (probed on 2.5.15). Exact `paths` keys do detect `require()`, and core cannot list every forbidden package there. `require` in `src/` still fails typecheck: there is no `@types/node` and no `require` binding.
+- The rules match string-literal specifiers: static import, side-effect import, `export ... from`, `export type ... from`, `import type`, inline `type` modifiers, and a call to `import("...")`. A template-literal `import()` is not detected. A type-position `import("mod")` or `typeof import("mod")` is not detected. `require()` is not detected by Biome pattern groups (probed on 2.5.15). Exact `paths` keys do detect `require()`, and core cannot list every forbidden package there. `require` in `src/` still fails typecheck: there is no `@types/node` and no `require` binding.
 - `*.test.ts` may import the packages `vitest`, `fast-check`, and `@fast-check/vitest`, not other subpaths. `vitest/browser` is only for `*.browser.test.tsx`.
 - No path aliases. `:ALIAS:` is banned in `core` so a future alias fails there.
 - `verzod` and `zod` subpaths (`zod/v4`) are allowed in `core`. A different package whose name starts with `zod` (`zodiac`) is not.

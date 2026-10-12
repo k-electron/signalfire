@@ -39,7 +39,7 @@ Rejected: dependency-cruiser. Latest is 18.6.0 (published 2026-10-11T19:35:10Z, 
 
 ### Overrides
 
-Add these to `biome.json`. Keep the recommended preset and `noExplicitAny`. Add `"includes": ["**", "!tools/layer-boundaries/fixtures/**"]` under `files` so forbidden fixtures are not in `biome check`. Apply confirms a fixture file is skipped and `src/` is still checked.
+Add these to `biome.jsonc`. Biome 2.5.15 rejects `//` comments in `biome.json`, and the test overrides need that comment. Keep the recommended preset and `noExplicitAny`. Add `"includes": ["**", "!tools/layer-boundaries/fixtures"]` under `files` so forbidden fixtures are not in `biome check`. Biome 2.5.15 warns that a folder ignore does not need a trailing `/**` (`useBiomeIgnoreFolder`). Apply confirms a fixture file is skipped and `src/` is still checked.
 
 Messages below are the diagnostic text. The proof looks at the category `lint/style/noRestrictedImports`, not the message.
 
@@ -146,9 +146,9 @@ No engine, platform, or app test overrides. Those layers do not use a package al
 For `fixtures/pass` and each directory under `fixtures/fail/<name>`:
 
 1. Make a temp directory.
-2. Copy the repo `biome.json` into it.
+2. Copy the repo `biome.jsonc` into it. Biome 2.5.15 rejects comments in `biome.json`. The override note is a comment, so the config file is `biome.jsonc`.
 3. Copy that fixture's `src/` to `temp/src`.
-4. Run `biome lint <temp>/src --config-path <temp> --reporter=json`.
+4. Run `biome lint <temp>/src --config-path <temp> --vcs-enabled=false --reporter=json`. The copied config enables VCS ignore files. A temp directory has no ignore file, and Biome exits before linting. `--vcs-enabled=false` is required for that copy. It does not change which imports are restricted.
 5. Read stdout JSON. Ignore the experimental-reporter line on stderr. Biome is pinned, so this shape is the one apply uses: `diagnostics[].category`.
 6. Pass tree: zero diagnostics whose category is `lint/style/noRestrictedImports`.
 7. Each fail directory: at least one such diagnostic.
@@ -256,9 +256,9 @@ The proof is the `.mjs` script. A `src/**/*.test.ts` file that spawns Biome woul
 
 - [Segment name collision] A same-layer file imported as `./app` or `./engine` fails. `./engine-helper` and `./approach` do not. → The pass tree locks the negative cases. The PR states the assumption. Stage 1 must not name a module after another layer.
 - [Src-root list is closed] Only `main`, `harness-smoke.test`, and `harness-smoke.property.test` are rejected. → A new root file is invisible until the globs gain its basename. The PR states that.
-- [`require()` and template-literal `import()`] Pattern groups did not flag `require("react")` or a template-literal `import()` of `react`. Exact `paths` keys do flag `require`, and core cannot list every package there. → Not in the spec. `require` in `src/` still fails typecheck. The PR states both holes.
+- [`require()`, template-literal `import()`, and type-position `import()`] Pattern groups did not flag `require("react")`, a template-literal `import()` of `react`, `import("react")` in a type position, or `typeof import("react")`. A call `import("react")` is flagged. Exact `paths` keys do flag `require`, and core cannot list every package there. → The spec covers the call form, `import type`, inline `type`, and `export type`. It does not cover the other three forms. `require` in `src/` still fails typecheck. The PR states the holes.
 - [JSON reporter] Biome prints that the JSON reporter is experimental. → The pin is 2.5.15. If a later Biome bump changes the shape, the script update lands with that bump.
-- [Override replacement] A new core override appended after the test overrides will not apply to tests. → Comment in `biome.json` above the test overrides: they repeat the path group because later `patterns` replace earlier ones.
+- [Override replacement] A new core override appended after the test overrides will not apply to tests. → Comment in `biome.jsonc` above the test overrides: they repeat the path group because later `patterns` replace earlier ones.
 - [`files.includes`] A bad exclude would stop linting `src/`. → Apply runs `pnpm lint` and confirms `src/` is still checked.
 
 ## Migration Plan

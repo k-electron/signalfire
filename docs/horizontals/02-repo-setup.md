@@ -67,7 +67,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 ├── pnpm-workspace.yaml
 ├── tsconfig.json
 ├── vite.config.ts
-├── biome.json
+├── biome.jsonc
 ├── lefthook.yml
 ```
 
@@ -93,7 +93,7 @@ Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests a
 | `pnpm build` | Production build |
 | `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` | Biome lint and format check |
+| `pnpm lint` | Biome check, then the layer-boundary fixture proof |
 | `pnpm format` | Biome format and safe fixes |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |
