@@ -54,7 +54,7 @@ Stage 0's exit needs a dependency-boundary check before any game logic lands. Ta
 
 - Engine and platform "May import: `core`" in horizontal 04 means other layers. Engine may import external packages except `react`, `react-dom`, `zustand`, and `xstate`, including subpaths (`react/jsx-runtime`, `react-dom/client`). Platform and app may import other external packages. `node:` builtins are forbidden in `core` only.
 - The only modules at the `src` root are `main.tsx`, `harness-smoke.test.ts`, and `harness-smoke.property.test.ts`. The check rejects those basenames from every layer. A new `src`-root file is not rejected until its basename is added to the patterns.
-- A specifier is rejected when a path segment is exactly a forbidden layer name. A same-layer file whose segment is `app`, `engine`, `platform`, or `core` is rejected too. `engine-helper` and `approach` are not.
+- A relative specifier (`./` or `../`) is rejected when a path segment is exactly a forbidden layer or src-root name. Package specifiers such as `pixi.js/lib/main`, `@pixi/app`, and `some-pkg/engine` are not. A same-layer relative file whose segment is `app`, `engine`, `platform`, or `core` is rejected. `engine-helper` and `approach` are not.
 - The rules match string-literal specifiers: static import, side-effect import, `export ... from`, `export type ... from`, `import type`, inline `type` modifiers, and a call to `import("...")`. A template-literal `import()` is not detected. A type-position `import("mod")` or `typeof import("mod")` is not detected. `require()` is not detected by Biome pattern groups (probed on 2.5.15). Exact `paths` keys do detect `require()`, and core cannot list every forbidden package there. `require` in `src/` still fails typecheck: there is no `@types/node` and no `require` binding.
 - `*.test.ts` may import the packages `vitest`, `fast-check`, and `@fast-check/vitest`, not other subpaths. `vitest/browser` is only for `*.browser.test.tsx`.
 - No path aliases. `:ALIAS:` is banned in `core` so a future alias fails there.
@@ -71,4 +71,4 @@ Stage 0's exit needs a dependency-boundary check before any game logic lands. Ta
 - **C7.** No new runtime dependency. No new dev dependency.
 - **C8.** Root `AGENTS.md` stays tool-agnostic and under 200 lines (145 lines today). `CLAUDE.md` stays `@AGENTS.md`. `src/AGENTS.md` keeps one section per layer; only the opening import sentence changes.
 - **C9.** The move, the check, the fixtures, the docs, the delta spec, and `tasks.md` land together. Roadmap status stays "Not started" because Stage 0 is not done. Archive copies the delta into `openspec/specs/`.
-- **C10.** Non-trivial. Tasks require a fresh-context review before the pull request is treated as ready. That review has not been done yet.
+- **C10.** Non-trivial. The fresh-context review is done (task 3.3).

@@ -1,6 +1,6 @@
 # src
 
-Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports `core`, `engine`, and `platform`; `engine` and `platform` import only `core` from `src`; `engine` does not import React or stores; `core` imports only itself, Zod, and verzod. If the horizontal 05 risk check drops verzod, the allowlist loses it and the hand-rolled chain lives in `core`. The dependency-boundary check enforces this.
+Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports `core`, `engine`, and `platform`; `engine` and `platform` import only `core` from `src`; `engine` does not import React or stores; `core` imports only itself, Zod, and verzod. The dependency-boundary check enforces this.
 
 ## core
 

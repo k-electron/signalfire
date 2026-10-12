@@ -65,18 +65,30 @@ Core, all files (`src/core/**`):
     },
     {
       "group": [
-        "**/app",
-        "**/app/**",
-        "**/engine",
-        "**/engine/**",
-        "**/platform",
-        "**/platform/**",
-        "**/main",
-        "**/main.*",
-        "**/harness-smoke.test",
-        "**/harness-smoke.test.*",
-        "**/harness-smoke.property.test",
-        "**/harness-smoke.property.test.*"
+        "./**/app",
+        "./**/app/**",
+        "../**/app",
+        "../**/app/**",
+        "./**/engine",
+        "./**/engine/**",
+        "../**/engine",
+        "../**/engine/**",
+        "./**/platform",
+        "./**/platform/**",
+        "../**/platform",
+        "../**/platform/**",
+        "./**/main",
+        "./**/main.*",
+        "../**/main",
+        "../**/main.*",
+        "./**/harness-smoke.test",
+        "./**/harness-smoke.test.*",
+        "../**/harness-smoke.test",
+        "../**/harness-smoke.test.*",
+        "./**/harness-smoke.property.test",
+        "./**/harness-smoke.property.test.*",
+        "../**/harness-smoke.property.test",
+        "../**/harness-smoke.property.test.*"
       ],
       "message": "core may not import another layer or a src-root module."
     }
@@ -108,16 +120,26 @@ Engine (`src/engine/**`):
     },
     {
       "group": [
-        "**/app",
-        "**/app/**",
-        "**/platform",
-        "**/platform/**",
-        "**/main",
-        "**/main.*",
-        "**/harness-smoke.test",
-        "**/harness-smoke.test.*",
-        "**/harness-smoke.property.test",
-        "**/harness-smoke.property.test.*"
+        "./**/app",
+        "./**/app/**",
+        "../**/app",
+        "../**/app/**",
+        "./**/platform",
+        "./**/platform/**",
+        "../**/platform",
+        "../**/platform/**",
+        "./**/main",
+        "./**/main.*",
+        "../**/main",
+        "../**/main.*",
+        "./**/harness-smoke.test",
+        "./**/harness-smoke.test.*",
+        "../**/harness-smoke.test",
+        "../**/harness-smoke.test.*",
+        "./**/harness-smoke.property.test",
+        "./**/harness-smoke.property.test.*",
+        "../**/harness-smoke.property.test",
+        "../**/harness-smoke.property.test.*"
       ],
       "message": "engine may import only core from src."
     }
@@ -135,7 +157,7 @@ No engine, platform, or app test overrides. Those layers do not use a package al
 
 ### Why segment globs, not one override per depth
 
-`noRestrictedImports` matches the specifier text. It does not resolve `..`. A blanket `../*` forbids `../sibling` inside the same layer (probed). Globs on the path segment (`**/engine`, `**/engine/**`, `**/main`, `**/main.*`) flag `../engine`, `../../engine/loop`, `../../../main`, and `../main.tsx` from nested files, and they do not flag `../tokens`, `./engine-helper`, `./approach`, or `../maintain` (probed). That covers every depth without a per-directory override.
+`noRestrictedImports` matches the specifier text. It does not resolve `..`. Biome 2.5.15 globs (`biome_glob`) do not strip a leading `./`, `*` stays inside one path segment, and `**` matches zero or more segments when it is between slashes. Layer and src-root names are therefore written as `./**/<name>` and `../**/<name>` (plus `/**` or `.*` where the old patterns had them). That matches `./app`, `../app/screen`, `../../engine/loop`, and `../../../main.tsx`, and it does not match `pixi.js/lib/main`, `@pixi/app`, or `some-pkg/engine`. `../tokens`, `./engine-helper`, `./approach`, and `../maintain` still pass.
 
 ### Fixture proof
 
@@ -175,11 +197,14 @@ Pass tree (export the bindings so unused-import warnings are not required for a 
 | `src/core/rules.test.ts` | `vitest`, `fast-check`, `@fast-check/vitest`, `./tokens` |
 | `src/core/rules.browser.test.tsx` | `vitest`, `vitest/browser`, `./tokens` |
 | `src/engine/loop.ts` | `../core/tokens`, `pixi.js` |
+| `src/engine/pixi-main.ts` | `pixi.js/lib/main` |
+| `src/engine/pixi-app.ts` | `@pixi/app` |
 | `src/engine/loop/clock.ts` | `../../core/tokens` |
 | `src/engine/loop/deep/frame.ts` | `../../../core/tokens` |
 | `src/engine/render/approach.ts` | `./neighbor` |
 | `src/platform/storage.ts` | `../core/tokens`, `idb-keyval` |
 | `src/app/screen.ts` | `../core/tokens`, `../engine/loop`, `../platform/storage`, `react` |
+| `src/app/pkg-engine.ts` | `some-pkg/engine` |
 | `src/app/screens/title.ts` | `../../engine/loop` |
 | `src/main.tsx` | `./app/screen`, `react` |
 | `src/harness-smoke.test.ts` | `vitest`, `react` |
