@@ -26,7 +26,8 @@
 	},
 	"dependencies": {
 		"react": "19.3.0",
-		"react-dom": "19.3.0"
+		"react-dom": "19.3.0",
+		"scratch-ci-missing": "0.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
