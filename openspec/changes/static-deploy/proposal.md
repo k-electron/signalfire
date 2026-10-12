@@ -53,7 +53,7 @@ Stage 0 is not done until a merge to `main` deploys the empty page. CI is alread
 
 ## Assumptions
 
-- The Worker name in the dashboard is `signalfire`, matching `wrangler.jsonc`. Production branch is `main`. Build command is `pnpm build`. Deploy command is `pnpm exec wrangler deploy`. `PNPM_VERSION` is `12.11.2` on production and on preview.
+- The Worker name in the dashboard is `signalfire`, matching `wrangler.jsonc`. Production branch is `main`. Build command is `pnpm build`. Deploy command is `pnpm exec wrangler deploy`. Production and preview set `PNPM_VERSION` to `12.11.2` and `NODE_VERSION` to `26.11.1`. `.node-version` carries the same Node pin.
 - `pnpm install` on that pnpm downloads Node `26.11.1`. `pnpm build` runs on that runtime. The build log is the check.
 - Preview and production share `_headers` and the build command. The pull request evidence is the preview URL. `vite preview` does not apply `_headers`.
 - The `workers.dev` hostname is chosen in the dashboard. The repo does not hardcode it.
