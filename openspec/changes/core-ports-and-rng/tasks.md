@@ -16,7 +16,7 @@
 
 - [x] 3.1 Run `pnpm check`. Verify typecheck, lint (including the fixture proof), both Vitest projects, and build pass, and that `pnpm test:e2e` is not part of that command. Verify `package.json` dependencies are unchanged, `docs/ROADMAP.md` still says Stage 1 is "Not started", and the horizontal docs are unchanged. Do not fill the playtest checklist: nothing the player sees or hears changes.
 - [x] 3.2 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 04 (Determinism and replay, Ports and adapters, Domain events), `src/AGENTS.md` (core), horizontal 08 (property tests), and the constitution. The review reports correctness and requirement gaps only. Verify each finding is fixed or answered in the pull request.
-- [ ] 3.3 Open the pull request from `change/core-ports-and-rng` with title `feat(core): add ports and a seeded generator`. Fill the template: OpenSpec link, constitution check, test evidence (`pnpm check`), no visual evidence, docs updated (the decision record), and the assumptions from the proposal. Do not merge.
+- [x] 3.3 Open the pull request from `change/core-ports-and-rng` with title `feat(core): add ports and a seeded generator`. Fill the template: OpenSpec link, constitution check, test evidence (`pnpm check`), no visual evidence, docs updated (the decision record), and the assumptions from the proposal. Do not merge.
 
 ## Workflow follow-up
 
