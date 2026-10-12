@@ -3,4 +3,6 @@ cacheDir: .pnpm-cache
 strictDepBuilds: true
 minimumReleaseAge: 1440
 allowBuilds:
+  esbuild: true
   lefthook: true
+  workerd: true

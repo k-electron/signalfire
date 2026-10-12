@@ -15,7 +15,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 
 | # | Stage | Status |
 |---|---|---|
-| 0 | Scaffold | Not started |
+| 0 | Scaffold | Done |
 | 1 | Core foundations | Not started |
 | 2 | Walking skeleton | Not started |
 | 3 | Thin pass across every system | Not started |
@@ -29,7 +29,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 ### 0. Scaffold
 
 - Repo, pnpm, Vite, strict TypeScript, Biome, Lefthook, Vitest, Playwright.
-- OpenSpec config, GitHub Actions CI, Cloudflare Pages deploying an empty app.
+- OpenSpec config, GitHub Actions CI, Cloudflare Workers deploying an empty app.
 - Docs: [Repo Setup](horizontals/02-repo-setup.md), [Tech Stack](horizontals/03-tech-stack.md), [CI/CD and Hosting](horizontals/10-ci-cd-and-hosting.md).
 - **Exit:** an empty page deploys on merge, CI is green, and the layer-boundary check runs.
 
