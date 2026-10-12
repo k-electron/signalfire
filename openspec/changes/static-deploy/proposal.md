@@ -1,0 +1,71 @@
+# Proposal
+
+## Why
+
+Stage 0 is not done until a merge to `main` deploys the empty page. CI is already green and the layer-boundary check already runs. Nothing serves the built app, and nothing sets the headers that keep the page from calling out.
+
+## What Changes
+
+- Connect the GitHub repo to Cloudflare Pages. Production is `main`. Every pull request gets a preview URL. The build command is `pnpm build`. The output directory is `dist`.
+- Set the Pages build variable `PNPM_VERSION` to the `packageManager` version (`pnpm@12.11.2`). Pages then installs with that pnpm, and pnpm downloads the lockfile Node (`node@runtime:26.11.1`) from `devEngines.runtime`. Do not add `.nvmrc`.
+- Add `public/_headers`. Vite copies it into `dist/`. It sets a Content Security Policy for what the app loads today (the site itself), a year-long cache for hashed assets, revalidation for the HTML document, and the standard security headers.
+- Move the inline `<style>` in `index.html` to a same-origin stylesheet so the policy can use `style-src 'self'`.
+- Update the CSP sentence in `docs/horizontals/10-ci-cd-and-hosting.md`: Puter and the analytics endpoint are added when those features land.
+- Mark Stage 0 done in `docs/ROADMAP.md` once the preview serves the page. CI and the layer-boundary check are already on `main`.
+
+## Capabilities
+
+### New Capabilities
+
+- `static-hosting`: Cloudflare Pages builds and serves the app on `main`, posts a preview URL per pull request, and sends the security, cache, and Content Security Policy headers.
+
+### Modified Capabilities
+
+- None. `ci-pipeline` and `hermetic-toolchain` keep their requirements. This change uses the pins and the `pnpm build` script they already define.
+
+## Impact
+
+- New: `public/_headers`, a same-origin stylesheet linked from `index.html`.
+- Edited: `index.html`, `docs/horizontals/10-ci-cd-and-hosting.md`, `docs/ROADMAP.md`.
+- Dashboard, not files: the Pages project, the Git connection, production branch `main`, build command, output directory, and `PNPM_VERSION`.
+- Unchanged: GitHub Actions, Dependabot, `package.json` pins, Vite config.
+- No new runtime dependency. No new dev dependency. Wrangler is not added.
+
+## Principles served
+
+- **P11.** The page is static. Nothing in this change sends player data anywhere.
+- **P13.** This is the remaining Stage 0 slice: an empty page on a real URL.
+- P1–P10 and P12 are not served.
+
+## Docs implemented
+
+- `docs/ROADMAP.md` Stage 0 exit: an empty page deploys on merge. Status becomes Done in this change.
+- `docs/horizontals/10-ci-cd-and-hosting.md`: Hosting and Headers. The CSP sentence is edited so it matches the origins this change allows.
+- `docs/horizontals/06-persistence-and-sync.md`: Privacy. Implemented as written. Not edited. No server is added.
+- `AGENTS.md`: typing data never leaves the device. Implemented as written. Not edited.
+- `docs/horizontals/02-repo-setup.md`: Node and pnpm pins. Implemented as written. Not edited.
+
+## Departures
+
+- Horizontal 10 says the Content Security Policy limits connections to the site, Puter, and the analytics endpoint. Puter and analytics are out of this change. The policy allows the site only. The same change updates that sentence: those origins are added when those features land. That is the doc update, not a decision record.
+
+## Assumptions
+
+- Karim creates the Pages project and connects this GitHub repo. Production branch is `main`. Build command is `pnpm build`. Output directory is `dist`. `PNPM_VERSION` is `12.11.2` on production and on preview. Pages uses that variable for the pnpm version and does not read `devEngines` or `packageManager`.
+- `pnpm install` on that pnpm downloads Node `26.11.1`. `pnpm build` runs on that runtime. The build log is the check.
+- Preview and production share `_headers` and the build command. The pull request evidence is the preview URL. `vite preview` does not apply `_headers`.
+- The `*.pages.dev` hostname is chosen in the dashboard. The repo does not hardcode it.
+- The built `index.html` has no inline script. If the build emits one, the policy or the HTML changes in this same change so the preview still loads.
+
+## Constitution check
+
+- **C1.** One capability, `static-hosting`. Not a C1 exemption. Apply waits for approval.
+- **C2.** Principles, docs, and the CSP departure are stated. The departure is resolved by editing horizontal 10.
+- **C3.** Karim approves this proposal before apply. The agent does not merge and does not push to `main`. Karim's review of the pull request is the Stage 0 exit approval.
+- **C4.** Not a logic domain. The evidence is the Pages preview: the page text, the build log's pnpm and Node versions, and the response headers. No Vitest test is added.
+- **C5.** The stylesheet and `index.html` stay strict. `pnpm typecheck` and `pnpm lint` are unchanged.
+- **C6.** No decision record. Pages is the hosting doc's choice. Header values are in `design.md`.
+- **C7.** No new runtime dependency.
+- **C8.** `AGENTS.md` is unchanged.
+- **C9.** `_headers`, the stylesheet, `index.html`, horizontal 10, the roadmap status, the delta spec, and `tasks.md` land together.
+- **C10.** Non-trivial. A fresh-context review of the diff happens before the pull request is treated as ready.
