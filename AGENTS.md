@@ -81,7 +81,7 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 | `pnpm lint` / `pnpm format` | Biome check / Biome fix |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |
-| `pnpm test -- <pattern>` | Run matching tests only |
+| `pnpm test <pattern>` | Run matching tests only |
 | `pnpm browsers:install` | Install Chromium inside the repo |
 | `pnpm test:e2e` | Playwright against the production build |
 | `pnpm check` | Typecheck, lint, test, and build |

@@ -94,7 +94,7 @@ Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests a
 | `pnpm format` | Biome format and safe fixes |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |
-| `pnpm test -- <pattern>` | Run matching tests only |
+| `pnpm test <pattern>` | Run matching tests only |
 | `pnpm browsers:install` | Install Chromium inside the repo |
 | `pnpm test:e2e` | Playwright against the production build |
 | `pnpm check` | Typecheck, lint, test, and build |

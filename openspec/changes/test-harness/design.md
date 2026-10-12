@@ -34,7 +34,7 @@ Vitest 5 inline projects inherit the root config, including Vite plugins (`exten
 
 `clearMocks` defaults to true in Vitest 5. The smokes do not assert mock history, so leave the default.
 
-`pnpm test` is `vitest run` (one shot, both projects). `pnpm test:unit` is `vitest run --project unit`. Extra arguments pass through, so `pnpm test -- <pattern>` still filters.
+`pnpm test` is `vitest run` (one shot, both projects). `pnpm test:unit` is `vitest run --project unit`. Pass the pattern without an extra `--`: `pnpm test <pattern>`. pnpm 12 forwards `pnpm test -- <pattern>` as `vitest run -- <pattern>`, and Vitest ignores arguments after `--`, so that form runs the whole suite.
 
 Alternatives: a `test` block inside `vite.config.ts` (couples the app server to the runners); a `vitest.workspace` file (the browser guide uses `test.projects`).
 
@@ -145,7 +145,7 @@ Prove rejection with a push attempt, not only `lefthook run`: break the logic sm
 
 ### Docs and ignore rules
 
-- `AGENTS.md` Commands: add `test`, `test:unit`, `test -- <pattern>`, `test:e2e`, `browsers:install`. `check` becomes typecheck, lint, test, and build. Say that browser and end-to-end runs need `pnpm browsers:install` after `pnpm install`. `content:check`, `tokens`, and `ladle` still arrive later. Update the filename bullet to add `*.browser.test.tsx` and `e2e/*.spec.ts`. Stay under 200 lines.
+- `AGENTS.md` Commands: add `test`, `test:unit`, `test <pattern>`, `test:e2e`, `browsers:install`. `check` becomes typecheck, lint, test, and build. Say that browser and end-to-end runs need `pnpm browsers:install` after `pnpm install`. `content:check`, `tokens`, and `ladle` still arrive later. Update the filename bullet to add `*.browser.test.tsx` and `e2e/*.spec.ts`. Stay under 200 lines.
 - `docs/horizontals/02-repo-setup.md`: the same scripts, the pre-push row (`pnpm test:unit`), and naming rows for the three test filenames. Remove the sentence that pre-push arrives with task 0.2.
 - `docs/horizontals/08-testing-and-dev-practices.md`: replace the Sources line that cites the Vitest 4 InfoQ article with the Vitest 5 browser guide (`https://vitest.dev/guide/browser/`). Leave the decision row as Vitest, with no major.
 - `README.md`: the run-locally sentence that says tests arrive later. `pnpm check` includes tests. Name `pnpm browsers:install`. Content checks still arrive later.

@@ -38,9 +38,9 @@
 
 ## 5. Integration
 
-- [ ] 5.1 Commit the harness on `change/test-harness`. Clone that HEAD into `.tmp/test-harness-clone`. There, run `pnpm install`, then `pnpm test:unit` and `pnpm exec lefthook run pre-push` before `pnpm browsers:install`. Verify both succeed. Then run `pnpm browsers:install`, `pnpm check`, and `pnpm test:e2e`. Verify all three succeed.
-- [ ] 5.2 For that clone, list paths under `$HOME` newer than a marker taken before `pnpm install`, excluding this repo and the clone. Verify `~/Library/Caches/ms-playwright` is absent or older than the marker. Put that list in the pull request. Unexpected paths are a finding to report, not to delete.
-- [ ] 5.3 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 08, horizontal 02, and the constitution. Verify each finding is fixed or answered in the pull request.
+- [x] 5.1 Commit the harness on `change/test-harness`. Clone that HEAD into `.tmp/test-harness-clone`. There, run `pnpm install`, then `pnpm test:unit` and `pnpm exec lefthook run pre-push` before `pnpm browsers:install`. Verify both succeed. Then run `pnpm browsers:install`, `pnpm check`, and `pnpm test:e2e`. Verify all three succeed.
+- [x] 5.2 For that clone, list paths under `$HOME` newer than a marker taken before `pnpm install`, excluding this repo and the clone. Verify `~/Library/Caches/ms-playwright` is absent or older than the marker. Put that list in the pull request. Unexpected paths are a finding to report, not to delete.
+- [x] 5.3 Ask a fresh-context agent that did not write the code to review the diff against this change, horizontal 08, horizontal 02, and the constitution. Verify each finding is fixed or answered in the pull request.
 - [ ] 5.4 Open the pull request from `change/test-harness` with title `test: add the test harness`. Verify the body includes the OpenSpec link, constitution check, assumptions, the hermetic path list, the pre-push result, and a statement that CI does not exist so `pnpm check` was not run in CI. Do not merge.
 
 ## Workflow follow-up

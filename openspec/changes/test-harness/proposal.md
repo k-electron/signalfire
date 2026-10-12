@@ -23,7 +23,7 @@ Stage 0 cannot be test-first until the runners exist. Task 0.2 adds them, so lat
 
 ### Modified Capabilities
 
-- None. `hermetic-toolchain` still requires `pnpm check` to run typecheck, lint, and build. This change adds tests to that command; it does not change those three requirements. `openspec-configuration` is unchanged: root `AGENTS.md` stays under 200 lines.
+- `hermetic-toolchain`: A clean checkout runs `pnpm browsers:install` before `pnpm check`. `pnpm check` now runs the Vitest projects before the build, so install alone is not enough for that command to pass. `openspec-configuration` is unchanged: root `AGENTS.md` stays under 200 lines.
 
 The working tree this proposal was written from is one commit behind `origin/main`. `openspec list --specs` here shows only `openspec-configuration`. The hermetic spec was read from `origin/main` (`f6ee037`, `openspec/specs/hermetic-toolchain/spec.md`).
 
