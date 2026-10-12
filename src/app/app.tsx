@@ -1,5 +1,5 @@
 export function App() {
-	const label: number = "Signalfire";
-	void label;
+	const ready: any = true;
+	void ready;
 	return <h1>Signalfire</h1>;
 }
