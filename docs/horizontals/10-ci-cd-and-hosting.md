@@ -35,7 +35,7 @@ Runs on every pull request and on every push to `main`.
 
 ## Hosting (Cloudflare Pages)
 
-- Connected to the GitHub repo through Cloudflare's Git integration. Cloudflare builds with `pnpm build` and serves `dist/`.
+- Connected to the GitHub repo through Cloudflare's Git integration. Cloudflare builds with `pnpm build` and serves `dist/`. The Pages project sets `PNPM_VERSION` from `packageManager`, and Node is the `devEngines.runtime` lockfile entry.
 - **Production:** the `main` branch. Because `main` only accepts merges that passed CI and review, every production deploy has passed every check.
 - **Previews:** every pull request branch gets its own URL, posted on the pull request. Agents use it for screenshots and recordings; Karim uses it to play changes before merge (Testing horizontal).
 - No server code and no environment secrets: the game is fully static, and puter.js runs in the browser.
@@ -46,7 +46,7 @@ A `_headers` file in `public/` sets:
 
 | Header | Purpose |
 |---|---|
-| Content Security Policy | Limits network connections to the site itself, Puter, and the analytics endpoint. Any other outbound request is blocked by the browser, which enforces the privacy rule technically |
+| Content Security Policy | Limits network connections to the site itself. Puter and the analytics endpoint are added when those features land. Any other outbound request is blocked by the browser, which enforces the privacy rule technically |
 | Cache control | Hashed assets cached for a year; `index.html` always revalidated, so new deploys are picked up immediately |
 | Standard security headers | `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` |
 
