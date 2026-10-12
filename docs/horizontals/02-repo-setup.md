@@ -60,6 +60,8 @@ How the repository is hosted, laid out, licensed, and worked in.
 ├── .agents/                  OpenSpec skills and workflows; .openspec-target names the owner
 ├── .claude/                  Claude Code slash commands and OpenSpec skills
 ├── .cursor/                  Cursor slash commands and OpenSpec skills
+├── .gitignore
+├── index.html
 ├── package.json
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
@@ -73,7 +75,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Toolchain pins
 
-- **Node:** Node 26, pinned with `devEngines.runtime` in `package.json` (`onFail: download`), so pnpm downloads that runtime for the project. Node 26 enters Active LTS on 2026-10-28. Until then it is Current. See the [Node.js release schedule](https://github.com/nodejs/Release/blob/main/README.md).
+- **Node:** Node 26, pinned with `devEngines.runtime` in `package.json` (`onFail: download`), so pnpm downloads that runtime for the project. The [Node.js release schedule](https://github.com/nodejs/Release/blob/main/README.md) starts Active LTS for Node 26 on 2026-10-28.
 - **pnpm:** pinned with the `packageManager` field in `package.json`.
 - Dependency versions are locked by `pnpm-lock.yaml`; CI installs with a frozen lockfile.
 - Project tooling (build, lint, test, dev servers, browsers) is installed in this repo and run through pnpm scripts or `pnpm exec`. Do not install it globally. The OpenSpec CLI is the exception: it is installed globally, outside this repo, and is not a `package.json` dependency.
@@ -105,7 +107,7 @@ Beyond `strict`:
 
 ## Biome settings
 
-- Recommended rule set, with `noExplicitAny` as an error (constitution C5).
+- Recommended rule set (`preset` set to `recommended`), with `noExplicitAny` as an error (constitution C5).
 - Biome's default formatting (no custom style debates).
 - Import sorting on.
 
