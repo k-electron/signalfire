@@ -9,7 +9,7 @@ Stage 0 cannot be test-first until the runners exist. Task 0.2 adds them, so lat
 - Add Vitest 5 with two projects: a Node project for `src/**/*.test.ts`, and a browser project (Playwright provider, Chromium, headless) for `src/**/*.browser.test.tsx`. `pnpm test` runs both. `pnpm test:unit` runs the Node project only.
 - Add fast-check and `@fast-check/vitest` for property tests in the Node project. A failing property prints the seed.
 - Add Playwright end-to-end tests in `e2e/`, run by `pnpm test:e2e` against `vite preview` of the production build. A fixture installs Playwright's fake clock before navigation, and the smoke test steps it.
-- Install browser binaries inside the repo. `PLAYWRIGHT_BROWSERS_PATH=0` is set by the scripts and by the Vitest and Playwright configs, not by the developer shell. `pnpm browsers:install` installs Chromium.
+- Install browser binaries inside the repo. `PLAYWRIGHT_BROWSERS_PATH=0` is set by the pnpm scripts that install or launch a browser, not by the developer shell. `pnpm browsers:install` installs Chromium.
 - Extend `pnpm check` to typecheck, lint, `pnpm test`, and build. End-to-end stays out of `check`. No coverage tool and no coverage threshold.
 - Lefthook `pre-push` runs `pnpm test:unit` and rejects the push when a Node test fails.
 - Add one labeled harness smoke test per kind: Node logic, property, component, end-to-end. The end-to-end smoke loads the production page and sees the "Signalfire" heading. Do not delete these tests later.

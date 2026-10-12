@@ -63,12 +63,12 @@ Before navigation, the end-to-end fake clock SHALL be installed at `2026-01-01T0
 
 ### Requirement: Browser binaries stay inside the repo
 
-`pnpm browsers:install` SHALL install Chromium under `node_modules/playwright-core/.local-browsers`. Every script that installs or launches a browser SHALL set `PLAYWRIGHT_BROWSERS_PATH=0` itself. A developer shell setting SHALL NOT be required. The install and the test scripts SHALL NOT write `~/Library/Caches/ms-playwright`.
+`pnpm browsers:install` SHALL install Chromium under `node_modules/playwright-core/.local-browsers`. Every script that installs or launches a browser SHALL set `PLAYWRIGHT_BROWSERS_PATH=0` itself. A developer shell setting SHALL NOT be required.
 
 #### Scenario: Install writes inside the repo
 
 - **WHEN** `pnpm browsers:install` runs
-- **THEN** Chromium is under `node_modules/playwright-core/.local-browsers` and `~/Library/Caches/ms-playwright` is unchanged
+- **THEN** Chromium is under `node_modules/playwright-core/.local-browsers`
 
 #### Scenario: Test scripts do not need a shell setting
 

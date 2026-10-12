@@ -27,7 +27,7 @@ Versions below were read from the npm registry on 2026-10-12. Each publish time 
 
 Two projects, matching the [Vitest browser guide](https://vitest.dev/guide/browser/):
 
-- `unit`: `environment: 'node'`, `include: ['src/**/*.test.ts']`, `exclude: ['src/**/*.browser.test.ts']`. The exclude stops a future `*.browser.test.ts` file matching the `*.test.ts` include. `*.browser.test.tsx` is already outside that include.
+- `unit`: `environment: 'node'`, `include: ['src/**/*.test.ts']`. That include does not match `*.browser.test.tsx`.
 - `browser`: `include: ['src/**/*.browser.test.tsx']`, `browser.enabled: true`, `browser.headless: true`, `browser.provider: playwright()` from `@vitest/browser-playwright`, `browser.instances: [{ browser: 'chromium' }]`.
 
 Vitest 5 inline projects inherit the root config, including Vite plugins (`extends` defaults to true). Put `@vitejs/plugin-react` on the root of `vitest.config.ts`, same plugin as `vite.config.ts`. Keep `browser` on the browser project only, so the unit project does not inherit browser mode. Do not set `extends: false` unless `pnpm test:unit` launches Chromium. If it does, set `extends: false` on the unit project and put the React plugin on the browser project. That does not change the spec.
@@ -65,15 +65,13 @@ Apply reads the `pnpm install` log. If `ERR_PNPM_IGNORED_BUILDS` names a package
 
 ### Hermetic browser path
 
-Playwright's hermetic install (`PLAYWRIGHT_BROWSERS_PATH=0`) writes to `node_modules/playwright-core/.local-browsers`. pnpm does not hoist a transitive `playwright-core`, so that package is also a direct dev dependency at the same version as `playwright`. The browsers then sit on the path the spec names. The path is read when a browser launches, and `playwright install` reads it from the environment. It does not read our Playwright config.
+Playwright's hermetic install (`PLAYWRIGHT_BROWSERS_PATH=0`) writes to `node_modules/playwright-core/.local-browsers`. pnpm does not hoist a transitive `playwright-core`, so that package is also a direct dev dependency at the same version as `playwright`. The browsers then sit on the path the spec names. `playwright install` reads the variable from the environment. It does not read our Playwright config.
 
-Set the variable in three places:
+Set the variable only as a prefix on `test`, `test:e2e`, and `browsers:install`. Do not copy it into Vitest or Playwright config files. `test:unit` and `pre-push` do not launch a browser and do not set it.
 
-1. Script prefix on `test`, `test:e2e`, and `browsers:install`, so the process starts with it. This is the path the spec requires.
-2. The first lines of `vitest.config.ts` and `playwright.config.ts` assign `process.env.PLAYWRIGHT_BROWSERS_PATH = '0'` before browsers launch. ESM imports run first; launch happens after the config module evaluates. The script prefix is the guarantee. The config line covers `pnpm exec` when the variable was unset.
-3. `test:unit` and `pre-push` do not launch a browser. They do not need the variable. The Vitest config may still assign it when the unit project loads. That assignment must not download or spawn Chromium.
+The prefix is a POSIX shell assignment. It works on macOS and on Linux CI. `cross-env` is not added. Outside contributors are not accepted until the walking skeleton, and Windows is not a target yet.
 
-`browsers:install` is `PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium`.
+`pnpm exec playwright` without one of those scripts does not set the variable. The supported commands are the scripts.
 
 Scripts:
 
@@ -87,7 +85,7 @@ Scripts:
 
 `check` keeps the hermetic order and inserts `pnpm test` before the build. End-to-end stays out: it builds again inside `test:e2e` and launches Playwright.
 
-Alternative: a postinstall download. Rejected. `strictDepBuilds` would ignore it unless `allowBuilds` allowed it, and a postinstall without the variable writes `~/Library/Caches/ms-playwright`.
+Alternative: a postinstall download. Rejected. `strictDepBuilds` would ignore it unless `allowBuilds` allowed it, and a postinstall without the variable uses Playwright's default cache instead of `node_modules`.
 
 ### End-to-end clock and preview
 
@@ -156,7 +154,7 @@ Roadmap status stays "Not started". Do not edit horizontal 10 or add a workflow.
 ## Risks / Trade-offs
 
 - [Clock `install` before `goto` prevents the heading from appearing] → The Playwright guide loads the page after `install`. If the heading never appears, stop and report. Do not drop the clock assertion or change the epoch to force a pass.
-- [A browser download hits `~/Library/Caches/ms-playwright`] → Scripts force `PLAYWRIGHT_BROWSERS_PATH=0`. Apply compares that directory to a timestamp taken before install. An unexpected new file under `$HOME` is a finding, not something to delete.
+- [A browser download misses `node_modules`] → The install and launch scripts set `PLAYWRIGHT_BROWSERS_PATH=0`. Confirm Chromium is under `node_modules/playwright-core/.local-browsers`. Do not inventory `$HOME`.
 - [`pnpm check` fails on a fresh clone that skipped `browsers:install`] → The commands table says to run it. The done criteria include it. Pre-push does not need it.
 - [TypeScript 7 rejects Vitest or Playwright types] → Stop and report. Do not add `@ts-ignore` or `@ts-expect-error`.
 - [The unit project inherits browser mode and launches Chromium] → Browser options stay on the browser project. If `pnpm test:unit` still launches Chromium, set `extends: false` on the unit project.
