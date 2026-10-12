@@ -9,8 +9,8 @@
 
 ## 2. Pull request
 
-- [ ] 2.1 Push `change/contribution-files` and open the pull request with title `docs(repo): add contribution templates`. Write the body by hand: OpenSpec link, constitution check, test evidence `none` (not a logic domain; no Vitest test and no playtest checklist), visual evidence `none`, docs updated, and the proposal assumptions. Say the GitHub render check waits until these files are on `main`. Verify the existing CI checks pass.
-- [ ] 2.2 Ask a fresh-context agent that did not write the files to review the diff against this change, horizontals 02 and 10, and the constitution. Verify each finding is fixed or answered in the pull request.
+- [x] 2.1 Push `change/contribution-files` and open the pull request with title `docs(repo): add contribution templates`. Write the body by hand: OpenSpec link, constitution check, test evidence `none` (not a logic domain; no Vitest test and no playtest checklist), visual evidence `none`, docs updated, and the proposal assumptions. Say the GitHub render check waits until these files are on `main`. Verify the existing CI checks pass.
+- [x] 2.2 Ask a fresh-context agent that did not write the files to review the diff against this change, horizontals 02 and 10, and the constitution. Verify each finding is fixed or answered in the pull request.
 
 ## Workflow follow-up
 
