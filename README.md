@@ -59,3 +59,5 @@ Your typing data stays on your device, or in your own Puter account if you sign 
 ## License
 
 [MIT](LICENSE), covering code and game content. Third-party notices are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The license doesn't grant rights to the project's name.
+
+Scratch.
