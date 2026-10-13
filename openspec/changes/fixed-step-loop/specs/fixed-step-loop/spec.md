@@ -8,7 +8,7 @@ Converts frame timestamps and input timestamps into fixed simulation steps of 1/
 
 ### Requirement: The first timestamp is the origin
 
-The first accepted timestamp, whether a frame or an input, SHALL set the sample cursor. It SHALL complete no step. The clock SHALL report 0, and the interpolation fraction SHALL be 0.
+While the sample cursor is unset, the first frame or input SHALL set the sample cursor. It SHALL complete no step. The clock SHALL report 0, and the interpolation fraction SHALL be 0.
 
 #### Scenario: An opening frame does not step
 
@@ -39,6 +39,11 @@ After the origin timestamp, a frame timestamp at or after the sample cursor SHAL
 - **WHEN** the caller presents a frame at 0 ms and a frame at 1000/120 ms
 - **THEN** the clock is 1 and the interpolation fraction is 0
 
+#### Scenario: A half-tick gap rounds up
+
+- **WHEN** the caller presents a frame at 0 ms and a frame at 1/240 ms
+- **THEN** the clock is 0 and the interpolation fraction is 1/1000
+
 #### Scenario: A repeated timestamp adds nothing
 
 - **WHEN** the caller presents frames at 0 ms, 10 ms, and 10 ms
@@ -62,6 +67,11 @@ Each completed step SHALL call the step callback once, in increasing order, with
 
 - **WHEN** the caller presents a frame at 0 ms and a frame at 25 ms
 - **THEN** the step callback receives 1, then 2, then 3, and during each call the clock reports that same index
+
+#### Scenario: Later steps continue the index
+
+- **WHEN** the caller presents frames at 0 ms, 16 ms, and 41 ms
+- **THEN** the step callback receives 1, then 2, then 3, then 4, and during each call the clock reports that same index
 
 ### Requirement: An input timestamp lands on its step
 
@@ -103,7 +113,7 @@ A frame timestamp or an input timestamp earlier than the sample cursor SHALL lea
 
 ### Requirement: Pause holds the simulation
 
-While the loop is paused, a frame timestamp or an input timestamp SHALL leave the clock and the interpolation fraction unchanged. Resume at a timestamp SHALL set the sample cursor to that timestamp and SHALL keep the clock and the leftover time. A resume while the loop is already running, and a pause while it is already paused, SHALL leave the sample cursor unchanged.
+While the loop is paused, a frame timestamp or an input timestamp SHALL leave the clock and the interpolation fraction unchanged. Resume at a timestamp SHALL set the sample cursor to that timestamp and SHALL keep the clock and the leftover time, including when no frame or input has set the cursor yet. A resume while the loop is already running, and a pause while it is already paused, SHALL leave the sample cursor unchanged.
 
 #### Scenario: A paused gap is dropped
 
@@ -119,6 +129,11 @@ While the loop is paused, a frame timestamp or an input timestamp SHALL leave th
 
 - **WHEN** the caller presents frames at 0 ms and 16 ms, resumes at 1000 ms, and presents a frame at 32 ms
 - **THEN** the clock is 3 and the interpolation fraction is 21/25
+
+#### Scenario: Resume before any sample sets the cursor
+
+- **WHEN** the caller pauses, resumes at 5100 ms, and presents a frame at 5116 ms
+- **THEN** the clock is 1 and the interpolation fraction is 23/25
 
 ### Requirement: Animation frames drive the stepper
 
@@ -140,5 +155,15 @@ A timestamp that is not finite, or that is negative, SHALL throw RangeError. The
 
 #### Scenario: NaN and a negative frame leave the cursor
 
-- **WHEN** the caller presents frames at 0 ms and 10 ms, then presents a frame that is not finite, then presents a frame at -1 ms, then presents a frame at 26 ms
+- **WHEN** the caller presents frames at 0 ms and 10 ms, then presents a frame at NaN, a frame at Infinity, and a frame at -1 ms, then presents a frame at 26 ms
 - **THEN** each bad frame throws RangeError, the clock is still 1 and the fraction is still 1/5 after each throw, and after 26 ms the clock is 3 and the fraction is 3/25
+
+#### Scenario: A bad input leaves the cursor
+
+- **WHEN** the caller presents frames at 0 ms and 10 ms, submits an input at NaN, submits an input at -1 ms, and presents a frame at 26 ms
+- **THEN** each bad input throws RangeError, the clock is still 1 and the fraction is still 1/5 after each throw, and after 26 ms the clock is 3 and the fraction is 3/25
+
+#### Scenario: A bad resume leaves the cursor
+
+- **WHEN** the caller presents frames at 0 ms and 10 ms, pauses, resumes at Infinity, resumes at -1 ms, presents a frame at 18 ms, resumes at 10 ms, and presents a frame at 18 ms
+- **THEN** each bad resume throws RangeError, the clock is 1 and the fraction is 1/5 until the last frame, and after that frame the clock is 2 and the fraction is 4/25
