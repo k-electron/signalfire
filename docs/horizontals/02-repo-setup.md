@@ -85,7 +85,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Scripts
 
-Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check`, `content:words`, `content:hash`, `tokens`, and `ladle` arrive with later tasks.
+Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check`, `content:words`, `content:hash`, and `ladle` arrive with later tasks.
 
 | Script | Does |
 |---|---|
@@ -93,7 +93,8 @@ Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests a
 | `pnpm build` | Production build |
 | `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` | Biome check, then the layer-boundary fixture proof |
+| `pnpm lint` | Biome check, then the layer-boundary fixture proof, then the token check |
+| `pnpm tokens` | Regenerate theme CSS from `src/core/theme/tokens.ts` |
 | `pnpm format` | Biome format and safe fixes |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |
