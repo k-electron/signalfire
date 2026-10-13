@@ -20,18 +20,18 @@ The Signalfire component SHALL live at `src/app/app.tsx`. Its browser smoke SHAL
 - **WHEN** the test runners collect harness smokes
 - **THEN** the Node logic smoke, the property smoke, and the end-to-end smoke stay at their current paths, and the component smoke is `src/app/app.browser.test.tsx`
 
-### Requirement: Core imports only core, Zod, and verzod
+### Requirement: Core imports only core and Zod
 
-A module under `src/core` SHALL pass the boundary check when it imports only `core`, `zod`, or `verzod`. It SHALL fail when it imports any other package, a Node builtin, another layer, or a module at the `src` root.
+A module under `src/core` SHALL pass the boundary check when it imports only `core` or `zod`. It SHALL fail when it imports any other package, including `verzod`, a Node builtin, another layer, or a module at the `src` root.
 
 #### Scenario: Core imports Zod, verzod, and core
 
 - **WHEN** a `src/core` module imports `zod`, `zod/v4`, `verzod`, or a relative module that stays inside `src/core`
-- **THEN** the boundary check passes for those imports
+- **THEN** the boundary check passes for `zod`, `zod/v4`, and the relative module, and fails for `verzod`
 
 #### Scenario: Core imports another package
 
-- **WHEN** a `src/core` module imports `react`, `react/jsx-runtime`, `@scope/pkg`, or `zodiac`
+- **WHEN** a `src/core` module imports `react`, `react/jsx-runtime`, `@scope/pkg`, `zodiac`, or `verzod`
 - **THEN** the boundary check fails
 
 #### Scenario: Core imports a Node builtin
