@@ -1,0 +1,11 @@
+{
+	"v": 1,
+	"updatedAt": "2026-10-12T20:00:00.000Z",
+	"rev": 0,
+	"master": 1,
+	"music": 1,
+	"effects": 1,
+	"voices": 1,
+	"effectsIntensity": "medium",
+	"fullscreen": false
+}

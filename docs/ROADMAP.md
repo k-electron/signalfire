@@ -37,7 +37,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 
 - `src/core` basics: schemas, ports, seeded RNG, run-log format, fixed-step loop.
 - Design tokens, the app-flow machine skeleton, the IndexedDB adapter.
-- Confirm verzod works with the installed Zod before adopting it; if not, use the hand-rolled chain ([Data Model](horizontals/05-data-model.md#risk)).
+- Zod 4.6.6. The migration chain is hand-rolled in `core`; verzod is not a dependency ([Data Model](horizontals/05-data-model.md#risk)).
 - Docs: [Architecture](horizontals/04-architecture.md), [Data Model](horizontals/05-data-model.md), [Design System](horizontals/07-design-system.md).
 - **Exit:** a headless replay test passes, and a document saves and migrates.
 

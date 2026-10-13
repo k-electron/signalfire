@@ -1,6 +1,6 @@
 # src
 
-Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports `core`, `engine`, and `platform`; `engine` and `platform` import only `core` from `src`; `engine` does not import React or stores; `core` imports only itself, Zod, and verzod. The dependency-boundary check enforces this.
+Four layers. Design: `docs/horizontals/04-architecture.md`. Imports go one way: `app` imports `core`, `engine`, and `platform`; `engine` and `platform` import only `core` from `src`; `engine` does not import React or stores; `core` imports only itself and Zod. The dependency-boundary check enforces this.
 
 ## core
 
@@ -11,7 +11,7 @@ Pure game logic: input judging, simulation, scoring, telemetry, adaptive engine,
 - Talk to the outside world only through ports in `ports/` and domain events in the outbox.
 - Functions take data and return data. No hidden module-level state.
 - Test-first (constitution C4); every OpenSpec scenario maps to a test. Invariants get property-based tests (stars never decrease, merges never lose earned items, generated text uses only allowed keys). Use in-memory fakes for ports.
-- Every saved document is a verzod versioned entity in `schemas/`. A new version needs a Zod schema, a pure `up` function from the previous version, and a fixture in `schemas/fixtures/<document>/v<n>.json`. Never delete old versions or drop earned progress.
+- Every saved document is a versioned chain in `schemas/`. A new version needs a Zod schema, a pure `up` function from the previous version, and a fixture in `schemas/fixtures/<document>/v<n>.json`. Never delete old versions or drop earned progress.
 
 ## engine
 
@@ -35,7 +35,7 @@ Adapters for browser storage, puter.js cloud sync, and device detection. Design:
 
 - Implement the `Storage` and `CloudSync` ports.
 - Local storage is IndexedDB through idb-keyval. No `localStorage`.
-- Every read is validated and migrated (Zod + verzod) before use.
+- Every read is validated and migrated by the core schema chain before use.
 - Rotate the previous version into a backup slot before every write; back up before migrations.
 - Write at checkpoints only, inside the `signalfire-write` Web Lock.
 - Merge logic lives in `core`. This layer moves data; it doesn't decide outcomes.

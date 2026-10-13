@@ -7,7 +7,7 @@ How the code is organized, how data and time flow through the game, and the rule
 | Topic | Decision |
 |---|---|
 | Code organization | Four layers: `core`, `engine`, `app`, `platform` |
-| Dependency rule | `core` imports only `core`, Zod, and verzod; the dependency-boundary check enforces the layer rules |
+| Dependency rule | `core` imports only `core` and Zod; the dependency-boundary check enforces the layer rules |
 | Game objects | Plain TypeScript entities updated by system functions; no ECS library |
 | Simulation timing | Fixed step with an accumulator; rendering interpolates |
 | Input timing | Keystrokes use their event timestamps and apply at the step they happened in |
@@ -37,12 +37,12 @@ How the code is organized, how data and time flow through the game, and the rule
 
 | Layer | Contains | May import |
 |---|---|---|
-| `core` | Pure, deterministic game logic and the interfaces (ports) it needs from the outside world. No DOM, no PixiJS, no React, no timers. Also holds the design tokens (plain constants). | Only `core`, Zod, and verzod |
+| `core` | Pure, deterministic game logic and the interfaces (ports) it needs from the outside world. No DOM, no PixiJS, no React, no timers. Also holds the design tokens (plain constants). | Only `core` and Zod |
 | `engine` | The runtime: loop, keyboard capture, PixiJS rendering, Tone.js audio. Implements the rendering and audio ports. | `core` |
 | `platform` | Browser and cloud adapters: local storage, puter.js, device detection. Implements the storage and sync ports. | `core` |
 | `app` | React screens, XState machines, Zustand stores. Wires everything together. | `core`, `engine`, `platform` |
 
-A dependency-boundary check runs in CI and fails on any import that breaks these rules. Adopting verzod still depends on the compatibility check in [horizontal 05](05-data-model.md#risk). If that check drops verzod, the hand-rolled chain lives in `core` and the allowlist loses verzod.
+A dependency-boundary check runs in CI and fails on any import that breaks these rules. The migration chain lives in `core`. verzod is not a dependency.
 
 ## Source layout
 

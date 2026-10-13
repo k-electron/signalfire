@@ -48,11 +48,9 @@
 											":URL:",
 											":ALIAS:",
 											"!zod",
-											"!zod/**",
-											"!verzod",
-											"!verzod/**"
+											"!zod/**"
 										],
-										"message": "core may import only core, zod, and verzod."
+										"message": "core may import only core and zod."
 									},
 									{
 										"group": [
@@ -110,13 +108,11 @@
 											":ALIAS:",
 											"!zod",
 											"!zod/**",
-											"!verzod",
-											"!verzod/**",
 											"!vitest",
 											"!fast-check",
 											"!@fast-check/vitest"
 										],
-										"message": "core tests may import zod, verzod, vitest, fast-check, and @fast-check/vitest."
+										"message": "core tests may import zod, vitest, fast-check, and @fast-check/vitest."
 									},
 									{
 										"group": [
@@ -173,8 +169,6 @@
 											":ALIAS:",
 											"!zod",
 											"!zod/**",
-											"!verzod",
-											"!verzod/**",
 											"!vitest",
 											"!vitest/browser",
 											"!fast-check",
