@@ -59,7 +59,7 @@ interface LocalStore {
 }
 ```
 
-The IndexedDB `apply` runs inside the write lock, then one `readwrite` transaction through the `UseStore` from `createStore`. Puts and deletes share that transaction. Wait on the transaction the way `set` and `setMany` do, with the exported `promisifyRequest`:
+The IndexedDB `apply` is one `readwrite` transaction through the `UseStore` from `createStore`. It does not request the write lock. Puts and deletes share that transaction. Wait on the transaction the way `set` and `setMany` do, with the exported `promisifyRequest`:
 
 ```ts
 customStore("readwrite", (objectStore) => {
@@ -79,15 +79,17 @@ Raw `set` and `delete` are `apply` of one change. They take the lock.
 
 ### The write lock
 
-`createWebWriteLock` calls `navigator.locks.request("signalfire-write", run)` with no options, so the mode is exclusive and the request waits. A `depth` counter on that object runs a nested call directly. Web Locks are not reentrant; without the counter, a save that already holds the lock would deadlock on `apply`.
+`createWebWriteLock` calls `navigator.locks.request("signalfire-write", run)` with no options, so the mode is exclusive and the request waits. It does not keep a depth counter. A counter that stays set across an IndexedDB await lets a second call on the same object skip the browser lock.
 
-`createLocalStorage` passes one lock object into both the adapter and the document store. Two factories have two counters and still share the browser lock by name.
+The IndexedDB `apply` does not request the lock. Document load and save request it, then call `apply`. Raw `set` and `delete` request it, then write. A nested `apply` does not request the lock again, so a save does not deadlock on its own write. A second load, save, set, or delete requests the browser lock and waits until the first callback finishes.
+
+`createLocalStorage` passes one lock object into both the adapter and the document store. Two factories still share the browser lock by name.
 
 `createImmediateWriteLock` runs the function with no `navigator` access. Node tests use it. It does not prove the browser lock. The Chromium tests do.
 
 Every document load and save enters the lock, including a load that does not write and a save that refuses the value. The key check throws before the lock.
 
-The Chromium wait test requests `signalfire-write` itself, outside the factory, and resolves a promise at the start of that callback. It starts the operation only after that. A flag set by the operation's promise records completion. The test reads the flag before releasing. It does not use a timer. It then releases, awaits the operation, and checks the stored keys.
+The Chromium wait test requests `signalfire-write` itself, outside the factory, and resolves a promise at the start of that callback. It starts the operation only after that. `navigator.locks.query()` must show a pending request named `signalfire-write`, and the operation's promise must still be pending, before the holder releases. The test does not use a timer. It then releases, awaits the operation, and checks the stored keys.
 
 ### Load
 
@@ -102,10 +104,10 @@ Inside the lock, after the key check:
 
 ### Save
 
-Inside the lock, after the key check, parse the candidate.
+Inside the lock, after the key check:
 
-- Anything other than `ok` with `migrated: false` returns `{ status: "invalid" }` and writes nothing. A candidate the chain reports as `newer` is this result, not the stored-newer result.
-- Read the live key. If `chain.parse(live)` is `newer`, return `{ status: "newer", version }` and write nothing.
+- Read the live key. If `chain.parse(live)` is `newer`, return `{ status: "newer", version }` and write nothing, including when the candidate itself is not the latest version.
+- Parse the candidate. Anything other than `ok` with `migrated: false` returns `{ status: "invalid" }` and writes nothing. A candidate the chain reports as `newer` is this result when the stored value is not newer.
 - If the live key is absent, `apply` a set of the candidate. No backup keys.
 - If the live value is deeply equal to `backup:0`, `apply` a set of the live key only.
 - Otherwise rotate, then set the live key to the candidate, in the same `apply`.
@@ -147,7 +149,7 @@ Multiple tabs, on the `signalfire-write` sentence, add: a document load takes th
 ## Risks / Trade-offs
 
 - [idb-keyval caches the database connection] → Tests clear the object store. They do not delete the database.
-- [A nested `navigator.locks.request` for `signalfire-write` deadlocks] → One lock object, depth counter, and the Chromium save covers a real nested `apply`.
+- [A nested `navigator.locks.request` for `signalfire-write` deadlocks] → `apply` does not request the lock. The Chromium tests require a pending request named `signalfire-write` before the holder releases.
 - [`createStore` does not upgrade an existing database that lacks the object store] → This change is the first creator of `signalfire`. No other code opens that name.
 - [Restore writes the backup's raw bytes] → The live key can be an older version until the caller saves the migrated document. `restored: true` is the signal. The same rule as a normal migrated load.
 - [One quarantine slot per document] → A later failure replaces the earlier raw value. The spec requires that.

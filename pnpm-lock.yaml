@@ -166,6 +166,9 @@ importers:
 
   .:
     dependencies:
+      idb-keyval:
+        specifier: 6.3.0
+        version: 6.3.0
       react:
         specifier: 19.3.0
         version: 19.3.0
@@ -1054,6 +1057,9 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  idb-keyval@6.3.0:
+    resolution: {integrity: sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==}
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -2147,6 +2153,8 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
+
+  idb-keyval@6.3.0: {}
 
   kleur@4.1.5: {}
 

@@ -11,7 +11,7 @@ Stage 1's exit needs a document that saves and migrates. Schemas and the in-memo
 - Before a save, rotate the previous value into the backup ring. Keep the last 3. Skip the rotate when that value is already the newest backup, so a migration backup is not stored twice.
 - If the stored value is invalid, copy the raw value to a quarantine key and restore the newest backup that parses. If none parses, remove the live value and keep the quarantine.
 - If the stored value is a newer version, leave it untouched. A save does not replace it.
-- Run document loads, document saves, and raw `set` and `delete` inside the exclusive Web Lock `signalfire-write`. A same-tab call already inside that lock continues, so a save that writes several keys does not wait on itself.
+- Run document loads, document saves, and raw `set` and `delete` inside the exclusive Web Lock `signalfire-write`. The IndexedDB batch write does not request the lock again, so a save does not wait on itself. A second operation requests the lock and waits.
 - Prove migration with a two-version chain defined in the test, the same approach as `document-schemas`. Shipped documents are version 1 only. The Chromium test plants an older value in real IndexedDB, loads it migrated, saves the latest version, checks the backup, then quarantines an invalid value and restores that backup.
 - Record the database name and the backup and quarantine key names in decision record 0004 and in horizontal 06. Those names are part of the saved data.
 
@@ -59,7 +59,7 @@ Out of this change: cloud sync, `syncState`, merge, the `signalfire-active` lock
 - The adapter uses `createStore("signalfire", "documents")`. It does not use idb-keyval's default `keyval-store` database.
 - Document keys are non-empty strings other than those that start with `backup:` or `quarantine:`. Backup slots are `backup:<key>:0` (newest) through `backup:<key>:2`. The quarantine key is `quarantine:<key>`.
 - The caller passes a `defineDocument` chain and a value. The store does not fill `updatedAt` or `rev`, and it does not pick which document to write.
-- A save accepts only a value the chain parses as the latest version (`ok`, not migrated). Anything else is refused and the stored keys stay as they were.
+- A save accepts only a value the chain parses as the latest version (`ok`, not migrated). Anything else is refused and the stored keys stay as they were. If the stored value is a newer version, that refusal reports `newer` with the stored version, including when the value being saved is not the latest version.
 - A missing key loads as absent. It is not an invalid document and it does not write.
 - "Newest valid backup" means the newest slot whose raw value parses as `ok`, including one the chain migrates. Restore writes that raw value back to the live key. The load result is the parsed document, with `restored` set. The backup slot is kept.
 - When no backup parses, the live key is removed and the load result is `invalid`. The quarantine key still holds the raw value.
