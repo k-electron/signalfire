@@ -16,7 +16,7 @@ How saved data is stored on the device, protected, and synced to the player's op
 
 ## Local storage
 
-- Every document from the Data Model horizontal is stored in IndexedDB as its own key, through idb-keyval.
+- Every document from the Data Model horizontal is stored in IndexedDB as its own key, through idb-keyval. The database is `signalfire` and the object store is `documents`.
 - Run logs are stored one per key (`run:<runId>`) with an index document.
 - All reads go through Zod validation and the core migration chain before use.
 - Writes are asynchronous and never happen during a frame of gameplay.
@@ -36,9 +36,9 @@ Telemetry is aggregated at the level-end checkpoint (Telemetry vertical); raw ke
 
 ### Backups
 
-- Before each write, the previous version of the document is rotated into a backup slot. The last 3 versions of each document are kept.
+- Before each write, the previous version of the document is rotated into a backup slot. The last 3 versions of each document are kept. The newest backup is `backup:<document key>:0`, then `:1`, then `:2`.
 - A backup is also taken before running any migration.
-- If a document fails validation, the newest valid backup is restored (Data Model horizontal).
+- If a document fails validation, the newest valid backup is restored (Data Model horizontal). The raw value that failed validation is kept at `quarantine:<document key>`.
 
 ### Eviction protection
 
@@ -127,7 +127,7 @@ Merge functions live in `src/core` and are built test-first (constitution C4), w
 
 - Each tab requests a Web Lock named `signalfire-active` for its lifetime, using the `steal` option so the **newest tab takes over**.
 - The tab that loses the lock stops its game loop, flushes unsaved changes, and shows: "Signalfire is open in another tab." with a button to take it back.
-- All writes also run inside a `signalfire-write` lock.
+- All writes also run inside a `signalfire-write` lock. A document load takes that lock too, because a load can write a backup or a quarantine entry.
 - A BroadcastChannel message tells other tabs when the active tab changes or data is written.
 
 ## Sync machine (XState)
