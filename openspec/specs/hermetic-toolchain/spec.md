@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The repository installs, checks, and serves an empty page from toolchain pins inside the project, without installing project tools globally.
+The repository installs, checks, and serves the app from toolchain pins inside the project, without installing project tools globally.
 
 ## Requirements
 
