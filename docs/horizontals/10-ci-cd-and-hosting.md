@@ -21,7 +21,7 @@ Runs on every pull request and on every push to `main`.
 |---|---|---|
 | Install | `pnpm install --frozen-lockfile` | yes |
 | Types | `pnpm typecheck` | yes |
-| Lint | `pnpm lint` (Biome, then the layer-boundary fixture proof) | yes |
+| Lint | `pnpm lint` (Biome, then the layer-boundary fixture proof, then the token check) | yes |
 | Unit and component tests | `pnpm test` (Vitest, including browser mode) | yes |
 | Content | `pnpm content:check` | pending; the command does not exist |
 | Build | `pnpm build` | yes |

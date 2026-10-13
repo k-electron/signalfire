@@ -7,7 +7,11 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"includes": ["**", "!tools/layer-boundaries/fixtures"]
+		"includes": [
+			"**",
+			"!tools/layer-boundaries/fixtures",
+			"!src/app/theme/tokens.css"
+		]
 	},
 	"formatter": {
 		"enabled": true
