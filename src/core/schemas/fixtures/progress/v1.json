@@ -1,0 +1,19 @@
+{
+	"v": 1,
+	"updatedAt": "2026-10-12T20:00:00.000Z",
+	"rev": 0,
+	"levels": {
+		"level:1.1": {
+			"cadet": {
+				"stars": 2,
+				"medals": ["medal:flawless"],
+				"bestScore": 100,
+				"bestNetWpm": 12.5,
+				"bestAccuracy": 0.95,
+				"attempts": 3,
+				"failedSinceLastStar": 1,
+				"calmUnlocked": false
+			}
+		}
+	}
+}

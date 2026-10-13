@@ -18,7 +18,7 @@ How saved data is stored on the device, protected, and synced to the player's op
 
 - Every document from the Data Model horizontal is stored in IndexedDB as its own key, through idb-keyval.
 - Run logs are stored one per key (`run:<runId>`) with an index document.
-- All reads go through Zod validation and verzod migration before use.
+- All reads go through Zod validation and the core migration chain before use.
 - Writes are asynchronous and never happen during a frame of gameplay.
 
 ### Checkpoints

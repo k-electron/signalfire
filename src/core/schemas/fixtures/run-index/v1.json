@@ -1,0 +1,14 @@
+{
+	"v": 1,
+	"updatedAt": "2026-10-12T20:00:00.000Z",
+	"rev": 0,
+	"kept": [
+		{
+			"runId": "01AFQCG20004HMASW9NF6YY41J",
+			"levelId": "level:1.1",
+			"tier": "cadet",
+			"mode": "campaign",
+			"kind": "best"
+		}
+	]
+}

@@ -8,7 +8,7 @@ The shape of everything the game saves and loads, how IDs work, and how saved da
 |---|---|
 | Save structure | Several documents, each with its own schema version |
 | Schemas | Zod, in `src/core/schemas` |
-| Migrations | verzod: each document is a versioned entity with one-step `up` migrations |
+| Migrations | A hand-rolled chain in `src/core/schemas`: versioned Zod schemas and one-step `up` functions |
 | Run logs | Per level: best run and last 3; plus best Courier and Daily Signal runs |
 | Content edits | Stars and medals are kept; ghosts recorded on older content are marked stale |
 
@@ -43,7 +43,7 @@ Every saved document shares an envelope:
 
 | Field | Meaning |
 |---|---|
-| `v` | Schema version of this document type (used by verzod) |
+| `v` | Schema version of this document type |
 | `updatedAt` | ISO timestamp of the last local change |
 | `rev` | Revision counter used by sync (Persistence horizontal) |
 
@@ -151,8 +151,8 @@ Each level's `contentVersion` is a hash of its definition and the content it dra
 
 ### How they work
 
-- Each document type is a verzod versioned entity. Every version has a Zod schema; every version after the first has an `up` function that converts the previous version.
-- On load, each document is parsed with `safeParse`, which migrates old versions to the latest. The migrated document is written back on the next save.
+- Each document type is a versioned chain in `src/core/schemas`. Every version has a Zod schema; every version after the first has an `up` function that converts the previous version.
+- On load, each document is parsed, which migrates old versions to the latest. The migrated document is written back on the next save.
 - Old version definitions are never deleted.
 - `up` functions are pure: no I/O, no randomness, no current time.
 
@@ -179,11 +179,11 @@ If a document fails validation:
 
 ## Risk
 
-verzod's compatibility with the Zod major version in use must be confirmed before adoption. If it isn't compatible, a hand-rolled chain with the same shape (versioned schemas, `up` functions, `safeParse`) replaces it without changing the documents.
+verzod 0.5.1 is not adopted. Its published peer is Zod 3. The chain is in `src/core/schemas`.
 
 ## Sources
 
-- [verzod README](https://cdn.jsdelivr.net/npm/verzod/README.md)
+- [verzod](https://cdn.jsdelivr.net/npm/verzod/README.md), considered and not adopted
 - [Save migrations that survive updates](https://crux.supercraft.host/blog/player-data-save-migrations-every-patch/)
 - [@wentools/schema-migrations](https://jsr.io/@wentools/schema-migrations), considered
 - [Old clients and incompatible schemas (Triplit discussion)](https://github.com/aspen-cloud/triplit/discussions/92)

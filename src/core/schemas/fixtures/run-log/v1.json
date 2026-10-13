@@ -1,0 +1,21 @@
+{
+	"v": 1,
+	"updatedAt": "2026-10-12T20:00:00.000Z",
+	"rev": 0,
+	"runId": "01AFQCG20004HMASW9NF6YY41J",
+	"levelId": "level:1.1",
+	"tier": "cadet",
+	"mode": "campaign",
+	"seed": "signalfire",
+	"contentVersion": "demo",
+	"engineVersion": "0.0.0",
+	"startedAt": "2026-10-12T20:00:00.000Z",
+	"inputs": [[10, 102, 0], [2, 102, 1]],
+	"summary": {
+		"accuracy": 1,
+		"netWpm": 10,
+		"score": 100,
+		"stars": 1,
+		"medals": []
+	}
+}
