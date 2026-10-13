@@ -6,23 +6,23 @@ Cloudflare Workers serves the built app from `main`, gives each pull request a p
 
 ## Requirements
 
-### Requirement: Production serves the empty page
+### Requirement: Production serves the title screen
 
-A merge to `main` SHALL deploy the production build. The served document SHALL show the visible text Signalfire and no other visible text.
+A merge to `main` SHALL deploy the production build. The served document SHALL show the title screen: a heading Signalfire and the text "Press Space to start."
 
 #### Scenario: Main is updated
 
 - **WHEN** `main` is updated
-- **THEN** the production URL's document shows Signalfire and no other visible text
+- **THEN** the production URL's document shows a heading Signalfire and the text "Press Space to start."
 
 ### Requirement: Each pull request gets a preview
 
-A pull request SHALL receive a preview URL for that branch's build. The preview document SHALL show the visible text Signalfire and no other visible text.
+A pull request SHALL receive a preview URL for that branch's build. The preview document SHALL show the title screen: a heading Signalfire and the text "Press Space to start."
 
 #### Scenario: A pull request is opened
 
 - **WHEN** a pull request is opened
-- **THEN** the pull request has a preview URL whose document shows Signalfire and no other visible text
+- **THEN** the pull request has a preview URL whose document shows a heading Signalfire and the text "Press Space to start."
 
 ### Requirement: The document is revalidated and locked to the site
 

@@ -26,9 +26,11 @@
 		"check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
 	},
 	"dependencies": {
+		"@xstate/react": "6.1.0",
 		"idb-keyval": "6.3.0",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
+		"xstate": "5.33.2",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
