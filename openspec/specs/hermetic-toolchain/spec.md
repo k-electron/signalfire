@@ -53,9 +53,9 @@ After install, the store, the cache, and the Node runtime SHALL resolve from the
 
 ### Requirement: The dev server shows the title
 
-`pnpm dev` SHALL serve a page whose visible text is "Signalfire" and nothing else.
+`pnpm dev` SHALL serve the title screen: a heading Signalfire and the text "Press Space to start."
 
 #### Scenario: Dev server
 
 - **WHEN** `pnpm dev` runs
-- **THEN** the page serves and shows the text Signalfire and no other text
+- **THEN** the page serves and shows a heading Signalfire and the text "Press Space to start."
