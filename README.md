@@ -56,4 +56,4 @@ Your typing data stays on your device.
 
 ## License
 
-[MIT](LICENSE), covering code and game content. The license does not grant rights to the project's name.
+[MIT](LICENSE), covering code and game content. The license does not grant rights to the project's name. Bundled font notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

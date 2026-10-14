@@ -21,8 +21,9 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 - `LICENSE`: MIT, covering code and creative content (lore, story text, level data, docs).
 - `THIRD_PARTY_NOTICES.md` holds required notices for bundled third-party data:
-  - **SCOWL** word lists: copyright and permission notice.
-  - **LDNOOBW** blocklist: CC BY 4.0 attribution.
+  - **Atkinson Hyperlegible Mono**: the copyright notice and the SIL Open Font License 1.1, copied from the font package's license file.
+  - **SCOWL** word lists: copyright and permission notice, added when those lists are bundled.
+  - **LDNOOBW** blocklist: CC BY 4.0 attribution, added when that list is bundled.
 - The same attributions appear on the in-game credits screen.
 - MIT does not grant rights to the project's name. The codename "Signalfire" and any final name are not covered by the license.
 
