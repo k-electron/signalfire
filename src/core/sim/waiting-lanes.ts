@@ -1,4 +1,4 @@
-import type { Level, Tuning } from "../content/load";
+import type { Level, Tuning, Zone } from "../content/load";
 import {
 	appendCharacter,
 	applyKeystroke,
@@ -13,6 +13,8 @@ import type { DomainEvent } from "../ports/domain-event";
 import { createOutbox, type Outbox } from "../ports/outbox";
 import { createRng, type Rng } from "../replay/rng";
 import { runLog } from "../schemas/run-log";
+import { scoreEvents } from "../scoring/score";
+import { awardStars, type MissedBar, type StarBars } from "../scoring/stars";
 
 const ENGINE_VERSION = "0.0.0";
 const STEPS_PER_SECOND = 120;
@@ -64,6 +66,7 @@ export type WaitingLanesRun = {
 	unhitCount(): number;
 	finish(outbox: Outbox): {
 		summary: RunSummary;
+		missed: readonly MissedBar[];
 		log: RunLogDocument;
 	};
 };
@@ -98,6 +101,8 @@ type State = {
 	level: Level;
 	seed: string;
 	identity: WaitingLanesIdentity;
+	starBars: StarBars | null;
+	events: DomainEvent[];
 };
 
 const placeholderSummary: RunSummary = {
@@ -110,10 +115,14 @@ const placeholderSummary: RunSummary = {
 
 export function createWaitingLanesRun(
 	level: Level,
+	zone: Zone,
 	tuning: Tuning,
 	seed: string,
 	identity: WaitingLanesIdentity,
 ): WaitingLanesRun {
+	if (zone.id !== level.zoneId) {
+		throw new RangeError("The zone does not match the level.");
+	}
 	const approachSteps = approachLength(tuning);
 	const lastStep = lastStepOf(level);
 	if (
@@ -137,6 +146,8 @@ export function createWaitingLanesRun(
 		level,
 		seed,
 		identity,
+		starBars: zone.starBars ?? null,
+		events: [],
 	};
 	fillQueue(state, 0);
 	return {
@@ -166,17 +177,22 @@ export function createWaitingLanesRun(
 
 export function replayWaitingLanes(
 	level: Level,
+	zone: Zone,
 	tuning: Tuning,
 	log: RunLogDocument,
 	outbox: Outbox,
-): { events: readonly DomainEvent[]; summary: RunSummary } {
+): {
+	events: readonly DomainEvent[];
+	summary: RunSummary;
+	missed: readonly MissedBar[];
+} {
 	const major = majorOf(log.engineVersion);
 	if (major !== 0) {
 		throw new RangeError("The engine version does not match.");
 	}
 	const inputs = expand(log.inputs);
 	const privateOutbox = createOutbox();
-	const run = createWaitingLanesRun(level, tuning, log.seed, {
+	const run = createWaitingLanesRun(level, zone, tuning, log.seed, {
 		runId: log.runId,
 		levelId: log.levelId,
 		tier: log.tier,
@@ -195,7 +211,7 @@ export function replayWaitingLanes(
 	for (const event of events) {
 		outbox.emit(event);
 	}
-	return { events, summary: finished.summary };
+	return { events, summary: finished.summary, missed: finished.missed };
 }
 
 function approachLength(tuning: Tuning): number {
@@ -310,7 +326,7 @@ function apply(
 	});
 	state.judge = judged.state;
 	if (judged.event !== null) {
-		outbox.emit(judged.event);
+		emit(state, outbox, judged.event);
 	}
 	if (judged.event?.type === "Hit") {
 		state.notes = state.notes.slice(1);
@@ -321,22 +337,27 @@ function apply(
 function finish(
 	state: State,
 	outbox: Outbox,
-): { summary: RunSummary; log: RunLogDocument } {
+): { summary: RunSummary; missed: readonly MissedBar[]; log: RunLogDocument } {
 	assertPlaying(state);
 	state.step = state.lastStep;
 	end(state, outbox);
-	const summary = summaryOf(state.judge);
+	const { summary, missed } = summaryOf(state);
 	const parsed = runLog.parse(
 		document(state.seed, encode(state.inputs), state.identity, summary),
 	);
 	if (parsed.status !== "ok") {
 		throw new RangeError("The run log is invalid.");
 	}
-	return { summary, log: parsed.document };
+	return { summary, missed, log: parsed.document };
+}
+
+function emit(state: State, outbox: Outbox, event: DomainEvent): void {
+	state.events.push(event);
+	outbox.emit(event);
 }
 
 function end(state: State, outbox: Outbox): void {
-	outbox.emit({ type: "LevelEnded", step: state.step });
+	emit(state, outbox, { type: "LevelEnded", step: state.step });
 	state.finished = true;
 }
 
@@ -352,14 +373,29 @@ function activeNote(state: State): ActiveNote | null {
 	return { character: note.character, spawnStep: note.spawnStep, posture };
 }
 
-function summaryOf(judge: JudgeState): RunSummary {
-	const attempts = attemptCounts(judge);
+function summaryOf(state: State): {
+	summary: RunSummary;
+	missed: readonly MissedBar[];
+} {
+	const attempts = attemptCounts(state.judge);
+	const netWpm = velocityWpm(state.judge);
+	const award = awardStars({
+		finished: true,
+		correctFirstAttempts: attempts.correctFirstAttempts,
+		firstAttempts: attempts.firstAttempts,
+		netWpm,
+		starBars: state.starBars,
+	});
 	return {
-		accuracy: attempts.firstAttempts === 0 ? 1 : integrityPercent(judge) / 100,
-		netWpm: velocityWpm(judge),
-		score: 0,
-		stars: 0,
-		medals: [],
+		summary: {
+			accuracy:
+				attempts.firstAttempts === 0 ? 1 : integrityPercent(state.judge) / 100,
+			netWpm,
+			score: scoreEvents(state.events),
+			stars: award.stars,
+			medals: [],
+		},
+		missed: award.missed,
 	};
 }
 

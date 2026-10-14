@@ -8,7 +8,13 @@ import level11File from "../../../content/levels/1-1-first-light.json" with {
 import tuningFile from "../../../content/tuning/waiting-lanes.json" with {
 	type: "json",
 };
-import { acceptLevel, acceptTuning } from "../content/load";
+import zone0File from "../../../content/zones/0-home-row-station.json" with {
+	type: "json",
+};
+import zone1File from "../../../content/zones/1-the-drift.json" with {
+	type: "json",
+};
+import { acceptLevel, acceptTuning, acceptZone } from "../content/load";
 import { createOutbox, type Outbox } from "../ports/outbox";
 import { runLog } from "../schemas/run-log";
 import {
@@ -24,14 +30,32 @@ const SPACE = 32;
 const level01 = acceptLevel(level01File);
 const level11 = acceptLevel(level11File);
 const tuning = acceptTuning(tuningFile);
+const zone0 = acceptZone(zone0File);
+const zone1 = acceptZone(zone1File);
 
-const blank = {
-	accuracy: 1,
-	netWpm: 0,
-	score: 0,
-	stars: 0,
-	medals: [] as string[],
+const integrityMiss = {
+	kind: "integrity" as const,
+	measuredPercent: 50,
+	neededPercent: 92,
+	shortfallPercent: 42,
 };
+
+const velocityMiss = {
+	kind: "velocity" as const,
+	measuredWpm: 0,
+	neededWpm: 6,
+	shortfallWpm: 6,
+};
+
+function zoneFor(levelId: string) {
+	if (levelId === level01.id) {
+		return zone0;
+	}
+	if (levelId === level11.id) {
+		return zone1;
+	}
+	throw new RangeError("The level has no shipped zone.");
+}
 
 function identity(levelId: string, contentVersion = "demo") {
 	return {
@@ -49,6 +73,7 @@ function identity(levelId: string, contentVersion = "demo") {
 function open(level: typeof level11, seed: string, contentVersion = "demo") {
 	return createWaitingLanesRun(
 		level,
+		zoneFor(level.id),
 		tuning,
 		seed,
 		identity(level.id, contentVersion),
@@ -231,12 +256,14 @@ test("a wrong key on level 0.1 still completes", () => {
 	const outbox = createOutbox();
 	const run = open(level01, "signalfire");
 	run.apply(J, 0, outbox);
-	const { summary } = run.finish(outbox);
+	const { summary, missed } = run.finish(outbox);
 	expect(outbox.drain()).toEqual([
 		{ type: "Error", step: 0 },
 		{ type: "LevelEnded", step: 5999 },
 	]);
 	expect(summary.stars).toBe(0);
+	expect(summary.score).toBe(250);
+	expect(missed).toEqual([]);
 });
 
 test("one hit and a later error", () => {
@@ -244,7 +271,7 @@ test("one hit and a later error", () => {
 	const run = open(level11, "signalfire");
 	press(run, 0, F, 0, outbox);
 	press(run, 120, J, 0, outbox);
-	const { summary } = run.finish(outbox);
+	const { summary, missed } = run.finish(outbox);
 	expect(outbox.drain()).toEqual([
 		{ type: "Hit", step: 0 },
 		{ type: "Error", step: 120 },
@@ -253,17 +280,25 @@ test("one hit and a later error", () => {
 	expect(summary).toEqual({
 		accuracy: 0.5,
 		netWpm: 12,
-		score: 0,
+		score: 260,
 		stars: 0,
 		medals: [],
 	});
+	expect(missed).toEqual([integrityMiss]);
 });
 
 test("no key-down scores nothing", () => {
 	const outbox = createOutbox();
 	const run = open(level11, "signalfire");
-	const { summary } = run.finish(outbox);
-	expect(summary).toEqual(blank);
+	const { summary, missed } = run.finish(outbox);
+	expect(summary).toEqual({
+		accuracy: 1,
+		netWpm: 0,
+		score: 250,
+		stars: 0,
+		medals: [],
+	});
+	expect(missed).toEqual([velocityMiss]);
 });
 
 test("inputs are listed before the level ends", () => {
@@ -293,13 +328,20 @@ test("steps are stored as deltas", () => {
 		[0, F, 0],
 		[2, F, 1],
 	]);
-	expect(log.summary).toEqual(blank);
+	expect(log.summary).toEqual({
+		accuracy: 1,
+		netWpm: 0,
+		score: 260,
+		stars: 0,
+		medals: [],
+	});
 });
 
 test("two inputs at one step keep a zero delta", () => {
 	const outbox = createOutbox();
 	const run = createWaitingLanesRun(
 		level11,
+		zone1,
 		tuning,
 		"signalfire",
 		identity("level:1.1"),
@@ -326,7 +368,13 @@ test("the same play twice is the same log", () => {
 
 test("a bad level id throws", () => {
 	expect(() =>
-		createWaitingLanesRun(level11, tuning, "signalfire", identity("level:1")),
+		createWaitingLanesRun(
+			level11,
+			zone1,
+			tuning,
+			"signalfire",
+			identity("level:1"),
+		),
 	).toThrow(RangeError);
 });
 
@@ -377,14 +425,21 @@ test("a scripted 1.1 run replays", () => {
 	const run = open(level11, "signalfire");
 	press(run, 0, F, 0, played);
 	press(run, 120, J, 0, played);
-	const { log } = run.finish(played);
-	const replay = replayWaitingLanes(level11, tuning, log, createOutbox());
+	const { log, missed } = run.finish(played);
+	const replay = replayWaitingLanes(
+		level11,
+		zone1,
+		tuning,
+		log,
+		createOutbox(),
+	);
 	expect(replay.events).toEqual([
 		{ type: "Hit", step: 0 },
 		{ type: "Error", step: 120 },
 		{ type: "LevelEnded", step: 5999 },
 	]);
 	expect(replay.summary).toEqual(log.summary);
+	expect(replay.missed).toEqual(missed);
 });
 
 test("playing matches the replay", () => {
@@ -392,10 +447,17 @@ test("playing matches the replay", () => {
 	const run = open(level11, "signalfire");
 	press(run, 0, F, 0, played);
 	press(run, 120, J, 0, played);
-	const { summary, log } = run.finish(played);
-	const replay = replayWaitingLanes(level11, tuning, log, createOutbox());
+	const { summary, missed, log } = run.finish(played);
+	const replay = replayWaitingLanes(
+		level11,
+		zone1,
+		tuning,
+		log,
+		createOutbox(),
+	);
 	expect(played.drain()).toEqual(replay.events);
 	expect(summary).toEqual(replay.summary);
+	expect(missed).toEqual(replay.missed);
 });
 
 test("a changed stored score does not change the replay", () => {
@@ -404,8 +466,14 @@ test("a changed stored score does not change the replay", () => {
 	run.apply(F, 0, outbox);
 	const { log } = run.finish(outbox);
 	const tampered = { ...log, summary: { ...log.summary, score: 9 } };
-	const replay = replayWaitingLanes(level11, tuning, tampered, createOutbox());
-	expect(replay.summary.score).toBe(0);
+	const replay = replayWaitingLanes(
+		level11,
+		zone1,
+		tuning,
+		tampered,
+		createOutbox(),
+	);
+	expect(replay.summary.score).toBe(260);
 });
 
 test("content version is stored and not simulated", () => {
@@ -418,6 +486,7 @@ test("content version is stored and not simulated", () => {
 			log: finished.log,
 			events: outbox.drain(),
 			summary: finished.summary,
+			missed: finished.missed,
 		};
 	}
 	const demo = played("demo");
@@ -426,25 +495,29 @@ test("content version is stored and not simulated", () => {
 	expect(other.log.contentVersion).toBe("other");
 	const demoReplay = replayWaitingLanes(
 		level11,
+		zone1,
 		tuning,
 		demo.log,
 		createOutbox(),
 	);
 	const otherReplay = replayWaitingLanes(
 		level11,
+		zone1,
 		tuning,
 		other.log,
 		createOutbox(),
 	);
 	expect(demoReplay.events).toEqual(otherReplay.events);
 	expect(demoReplay.summary).toEqual(otherReplay.summary);
+	expect(demoReplay.missed).toEqual(otherReplay.missed);
+	expect(demo.missed).toEqual(demoReplay.missed);
 });
 
 test("engine version 0.0.0 replays", () => {
 	const run = open(level11, "signalfire");
 	const { log } = run.finish(createOutbox());
 	const outbox = createOutbox();
-	const replay = replayWaitingLanes(level11, tuning, log, outbox);
+	const replay = replayWaitingLanes(level11, zone1, tuning, log, outbox);
 	expect(replay.events.length).toBeGreaterThan(0);
 	expect(log.engineVersion).toBe("0.0.0");
 	expect(outbox.drain()).toEqual(replay.events);
@@ -457,10 +530,32 @@ test("a different major is refused", () => {
 	expect(() =>
 		replayWaitingLanes(
 			level11,
+			zone1,
 			tuning,
 			{ ...log, engineVersion: "1.0.0" },
 			outbox,
 		),
 	).toThrow(RangeError);
+	expect(outbox.drain()).toEqual([]);
+});
+
+test("zone 0 with level 1.1 is rejected", () => {
+	expect(() =>
+		createWaitingLanesRun(
+			level11,
+			zone0,
+			tuning,
+			"signalfire",
+			identity(level11.id),
+		),
+	).toThrow(RangeError);
+});
+
+test("replay with the other zone is rejected", () => {
+	const { log } = open(level11, "signalfire").finish(createOutbox());
+	const outbox = createOutbox();
+	expect(() => replayWaitingLanes(level11, zone0, tuning, log, outbox)).toThrow(
+		RangeError,
+	);
 	expect(outbox.drain()).toEqual([]);
 });
