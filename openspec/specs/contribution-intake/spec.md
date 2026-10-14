@@ -60,24 +60,6 @@ The README SHALL describe the game as a browser game that teaches touch typing.
 - **WHEN** a visitor reads the start of the README
 - **THEN** it describes a browser game that teaches touch typing
 
-### Requirement: The README says the game is not deployed
-
-The README play section SHALL say the game is not deployed yet.
-
-#### Scenario: A visitor looks for where to play
-
-- **WHEN** a visitor reads the README play section
-- **THEN** it says the game is not deployed yet
-
-### Requirement: The README states Stage 0
-
-The README status section SHALL say the project is pre-alpha and that Stage 0 has exited.
-
-#### Scenario: A visitor reads the status
-
-- **WHEN** a visitor reads the README status section
-- **THEN** it says pre-alpha and that Stage 0 has exited
-
 ### Requirement: The README says how the project is built
 
 The README SHALL say the code is written by AI agents using OpenSpec, and SHALL link the philosophy and the design docs.
@@ -122,3 +104,21 @@ The README license section SHALL say the project is MIT, covering code and game 
 
 - **WHEN** a visitor reads the README license section
 - **THEN** it says MIT, covering code and game content, and that the project name is not covered
+
+### Requirement: The README gives the play URL
+
+The README play section SHALL give `https://signalfire.k-electron.workers.dev/`.
+
+#### Scenario: A visitor looks for where to play
+
+- **WHEN** a visitor reads the README play section
+- **THEN** it gives `https://signalfire.k-electron.workers.dev/`
+
+### Requirement: The README states Stages 0 and 1
+
+The README status section SHALL say the project is pre-alpha and that Stages 0 and 1 have exited.
+
+#### Scenario: A visitor reads the status
+
+- **WHEN** a visitor reads the README status section
+- **THEN** it says pre-alpha and that Stages 0 and 1 have exited
