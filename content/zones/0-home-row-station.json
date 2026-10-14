@@ -1,0 +1,6 @@
+{
+	"id": "zone:0",
+	"name": "Home Row Station",
+	"machine": "machine:skiff",
+	"keys": ["f", "j", " "]
+}

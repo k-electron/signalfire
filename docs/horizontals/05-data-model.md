@@ -30,6 +30,7 @@ The shape of everything the game saves and loads, how IDs work, and how saved da
 | Character (key mastery, Keylings) | `char:<character>` | `char:e`, `char:?` |
 | Medal | `medal:<slug>` | `medal:flawless` |
 | Machine | `machine:<slug>` | `machine:dart` |
+| Tuning | `tuning:<slug>` | `tuning:waiting-lanes` |
 | Mod | `mod:<slug>` | `mod:reach-boosters` |
 | Achievement | `achievement:<slug>` | `achievement:first-light` |
 | Dispatch template | `dispatch:<slug>` | `dispatch:earn-medals` |
@@ -138,7 +139,7 @@ Device ID and per-document sync bookkeeping. Defined in the Persistence horizont
 
 ## Bundled content (not saved)
 
-Game data in `content/` is validated against Zod schemas at build time:
+Game data in `content/` is validated against Zod schemas by `pnpm content:check`, and parsed again when the app loads the files.
 
 | Content | Schema covers |
 |---|---|
@@ -147,8 +148,11 @@ Game data in `content/` is validated against Zod schemas at build time:
 | Word lists | Curated lists per zone, blocklist |
 | Story | Dialogue lines with level IDs and speaker |
 | Prose | Passages for Zones 6–9 and endless modes |
+| Tuning | ID, approach seconds, queue depth |
 
-Each level's `contentVersion` is a hash of its definition and the content it draws on. Changing a level changes its hash.
+The schemas in `src/core/schemas/content` cover zones (id, sector name, machine, key set, optional star bars), levels (id, name, zone, type `intro` or `drill`, allowed keys, focus keys, mechanics `lanes-wait` and `space-pulse`, five phases with a duration and units, medals, tuning id), and tuning (id, approach seconds, queue depth). Gate requirement, the other pressure controls, other mechanics and level types, word lists, story, and prose wait for the level that needs them.
+
+Each level's `contentVersion` is the hash in [decision 0007](../decisions/0007-content-version-hash.md): the level, the zone's star bars, and the tuning it uses. Changing any of those changes the hash.
 
 ### When content changes
 

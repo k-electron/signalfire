@@ -1,0 +1,22 @@
+{
+	"id": "level:1.1",
+	"name": "First Light",
+	"zoneId": "zone:1",
+	"type": "drill",
+	"tuningId": "tuning:waiting-lanes",
+	"allowedKeys": ["f", "j", " "],
+	"focusKeys": ["f", "j"],
+	"mechanics": ["lanes-wait"],
+	"medals": ["medal:flawless", "medal:full-clear", "medal:clean-reach"],
+	"phases": [
+		{ "name": "arrival", "durationSeconds": 8, "units": ["fff", "jjj"] },
+		{ "name": "build", "durationSeconds": 12, "units": ["fjf jfj", "f j f j"] },
+		{
+			"name": "peak",
+			"durationSeconds": 12,
+			"units": ["fjfj jfjf", "ff jj fj"]
+		},
+		{ "name": "breather", "durationSeconds": 8, "units": ["fj jf"] },
+		{ "name": "finale", "durationSeconds": 10, "units": ["fjf jfj fj"] }
+	]
+}

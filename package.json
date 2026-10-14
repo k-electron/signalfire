@@ -23,7 +23,8 @@
 		"test:unit": "vitest run --project unit",
 		"browsers:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
 		"test:e2e": "pnpm build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-		"check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+		"content:check": "node tools/content/check.mjs",
+		"check": "pnpm typecheck && pnpm lint && pnpm content:check && pnpm test && pnpm build"
 	},
 	"dependencies": {
 		"@xstate/react": "6.1.0",

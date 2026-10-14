@@ -1,0 +1,5 @@
+{
+	"id": "tuning:waiting-lanes",
+	"approachSeconds": 6,
+	"queueDepth": 1
+}

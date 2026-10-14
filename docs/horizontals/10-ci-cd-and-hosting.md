@@ -23,7 +23,7 @@ Runs on every pull request and on every push to `main`.
 | Types | `pnpm typecheck` | yes |
 | Lint | `pnpm lint` (Biome, then the layer-boundary fixture proof, then the token check) | yes |
 | Unit and component tests | `pnpm test` (Vitest, including browser mode) | yes |
-| Content | `pnpm content:check` | pending; the command does not exist |
+| Content | `pnpm content:check` | yes |
 | Build | `pnpm build` | yes |
 | Bundle | No command yet. The production bundle must contain no dev-only modules (Dev Tooling) | pending |
 | End-to-end | `pnpm test:e2e` against the production build | yes |

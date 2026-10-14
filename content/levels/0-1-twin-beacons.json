@@ -1,0 +1,18 @@
+{
+	"id": "level:0.1",
+	"name": "Twin Beacons",
+	"zoneId": "zone:0",
+	"type": "intro",
+	"tuningId": "tuning:waiting-lanes",
+	"allowedKeys": ["f", "j", " "],
+	"focusKeys": ["f", "j", " "],
+	"mechanics": ["lanes-wait", "space-pulse"],
+	"medals": [],
+	"phases": [
+		{ "name": "arrival", "durationSeconds": 8, "units": ["fff", "jjj"] },
+		{ "name": "build", "durationSeconds": 12, "units": ["fjf", "jfj"] },
+		{ "name": "peak", "durationSeconds": 12, "units": ["fjfj", "jfjf"] },
+		{ "name": "breather", "durationSeconds": 8, "units": ["f j", "j f"] },
+		{ "name": "finale", "durationSeconds": 10, "units": ["fj ", "jf "] }
+	]
+}
