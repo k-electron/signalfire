@@ -97,7 +97,7 @@ export const tokens = {
 	motion: {
 		micro: { durationMs: 100, easing: "ease-out" },
 		standard: { durationMs: 240, stiffness: 380, damping: 30 },
-		scene: { durationMs: 650, easing: [1, 0, 0, 1] },
+		scene: { durationMs: 650, easing: [0.87, 0, 0.13, 1] },
 		celebrate: { minMs: 1200, maxMs: 2000 },
 	},
 	layer: {

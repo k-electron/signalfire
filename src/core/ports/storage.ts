@@ -1,5 +1,3 @@
-import type { LoadResult, SaveResult } from "../storage/document-store";
-
 export type StorageKey =
 	| "profile"
 	| "settings"
@@ -7,7 +5,8 @@ export type StorageKey =
 	| "run-index"
 	| `run:${string}`;
 
-export interface Storage {
-	load(key: StorageKey): Promise<LoadResult<unknown>>;
-	save(key: StorageKey, value: unknown): Promise<SaveResult>;
-}
+// The document type is the chain createGameStorage passes in. A separate
+// overload list is not checked against that object, so this alias is the port.
+export type Storage = ReturnType<
+	typeof import("../storage/game-storage").createGameStorage
+>;

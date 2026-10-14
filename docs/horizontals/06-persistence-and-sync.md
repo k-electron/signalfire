@@ -39,6 +39,7 @@ Telemetry is aggregated at the level-end checkpoint (Telemetry vertical); raw ke
 - Before each write, the previous version of the document is rotated into a backup slot when that value is not invalid. The last 3 versions of each document are kept. The newest backup is `backup:<document key>:0`, then `:1`, then `:2`.
 - A backup is also taken before running any migration.
 - If a document fails its own version's schema, the newest valid backup is restored (Data Model horizontal). The raw value is appended at `quarantine:<document key>:0`, then `:1`, and so on. An earlier slot is not overwritten. An invalid value is not rotated into the backup ring. A migration that cannot finish does not quarantine or delete anything.
+- A save does not run when the live value's migration cannot finish. That value is not rotated.
 
 ### Eviction protection
 

@@ -15,6 +15,32 @@ export interface DocumentChain<T> {
 	parse(data: unknown): ParseResult<T>;
 }
 
+export type DocumentOf<Chain> = Chain extends {
+	parse(data: unknown): ParseResult<infer Document>;
+}
+	? Document
+	: never;
+
+type ChainMap = Readonly<Record<string, DocumentChain<unknown>>>;
+
+type RunKey = `run:${string}`;
+
+export type DocumentStore<
+	Chains extends ChainMap,
+	Run extends DocumentChain<unknown> | undefined,
+> = {
+	load<K extends keyof Chains & string>(
+		key: K,
+	): Promise<LoadResult<DocumentOf<Chains[K]>>>;
+	load(
+		key: [Run] extends [undefined] ? never : RunKey,
+	): Promise<LoadResult<DocumentOf<NonNullable<Run>>>>;
+	save(
+		key: (keyof Chains & string) | ([Run] extends [undefined] ? never : RunKey),
+		value: unknown,
+	): Promise<SaveResult>;
+};
+
 export type LoadResult<T> =
 	| { readonly status: "absent" }
 	| {
@@ -32,12 +58,22 @@ export type SaveResult =
 	| { readonly status: "saved" }
 	| { readonly status: "invalid" }
 	| { readonly status: "newer"; readonly version: number }
+	| { readonly status: "failed" }
 	| { readonly status: "busy" };
 
+export function createDocumentStore<
+	const Chains extends ChainMap,
+	Run extends DocumentChain<unknown> | undefined = undefined,
+>(
+	store: LocalStore,
+	lock: WriteLock,
+	chains: Chains,
+	run?: Run,
+): DocumentStore<Chains, Run>;
 export function createDocumentStore(
 	store: LocalStore,
 	lock: WriteLock,
-	chains: Readonly<Record<string, DocumentChain<unknown>>>,
+	chains: ChainMap,
 	run?: DocumentChain<unknown>,
 ) {
 	return {
@@ -86,11 +122,11 @@ function isRunKey(key: string): boolean {
 	return key.startsWith("run:") && runId.safeParse(key.slice(4)).success;
 }
 
-async function loadDocument(
+async function loadDocument<T>(
 	store: LocalStore,
 	key: string,
-	chain: DocumentChain<unknown>,
-): Promise<LoadResult<unknown>> {
+	chain: DocumentChain<T>,
+): Promise<LoadResult<T>> {
 	const live = await store.get(key);
 	if (live === undefined) {
 		return { status: "absent" };
@@ -136,6 +172,9 @@ async function saveDocument(
 		if (stored.status === "newer") {
 			return { status: "newer", version: stored.version };
 		}
+		if (stored.status === "failed") {
+			return { status: "failed" };
+		}
 	}
 	const candidate = chain.parse(value);
 	if (candidate.status !== "ok" || candidate.migrated) {
@@ -169,12 +208,12 @@ async function backupBeforeMigration(
 	await store.apply(rotate(key, live, backup0, backup1));
 }
 
-async function quarantine(
+async function quarantine<T>(
 	store: LocalStore,
 	key: string,
-	chain: DocumentChain<unknown>,
+	chain: DocumentChain<T>,
 	live: unknown,
-): Promise<LoadResult<unknown>> {
+): Promise<LoadResult<T>> {
 	const backups = [
 		await store.get(backupKey(key, 0)),
 		await store.get(backupKey(key, 1)),

@@ -180,7 +180,7 @@ If a document's version is newer than this build understands (for example, cloud
 
 ### Invalid data
 
-A value is invalid only when it fails the schema of its own version. A migration that cannot finish is not invalid: the store leaves every key unchanged and does not quarantine or delete the document.
+A value is invalid only when it fails the schema of its own version. A migration that cannot finish is not invalid: the store leaves every key unchanged and does not quarantine or delete the document. A save during a failed migration reports failed and leaves every key unchanged.
 
 If a document fails its own version's schema:
 

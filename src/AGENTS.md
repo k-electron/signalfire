@@ -36,7 +36,7 @@ Adapters for browser storage, puter.js cloud sync, and device detection. Design:
 - Implement the `Storage` and `CloudSync` ports.
 - Local storage is IndexedDB through idb-keyval. No `localStorage`.
 - The `Storage` port loads and saves a key bound to that key's chain. A read is validated and migrated by the core schema chain before use.
-- Rotate a previous value that is not invalid into a backup slot before every write; back up before migrations. A failed migration does not quarantine or delete the document.
+- Rotate a previous value that is not invalid, and whose migration can finish, into a backup slot before every write; back up before migrations. A failed migration refuses the save and does not quarantine or delete the document.
 - Write at checkpoints only, inside the `signalfire-write` Web Lock.
 - Merge logic lives in `core`. This layer moves data; it doesn't decide outcomes.
 - Load puter.js on demand only. `puter.auth.signIn()` must be triggered by a click.
