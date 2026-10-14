@@ -13,16 +13,16 @@ GitHub Actions SHALL run the blocking checks on every pull request and on every 
 #### Scenario: A pull request is opened or updated
 
 - **WHEN** a pull request is opened, synchronized, or reopened
-- **THEN** Install, Types, Lint, Tests, Build, End-to-end, and the pull request title check run
+- **THEN** Install, Types, Lint, Content, Tests, Build, End-to-end, and the pull request title check run
 
 #### Scenario: A commit is pushed to main
 
 - **WHEN** a commit is pushed to `main`
-- **THEN** Install, Types, Lint, Tests, Build, and End-to-end run, and the pull request title check does not run
+- **THEN** Install, Types, Lint, Content, Tests, Build, and End-to-end run, and the pull request title check does not run
 
 ### Requirement: Install fails when the lockfile does not match
 
-The Install check SHALL run `pnpm install --frozen-lockfile`. When that command fails, Types, Lint, Tests, Build, and End-to-end SHALL be skipped on that run.
+The Install check SHALL run `pnpm install --frozen-lockfile`. When that command fails, Types, Lint, Content, Tests, Build, and End-to-end SHALL be skipped on that run.
 
 #### Scenario: The lockfile matches the manifest
 
@@ -32,7 +32,7 @@ The Install check SHALL run `pnpm install --frozen-lockfile`. When that command 
 #### Scenario: The lockfile does not match the manifest
 
 - **WHEN** `pnpm install --frozen-lockfile` fails
-- **THEN** the Install check fails, and Types, Lint, Tests, Build, and End-to-end are skipped
+- **THEN** the Install check fails, and Types, Lint, Content, Tests, Build, and End-to-end are skipped
 
 ### Requirement: Types fails on a type error
 
@@ -167,3 +167,12 @@ The workflow SHALL request `contents: read`. Every job SHALL run with that permi
 
 - **WHEN** `.node-version` equals the lockfile's `node@runtime` version and `pnpm lint` runs on a tree that otherwise passes lint
 - **THEN** `pnpm lint` succeeds
+
+### Requirement: Content fails when content is invalid
+
+The Content check SHALL run `pnpm content:check`.
+
+#### Scenario: Invalid content is the only failure
+
+- **WHEN** `pnpm content:check` fails and `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`, and `pnpm test:e2e` succeed
+- **THEN** the Content check fails and Types, Lint, Tests, Build, and End-to-end pass

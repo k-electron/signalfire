@@ -8,12 +8,12 @@ The repository installs, checks, and serves the app from toolchain pins inside t
 
 ### Requirement: A clean checkout checks and builds
 
-On a clean checkout, `pnpm install`, then `pnpm browsers:install`, then `pnpm check` SHALL run typecheck, lint, the Vitest projects, and build, and all of them SHALL pass. `pnpm check` needs the Chromium binaries from `pnpm browsers:install`.
+On a clean checkout, `pnpm install`, then `pnpm browsers:install`, then `pnpm check` SHALL run typecheck, lint, `pnpm content:check`, the Vitest projects, and build, and all of them SHALL pass. `pnpm check` needs the Chromium binaries from `pnpm browsers:install`.
 
 #### Scenario: Install and check
 
 - **WHEN** `pnpm install`, then `pnpm browsers:install`, then `pnpm check` runs on a clean checkout
-- **THEN** typecheck, lint, the Vitest projects, and build pass
+- **THEN** typecheck, lint, `pnpm content:check`, the Vitest projects, and build pass
 
 ### Requirement: Explicit any fails lint
 

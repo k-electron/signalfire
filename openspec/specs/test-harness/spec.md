@@ -86,12 +86,12 @@ The repo SHALL keep four tests labeled as harness smoke tests: one Node logic te
 
 ### Requirement: Check runs typecheck, lint, test, and build
 
-`pnpm check` SHALL run typecheck, lint, `pnpm test`, and build, in that order.
+`pnpm check` SHALL run typecheck, lint, `pnpm content:check`, `pnpm test`, and build, in that order.
 
 #### Scenario: Check runs both test projects
 
 - **WHEN** `pnpm check` runs after browser binaries are installed
-- **THEN** typecheck, lint, the Node smokes, the component smoke, and the build pass
+- **THEN** typecheck, lint, `pnpm content:check`, the Node smokes, the component smoke, and the build pass
 
 ### Requirement: Pre-push runs the Node unit tests
 

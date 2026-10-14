@@ -180,6 +180,8 @@ Automated checks run on every content change:
 | First-letter check | Shooter waves can produce duplicate first letters on screen |
 | Length check | Units fall outside the level's length range |
 
+`pnpm content:check` runs the schema, the key-set rule, and the drill rule (every unit contains a focus key). Blocklist, focus-share percent, repeat, first-letter, and length checks arrive with the content they cover.
+
 ## Open questions
 
 - Should pseudo-words be used at all, or should Zone 1 rely on patterns and the small real-word list? Playtest both.

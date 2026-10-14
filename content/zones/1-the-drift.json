@@ -1,0 +1,11 @@
+{
+	"id": "zone:1",
+	"name": "The Drift",
+	"machine": "machine:skiff",
+	"keys": ["f", "j", " "],
+	"starBars": {
+		"one": { "accuracyPercent": 92, "wpm": 6 },
+		"two": { "accuracyPercent": 95, "wpm": 9 },
+		"three": { "accuracyPercent": 97, "wpm": 12 }
+	}
+}

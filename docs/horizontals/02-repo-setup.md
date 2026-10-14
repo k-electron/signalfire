@@ -85,7 +85,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Scripts
 
-Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check`, `content:words`, `content:hash`, and `ladle` arrive with later tasks.
+Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:words`, `content:hash`, and `ladle` arrive with later tasks.
 
 | Script | Does |
 |---|---|
@@ -101,7 +101,8 @@ Agents and humans use the same commands. `AGENTS.md` lists them. Browser tests a
 | `pnpm test <pattern>` | Run matching tests only |
 | `pnpm browsers:install` | Install Chromium inside the repo |
 | `pnpm test:e2e` | Playwright against the production build |
-| `pnpm check` | Typecheck, lint, test, and build |
+| `pnpm content:check` | Validate zones, levels, and tuning |
+| `pnpm check` | Typecheck, lint, content check, test, and build |
 
 ## TypeScript settings
 

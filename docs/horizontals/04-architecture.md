@@ -46,7 +46,7 @@ A dependency-boundary check runs in CI and fails on any import that breaks these
 
 ## Source layout
 
-The tree is the target layout. After Stage 1 these directories exist: `src/core/ports`, `src/core/replay`, `src/core/schemas`, `src/core/storage`, `src/core/theme`, `src/engine/loop`, `src/platform/storage`, and `src/app` (machines, screens, theme). The other names arrive with the stage that fills them.
+The tree is the target layout. These directories exist: `src/core/ports`, `src/core/replay`, `src/core/schemas`, `src/core/storage`, `src/core/theme`, `src/core/content`, `src/engine/loop`, `src/platform/storage`, and `src/app` (machines, screens, theme). The other names arrive with the stage that fills them.
 
 ```
 src/
@@ -83,7 +83,7 @@ src/
 └── main.tsx
 ```
 
-Game data lives in `content/` at the repo root. It is validated against `core/schemas` at build time and bundled.
+Game data lives in `content/` at the repo root. `pnpm content:check` validates it against `core/schemas` before a build is trusted, and the app parses it again when it loads the files.
 
 ## Game loop
 

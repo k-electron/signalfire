@@ -10,3 +10,4 @@ Decision records (MADR minimal). Template and rules: [docs/AGENTS.md](../AGENTS.
 | [0004](0004-local-document-keys.md) | Local document keys | accepted |
 | [0005](0005-quarantine-slots.md) | Quarantine slots | accepted |
 | [0006](0006-dependency-preference.md) | Dependency preference | accepted |
+| [0007](0007-content-version-hash.md) | Content version hash | accepted |

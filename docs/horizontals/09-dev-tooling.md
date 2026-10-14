@@ -8,7 +8,7 @@ Tools that make the game fast to build, tune, and debug, for agents and for Kari
 |---|---|
 | In-game debug tools | Overlay, command palette, and Level Lab; dev builds only |
 | Tuning panel | Tweakpane; dev builds only |
-| Content format | JSON in `content/`, validated by Zod at build, hot-reloaded in dev |
+| Content format | JSON in `content/`. `pnpm content:check` validates it before a build is trusted, and the app parses it again on load. Hot-reloaded in dev |
 | Claude Code hooks | Auto-format after edits |
 
 ## Dev-only by construction
@@ -66,7 +66,7 @@ A dev screen for building and checking levels without playing through the map.
 
 | Script | Does |
 |---|---|
-| `pnpm content:check` | Validates all content against Zod schemas; runs the key-set, blocklist, focus-coverage, repeat, first-letter, and length checks (Text Content vertical) |
+| `pnpm content:check` | Validates zones, levels, and tuning against Zod schemas, then the key-set rule and the drill rule that every unit contains a focus key. Blocklist, focus-share percent, repeat, first-letter, and length checks arrive with the content they cover |
 | `pnpm content:words` | Builds curated word lists from SCOWL for each zone's key set, applies the blocklist, and writes candidates for human review |
 | `pnpm tokens` | Regenerates CSS variables from `tokens.ts` (Design System horizontal) |
 | `pnpm content:hash` | Prints each level's `contentVersion` hash (Data Model horizontal) |

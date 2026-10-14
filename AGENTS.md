@@ -89,9 +89,10 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 | `pnpm test <pattern>` | Run matching tests only |
 | `pnpm browsers:install` | Install Chromium inside the repo |
 | `pnpm test:e2e` | Playwright against the production build |
-| `pnpm check` | Typecheck, lint, test, and build |
+| `pnpm content:check` | Validate zones, levels, and tuning |
+| `pnpm check` | Typecheck, lint, content check, test, and build |
 
-Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `content:check` and `ladle` arrive with later tasks.
+Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `ladle` arrives with a later task.
 
 ## Before you say "done"
 
