@@ -4,7 +4,7 @@ const STEPS_PER_SECOND = 120;
 // A gap longer than 360 steps is more than 3 seconds at 1/120 s. Verticals 02,
 // 05, and 06 exclude that pause from Velocity. Active minutes are the remaining
 // span in minutes. That reading is an assumption in
-// openspec/changes/input-judging/design.md.
+// openspec/changes/archive/2026-10-14-input-judging/design.md.
 const PAUSE_STEPS = 3 * STEPS_PER_SECOND;
 
 const SHIFT_SIDES = ["left", "right", "none"] as const;
