@@ -1,7 +1,26 @@
-import { expect, test } from "vitest";
+import { expect, expectTypeOf, test } from "vitest";
 import profileFixture from "../schemas/fixtures/profile/v1.json" with {
 	type: "json",
 };
+import progressFixture from "../schemas/fixtures/progress/v1.json" with {
+	type: "json",
+};
+import runIndexFixture from "../schemas/fixtures/run-index/v1.json" with {
+	type: "json",
+};
+import runLogFixture from "../schemas/fixtures/run-log/v1.json" with {
+	type: "json",
+};
+import settingsFixture from "../schemas/fixtures/settings/v1.json" with {
+	type: "json",
+};
+import type { ParseResult } from "../schemas/parse";
+import type { profile } from "../schemas/profile";
+import type { progress } from "../schemas/progress";
+import type { runIndex } from "../schemas/run-index";
+import type { runLog } from "../schemas/run-log";
+import type { settings } from "../schemas/settings";
+import type { LoadResult } from "../storage/document-store";
 import {
 	createFakeAudioOut,
 	createFakeClock,
@@ -101,6 +120,48 @@ test("two storages do not share entries", async () => {
 	await first.save("profile", profileFixture);
 	expect(await second.load("profile")).toEqual({ status: "absent" });
 });
+
+test("each shipped key returns its document", async () => {
+	const storage = createFakeStorage();
+	await storage.save("profile", profileFixture);
+	await storage.save("settings", settingsFixture);
+	await storage.save("progress", progressFixture);
+	await storage.save("run-index", runIndexFixture);
+	await storage.save("run:01AFQCG20004HMASW9NF6YY41J", runLogFixture);
+
+	const profileDocument = okDocument(await storage.load("profile"));
+	const settingsDocument = okDocument(await storage.load("settings"));
+	const progressDocument = okDocument(await storage.load("progress"));
+	const runIndexDocument = okDocument(await storage.load("run-index"));
+	const runLogDocument = okDocument(
+		await storage.load("run:01AFQCG20004HMASW9NF6YY41J"),
+	);
+
+	expectTypeOf(profileDocument).toEqualTypeOf<DocumentOf<typeof profile>>();
+	expectTypeOf(settingsDocument).toEqualTypeOf<DocumentOf<typeof settings>>();
+	expectTypeOf(progressDocument).toEqualTypeOf<DocumentOf<typeof progress>>();
+	expectTypeOf(runIndexDocument).toEqualTypeOf<DocumentOf<typeof runIndex>>();
+	expectTypeOf(runLogDocument).toEqualTypeOf<DocumentOf<typeof runLog>>();
+
+	expect(profileDocument.callSign).toBe(profileFixture.callSign);
+	expect(settingsDocument.master).toBe(settingsFixture.master);
+	expect(progressDocument.levels).toEqual(progressFixture.levels);
+	expect(runIndexDocument.kept).toEqual(runIndexFixture.kept);
+	expect(runLogDocument.runId).toBe(runLogFixture.runId);
+});
+
+function okDocument<T>(result: LoadResult<T>): T {
+	if (result.status !== "ok") {
+		throw new Error(`expected ok, got ${result.status}`);
+	}
+	return result.document;
+}
+
+type DocumentOf<Chain> = Chain extends {
+	parse(data: unknown): ParseResult<infer Document>;
+}
+	? Document
+	: never;
 
 test("a local write is not in the cloud", async () => {
 	const storage = createFakeStorage();

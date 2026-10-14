@@ -179,6 +179,22 @@ test("an invalid live value stays out of the backup ring", async () => {
 	expect(await store.get("quarantine:progress:0")).toEqual({ v: 1 });
 });
 
+test("a save leaves the failed migration and the backups in place", async () => {
+	const { store, documents } = setup({ progress: brokenStarChain });
+	await setRaw(store, "progress", older);
+	await setRaw(store, "backup:progress:0", latestStars(3));
+	await setRaw(store, "backup:progress:1", latestStars(2));
+	await setRaw(store, "backup:progress:2", latestStars(1));
+	expect(await documents.save("progress", latestStars(9))).toEqual({
+		status: "failed",
+	});
+	expect(await store.get("progress")).toEqual(older);
+	expect(await store.get("backup:progress:0")).toEqual(latestStars(3));
+	expect(await store.get("backup:progress:1")).toEqual(latestStars(2));
+	expect(await store.get("backup:progress:2")).toEqual(latestStars(1));
+	expect(await store.get("quarantine:progress:0")).toBeUndefined();
+});
+
 test("a future value loads as newer", async () => {
 	const { store, documents } = setup({ progress: starChain });
 	const future = { v: 3, stars: 9 };

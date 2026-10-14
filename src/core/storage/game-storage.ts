@@ -1,4 +1,3 @@
-import type { Storage } from "../ports/storage";
 import { profile } from "../schemas/profile";
 import { progress } from "../schemas/progress";
 import { runIndex } from "../schemas/run-index";
@@ -7,7 +6,7 @@ import { settings } from "../schemas/settings";
 import { createDocumentStore, type LocalStore } from "./document-store";
 import type { WriteLock } from "./write-lock";
 
-export function createGameStorage(store: LocalStore, lock: WriteLock): Storage {
+export function createGameStorage(store: LocalStore, lock: WriteLock) {
 	return createDocumentStore(
 		store,
 		lock,

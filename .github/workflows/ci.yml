@@ -19,9 +19,6 @@ jobs:
     if: github.event_name == 'push' || github.event.action != 'edited'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -52,9 +49,6 @@ jobs:
     if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -78,9 +72,6 @@ jobs:
     if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -104,9 +95,6 @@ jobs:
     if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -139,9 +127,6 @@ jobs:
     if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
@@ -165,9 +150,6 @@ jobs:
     if: ${{ (github.event_name == 'push' || github.event.action != 'edited') && needs.install.result == 'success' && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1

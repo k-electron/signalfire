@@ -152,12 +152,12 @@ Project commands SHALL run through pnpm. The workflow SHALL install that pnpm wi
 
 ### Requirement: Jobs request the permissions they use
 
-The title job SHALL request `contents: read`. Each job that restores or saves the pnpm store or the browser directory SHALL request `contents: read` and `actions: write`.
+The workflow SHALL request `contents: read`. Every job SHALL run with that permission, including the title job and each job that restores or saves the pnpm store or the browser directory.
 
 #### Scenario: The workflow permissions match the jobs
 
 - **WHEN** the workflow file is read
-- **THEN** the title job requests contents read, and each job that uses the cache requests contents read and actions write
+- **THEN** the workflow requests contents read, and the title job and each job that restores or saves a cache run with contents read
 
 ### Requirement: The Node version has one source
 

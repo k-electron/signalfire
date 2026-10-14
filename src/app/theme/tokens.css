@@ -51,7 +51,7 @@
 	--shadow-glow-lg: var(--glow-lg);
 	--shadow-focus: 0 0 0 2px var(--ring), var(--glow-sm);
 	--ease-micro: ease-out;
-	--ease-scene: cubic-bezier(1, 0, 0, 1);
+	--ease-scene: cubic-bezier(0.87, 0, 0.13, 1);
 }
 
 :root {
