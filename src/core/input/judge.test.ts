@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import {
 	activeCharacter,
+	appendCharacter,
 	applyKeystroke,
 	attemptCounts,
 	integrityPercent,
@@ -264,5 +265,25 @@ test("an unusable keystroke is rejected", () => {
 	expect(attemptCounts(hit.state)).toEqual({
 		correctFirstAttempts: 1,
 		firstAttempts: 1,
+	});
+});
+
+test("appendCharacter adds the next code point without judging", () => {
+	const hit = applyKeystroke(startJudge([F]), down(0, F));
+	const appended = appendCharacter(hit.state, J);
+	expect(activeCharacter(appended)).toBe(J);
+	expect(attemptCounts(appended)).toEqual(attemptCounts(hit.state));
+	expect(integrityPercent(appended)).toBe(integrityPercent(hit.state));
+	expect(velocityWpm(appended)).toBe(velocityWpm(hit.state));
+	expect(hit.state.sequence).toEqual([F]);
+});
+
+test("appendCharacter rejects a surrogate", () => {
+	const started = startJudge([F]);
+	expect(() => appendCharacter(started, 55296)).toThrow(RangeError);
+	expect(activeCharacter(started)).toBe(F);
+	expect(attemptCounts(started)).toEqual({
+		correctFirstAttempts: 0,
+		firstAttempts: 0,
 	});
 });

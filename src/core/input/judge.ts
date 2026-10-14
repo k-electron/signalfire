@@ -92,6 +92,21 @@ export function activeCharacter(state: JudgeState): number | null {
 	return character === undefined ? null : character;
 }
 
+export function appendCharacter(
+	state: JudgeState,
+	character: number,
+): JudgeState {
+	if (
+		!Number.isSafeInteger(character) ||
+		character < 0 ||
+		character > 0x10ffff ||
+		(character >= 0xd800 && character <= 0xdfff)
+	) {
+		throw new RangeError("The character must be a Unicode code point.");
+	}
+	return { ...state, sequence: [...state.sequence, character] };
+}
+
 export function attemptCounts(state: JudgeState): AttemptCounts {
 	return {
 		correctFirstAttempts: state.correctFirstAttempts,
