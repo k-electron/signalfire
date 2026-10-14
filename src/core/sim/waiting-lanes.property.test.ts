@@ -9,14 +9,29 @@ import level11File from "../../../content/levels/1-1-first-light.json" with {
 import tuningFile from "../../../content/tuning/waiting-lanes.json" with {
 	type: "json",
 };
-import { acceptLevel, acceptTuning } from "../content/load";
+import zone0File from "../../../content/zones/0-home-row-station.json" with {
+	type: "json",
+};
+import zone1File from "../../../content/zones/1-the-drift.json" with {
+	type: "json",
+};
+import { acceptLevel, acceptTuning, acceptZone } from "../content/load";
 import { createOutbox } from "../ports/outbox";
 import { createWaitingLanesRun, replayWaitingLanes } from "./waiting-lanes";
 
 const level01 = acceptLevel(level01File);
 const level11 = acceptLevel(level11File);
 const tuning = acceptTuning(tuningFile);
+const zone0 = acceptZone(zone0File);
+const zone1 = acceptZone(zone1File);
 const levels = [level01, level11];
+
+function zoneFor(levelId: string) {
+	if (levelId === level01.id) {
+		return zone0;
+	}
+	return zone1;
+}
 
 const otherScalars = [65, 97, 98, 99];
 
@@ -67,7 +82,13 @@ test.prop([fc.constantFrom(...levels), fc.string({ maxLength: 40 }), inputs])(
 	"an arbitrary seed and input list replay",
 	(level, seed, list) => {
 		const recorded = createOutbox();
-		const run = createWaitingLanesRun(level, tuning, seed, identity(level.id));
+		const run = createWaitingLanesRun(
+			level,
+			zoneFor(level.id),
+			tuning,
+			seed,
+			identity(level.id),
+		);
 		for (const input of list) {
 			run.advance(input.step, recorded);
 			run.apply(input.character, input.flags, recorded);
@@ -75,10 +96,17 @@ test.prop([fc.constantFrom(...levels), fc.string({ maxLength: 40 }), inputs])(
 		const finished = run.finish(recorded);
 		const played = recorded.drain();
 		const replayed = createOutbox();
-		const result = replayWaitingLanes(level, tuning, finished.log, replayed);
+		const result = replayWaitingLanes(
+			level,
+			zoneFor(level.id),
+			tuning,
+			finished.log,
+			replayed,
+		);
 		expect(result.events).toEqual(played);
 		expect(replayed.drain()).toEqual(result.events);
 		expect(result.summary).toEqual(finished.log.summary);
+		expect(result.missed).toEqual(finished.missed);
 	},
 );
 
@@ -98,6 +126,7 @@ test.prop([fc.constantFrom(...levels), fc.string({ maxLength: 40 })])(
 			const outbox = createOutbox();
 			const run = createWaitingLanesRun(
 				level,
+				zoneFor(level.id),
 				tuning,
 				seed,
 				identity(level.id),
