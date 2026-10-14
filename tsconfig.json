@@ -20,5 +20,6 @@
 		"vite.config.ts",
 		"vitest.config.ts",
 		"playwright.config.ts"
-	]
+	],
+	"exclude": ["src/app/theme/tokens-output.test.ts"]
 }

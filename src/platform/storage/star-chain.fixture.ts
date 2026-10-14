@@ -30,3 +30,17 @@ export const starChain = defineDocument<z.infer<typeof version2>>({
 export function latestStars(stars: number): z.infer<typeof version2> {
 	return { v: 2, stars, note: "kept" };
 }
+
+export const brokenStarChain = defineDocument<z.infer<typeof version2>>({
+	latest: 2,
+	versions: {
+		1: { initial: true, schema: version1 },
+		2: {
+			initial: false,
+			schema: version2,
+			up() {
+				return { v: 2, stars: 2 };
+			},
+		},
+	},
+});

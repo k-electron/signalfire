@@ -3,7 +3,8 @@ import type { ZodType } from "zod";
 export type ParseResult<T> =
 	| { readonly status: "ok"; readonly migrated: boolean; readonly document: T }
 	| { readonly status: "newer"; readonly version: number }
-	| { readonly status: "invalid" };
+	| { readonly status: "invalid" }
+	| { readonly status: "failed" };
 
 type DocumentVersion =
 	| { readonly initial: true; readonly schema: ZodType }
@@ -16,9 +17,16 @@ type DocumentVersion =
 export function defineDocument<T>(definition: {
 	readonly latest: number;
 	readonly versions: Readonly<Record<number, DocumentVersion>>;
-}): { parse: (data: unknown) => ParseResult<T> } {
+}): {
+	readonly versions: readonly number[];
+	parse: (data: unknown) => ParseResult<T>;
+} {
 	const { latest, versions } = definition;
+	const versionNumbers = Object.keys(versions)
+		.map((key) => Number(key))
+		.sort((left, right) => left - right);
 	return {
+		versions: versionNumbers,
 		parse(data: unknown): ParseResult<T> {
 			const version = versionOf(data);
 			if (version === null || version < 1) {
@@ -29,7 +37,7 @@ export function defineDocument<T>(definition: {
 			}
 			const start = versions[version];
 			if (start === undefined) {
-				return { status: "invalid" };
+				return { status: "failed" };
 			}
 			const parsed = start.schema.safeParse(data);
 			if (!parsed.success) {
@@ -40,11 +48,17 @@ export function defineDocument<T>(definition: {
 			for (let step = version + 1; step <= latest; step += 1) {
 				const next = versions[step];
 				if (next === undefined || next.initial) {
-					return { status: "invalid" };
+					return { status: "failed" };
 				}
-				const upgraded = next.schema.safeParse(next.up(value));
+				let upgradedRaw: unknown;
+				try {
+					upgradedRaw = next.up(value);
+				} catch {
+					return { status: "failed" };
+				}
+				const upgraded = next.schema.safeParse(upgradedRaw);
 				if (!upgraded.success) {
-					return { status: "invalid" };
+					return { status: "failed" };
 				}
 				value = upgraded.data;
 				migrated = true;

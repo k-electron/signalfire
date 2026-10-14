@@ -46,6 +46,8 @@ A dependency-boundary check runs in CI and fails on any import that breaks these
 
 ## Source layout
 
+The tree is the target layout. After Stage 1 these directories exist: `src/core/ports`, `src/core/replay`, `src/core/schemas`, `src/core/storage`, `src/core/theme`, `src/engine/loop`, `src/platform/storage`, and `src/app` (machines, screens, theme). The other names arrive with the stage that fills them.
+
 ```
 src/
 ├── core/
@@ -59,6 +61,7 @@ src/
 │   ├── meta/         Dispatches, weekly goal, achievements
 │   ├── replay/       Seeded randomness, run logs, replay runner
 │   ├── schemas/      Zod schemas and the types derived from them
+│   ├── storage/      Document load, save, backup, and quarantine
 │   ├── theme/        Design tokens: colors, motion, sizes (plain constants)
 │   └── ports/        Interfaces: Clock, Storage, CloudSync, AudioOut, RenderOut
 ├── engine/

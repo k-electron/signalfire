@@ -13,11 +13,11 @@ Built for desktop and laptop computers with a US QWERTY keyboard.
 
 ## Play
 
-Not deployed yet. The game will be hosted on Cloudflare Workers; the link will appear here.
+https://signalfire.k-electron.workers.dev/
 
 ## Status
 
-Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) has exited.
+Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) and [Stage 1](docs/ROADMAP.md) (core foundations) have exited.
 
 ## How this project is built
 

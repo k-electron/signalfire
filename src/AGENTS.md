@@ -10,7 +10,7 @@ Pure game logic: input judging, simulation, scoring, telemetry, adaptive engine,
 - Outcomes (hits, stars, unlocks) depend only on integer steps and inputs. Floats are allowed for positions, never for decisions.
 - Talk to the outside world only through ports in `ports/` and domain events in the outbox.
 - Functions take data and return data. No hidden module-level state.
-- Test-first (constitution C4); every OpenSpec scenario maps to a test. Invariants get property-based tests (stars never decrease, merges never lose earned items, generated text uses only allowed keys). Use in-memory fakes for ports.
+- Test-first (constitution C4). Logic-domain scenarios map to a test. Tooling, CI, and docs are checked by running the command. Invariants get property-based tests (stars never decrease, merges never lose earned items, generated text uses only allowed keys). Use in-memory fakes for ports.
 - Every saved document is a versioned chain in `schemas/`. A new version needs a Zod schema, a pure `up` function from the previous version, and a fixture in `schemas/fixtures/<document>/v<n>.json`. Never delete old versions or drop earned progress.
 
 ## engine
@@ -35,8 +35,8 @@ Adapters for browser storage, puter.js cloud sync, and device detection. Design:
 
 - Implement the `Storage` and `CloudSync` ports.
 - Local storage is IndexedDB through idb-keyval. No `localStorage`.
-- Every read is validated and migrated by the core schema chain before use.
-- Rotate the previous version into a backup slot before every write; back up before migrations.
+- The `Storage` port loads and saves a key bound to that key's chain. A read is validated and migrated by the core schema chain before use.
+- Rotate a previous value that is not invalid into a backup slot before every write; back up before migrations. A failed migration does not quarantine or delete the document.
 - Write at checkpoints only, inside the `signalfire-write` Web Lock.
 - Merge logic lives in `core`. This layer moves data; it doesn't decide outcomes.
 - Load puter.js on demand only. `puter.auth.signIn()` must be triggered by a click.

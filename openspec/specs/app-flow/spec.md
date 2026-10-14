@@ -154,20 +154,6 @@ Asking to go back from a zone map that was opened from the hub SHALL return to t
 - **WHEN** the zone map was opened from the hub and the flow is asked to go back
 - **THEN** the flow is the hub
 
-### Requirement: The zone map opens the level
-
-Asking to start the level from the zone map SHALL open the level. Asking to go back from the level SHALL return to the zone map.
-
-#### Scenario: The zone map opens the level
-
-- **WHEN** the flow is asked to start the level from the zone map
-- **THEN** the flow is the level
-
-#### Scenario: Back from the level returns to the zone map
-
-- **WHEN** the flow is asked to go back from the level
-- **THEN** the flow is the zone map
-
 ### Requirement: Finishing the level opens results
 
 Asking to finish the level SHALL open results. Continue SHALL be selected. Asking to go back, or asking to return to the zone map, SHALL open the zone map. Asking to return to the hub SHALL open the hub.
@@ -366,6 +352,11 @@ Escape SHALL ask the flow to go back.
 - **WHEN** the player presses Escape on results
 - **THEN** the player sees the zone map heading
 
+#### Scenario: Escape on the level opens pause
+
+- **WHEN** the player presses Escape on the level
+- **THEN** the player sees the pause heading
+
 ### Requirement: Number keys pick a destination
 
 On the hub, 1, 2, 3, 4, and 5 SHALL open the galaxy map, the dossier, the hangar, the codex, and settings. On results, 1 SHALL open the zone map and 2 SHALL open the hub. A number key on the title SHALL leave the title showing.
@@ -484,7 +475,7 @@ Activating a control with the pointer SHALL ask for the same destination as sele
 
 ### Requirement: The open screen takes the keyboard
 
-When a screen opens, the player SHALL be able to use the next key without clicking. The focus indicator SHALL be visible.
+When a screen opens, the player SHALL be able to use the next mapped key without clicking, including when focus is outside the shell. The selected item's focus indicator SHALL be visible.
 
 #### Scenario: Space works on the title without a click
 
@@ -495,6 +486,11 @@ When a screen opens, the player SHALL be able to use the next key without clicki
 
 - **WHEN** the player clicks Settings on the hub
 - **THEN** pressing Escape returns to the hub without another click, and the focus indicator is visible on settings before that press
+
+#### Scenario: Space works when focus is outside the shell
+
+- **WHEN** the title is showing and focus is on the document body
+- **THEN** pressing Space opens onboarding on a first run
 
 ### Requirement: A failed screen offers a way back
 
@@ -518,3 +514,45 @@ A first-run player SHALL be able to move from the title to onboarding, the hub, 
 
 - **WHEN** the player, on a first run, presses Space on the title, Space on onboarding, 5 on the hub, Escape, 5 again, and then the browser Back button
 - **THEN** the player sees, in order, the onboarding heading, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
+
+### Requirement: The zone map opens the level, and back opens pause
+
+Asking to start the level from the zone map SHALL open the level. Asking to go back from the level SHALL open pause.
+
+#### Scenario: The zone map opens the level
+
+- **WHEN** the flow is asked to start the level from the zone map
+- **THEN** the flow is the level
+
+#### Scenario: Back from the level opens pause
+
+- **WHEN** the flow is asked to go back from the level
+- **THEN** the flow is pause
+
+### Requirement: Pause resumes the level
+
+Pause SHALL show a heading Pause. Pressing Space or Escape on pause SHALL return to the level.
+
+#### Scenario: Pause shows its name
+
+- **WHEN** pause is showing
+- **THEN** the player sees a heading Pause
+
+#### Scenario: Space on pause returns to the level
+
+- **WHEN** the player presses Space on pause
+- **THEN** the player sees the level heading
+
+#### Scenario: Escape on pause returns to the level
+
+- **WHEN** the player presses Escape on pause
+- **THEN** the player sees the level heading
+
+### Requirement: The selected item is visible
+
+The selected hub item and the selected results item SHALL be painted with the focus ring and glow. Other items on that screen SHALL stay unpainted by that ring.
+
+#### Scenario: The selected hub item shows the focus ring
+
+- **WHEN** the galaxy map item is selected on the hub
+- **THEN** that item shows the focus ring and the other hub items do not

@@ -6,40 +6,6 @@ Saves each document in IndexedDB, migrates an older version on load, and restore
 
 ## Requirements
 
-### Requirement: The game store is an IndexedDB database
-
-The game's local store SHALL keep values in IndexedDB database `signalfire`, object store `documents`. A second opening of that store SHALL see the same keys.
-
-#### Scenario: A stored profile is in signalfire
-
-- **WHEN** the caller saves the shipped version 1 profile under `profile` and then reads IndexedDB database `signalfire`, object store `documents`, key `profile`
-- **THEN** the stored value equals that profile
-
-#### Scenario: Two openings share a key
-
-- **WHEN** one opening sets `{ "stars": 1 }` under `progress` and a second opening gets `progress`
-- **THEN** the get resolves to `{ "stars": 1 }`
-
-#### Scenario: A raw value round-trips as a copy
-
-- **WHEN** the caller sets `{ "stars": 1 }` under `progress`, changes that object, gets `progress`, and changes the object that was returned
-- **THEN** both gets resolve to `{ "stars": 1 }`
-
-#### Scenario: A missing key is absent
-
-- **WHEN** the caller gets `missing`
-- **THEN** the get resolves to `undefined`
-
-#### Scenario: Delete removes the key
-
-- **WHEN** the caller sets `{ "stars": 1 }` under `progress` and then deletes `progress`
-- **THEN** a later get of `progress` resolves to `undefined`
-
-#### Scenario: Delete of a missing key resolves
-
-- **WHEN** the caller deletes `missing`
-- **THEN** the delete resolves and a get of `missing` resolves to `undefined`
-
 ### Requirement: A missing document loads as absent
 
 A load of a key with no value SHALL report absent and SHALL leave the store unchanged.
@@ -75,31 +41,34 @@ A load of a value that is already the latest version SHALL return that document 
 #### Scenario: Loading the latest version stores no backup
 
 - **WHEN** the shipped version 1 profile is the live value under `profile` and the caller loads `profile`
-- **THEN** `backup:profile:0`, `backup:profile:1`, `backup:profile:2`, and `quarantine:profile` are absent, and the live key is still the profile
+- **THEN** `backup:profile:0`, `backup:profile:1`, `backup:profile:2`, and `quarantine:profile:0` are absent, and the live key is still the profile
 
 ### Requirement: An older version migrates in memory and is backed up
 
-A load of an older version SHALL return the migrated latest document with restored false, SHALL leave the raw older value under the live key, and SHALL store that raw value at `backup:<key>:0` when the newest backup is not already that value.
-
-The chain in these scenarios has version 1 `{ "v": 1, "stars": <number> }` and version 2, which copies `stars`, sets `v` to 2, and adds `note` of `kept`. Version 2 is the latest version. A value that fails its version's shape is invalid.
+A load of an older version SHALL return the migrated latest document with restored false, SHALL leave the raw older value under the live key, and SHALL store it at `backup:<key>:0` when that backup is not already the same value. Each key is bound to one chain. Callers load and save the key. The progress scenarios use a chain whose version 2 copies stars, sets `v` to 2, and adds `note` of `kept`.
 
 #### Scenario: Version 1 migrates to version 2 and keeps stars
 
-- **WHEN** the caller sets `{ "v": 1, "stars": 2 }` under `progress` and loads `progress` with that chain
+- **WHEN** the caller sets `{ "v": 1, "stars": 2 }` under `progress` and loads `progress`
 - **THEN** the result is ok, migrated is true, restored is false, `v` is 2, `stars` is 2, `note` is `kept`, the live key is still `{ "v": 1, "stars": 2 }`, `backup:progress:0` is that same value, and `backup:progress:1` and `backup:progress:2` are absent
 
 #### Scenario: A second load does not store a second copy
 
-- **WHEN** the live key and `backup:progress:0` are both `{ "v": 1, "stars": 2 }` and the caller loads `progress` with that chain
+- **WHEN** the live key and `backup:progress:0` are both `{ "v": 1, "stars": 2 }` and the caller loads `progress`
 - **THEN** `backup:progress:0` is still `{ "v": 1, "stars": 2 }` and `backup:progress:1` is absent
+
+#### Scenario: A failed migration writes nothing
+
+- **WHEN** the live key is `{ "v": 1, "stars": 2 }` and the bound chain's version 2 step returns a value the version 2 schema rejects
+- **THEN** the load is failed, the live key is still `{ "v": 1, "stars": 2 }`, and `backup:progress:0` and `quarantine:progress:0` are absent
 
 ### Requirement: A save writes the latest version and rotates backups
 
-A save of a latest-version document SHALL report saved, SHALL store that document under the live key, and SHALL rotate the previous live value into the backup ring, newest at `backup:<key>:0`, keeping at most three. When the previous live value is already the newest backup, that ring SHALL stay as it was. The first save, with no previous value, SHALL write no backup.
+A save of a latest-version document SHALL report saved and store that document under the live key. It SHALL rotate a previous live value that is not invalid into `backup:<key>:0`, keeping at most three, unless that value is already the newest backup. The first save SHALL write no backup. An invalid previous live value SHALL be appended to quarantine and stay out of the backup ring.
 
 #### Scenario: The first save stores no backup
 
-- **WHEN** the caller saves `{ "v": 2, "stars": 1, "note": "kept" }` under `progress` with that chain and the key was absent
+- **WHEN** the caller saves `{ "v": 2, "stars": 1, "note": "kept" }` under `progress` on that store and the key was absent
 - **THEN** the result is saved, the live key is that document, and `backup:progress:0` is absent
 
 #### Scenario: The migrated document is saved and the older value stays the newest backup
@@ -117,77 +86,87 @@ A save of a latest-version document SHALL report saved, SHALL store that documen
 - **WHEN** the live key holds `{ "v": 2, "stars": 2, "note": "kept" }` and the caller saves `{ "v": 1, "stars": 9 }`
 - **THEN** the result is invalid, the live key is unchanged, and `backup:progress:0` is absent
 
+#### Scenario: An invalid live value stays out of the backup ring
+
+- **WHEN** the live key is `{ "v": 1 }`, every backup slot is absent, and the caller saves `{ "v": 2, "stars": 1, "note": "kept" }`
+- **THEN** the result is saved, the live key is that document, `backup:progress:0` is absent, and `quarantine:progress:0` is `{ "v": 1 }`
+
 ### Requirement: A newer version stays stored
 
 A load of a newer version SHALL report newer, with that version, and SHALL leave the stored keys unchanged. A save while that newer value is the live key SHALL report newer, with that version, and SHALL leave the stored keys unchanged.
 
 #### Scenario: A future value loads as newer
 
-- **WHEN** the caller sets `{ "v": 3, "stars": 9 }` under `progress` and loads `progress` with that chain
-- **THEN** the result is newer, the version is 3, the live key is still that value, and `backup:progress:0` and `quarantine:progress` are absent
+- **WHEN** the caller sets `{ "v": 3, "stars": 9 }` under `progress` and loads `progress` on that store
+- **THEN** the result is newer, the version is 3, the live key is still that value, and `backup:progress:0` and `quarantine:progress:0` are absent
 
 #### Scenario: A save leaves the newer value in place
 
-- **WHEN** the live key is `{ "v": 3, "stars": 9 }` and the caller saves `{ "v": 2, "stars": 1, "note": "kept" }` with that chain
+- **WHEN** the live key is `{ "v": 3, "stars": 9 }` and the caller saves `{ "v": 2, "stars": 1, "note": "kept" }` on that store
 - **THEN** the result is newer, the version is 3, the live key is still `{ "v": 3, "stars": 9 }`, and `backup:progress:0` is absent
-
-### Requirement: Invalid data is quarantined and the newest valid backup is restored
-
-When the live value fails validation, the store SHALL copy that raw value to `quarantine:<key>` and SHALL put the newest backup that parses back under the live key. The backup slots SHALL stay as they were. The load SHALL return that backup's parsed document with restored true. When no backup parses, the store SHALL remove the live key and the load SHALL report invalid.
-
-#### Scenario: An invalid newer backup is skipped
-
-- **WHEN** the live key is `{ "v": 2 }`, `backup:progress:0` is `{ "v": 1 }`, `backup:progress:1` is `{ "v": 1, "stars": 2 }`, and the caller loads `progress` with that chain
-- **THEN** the result is ok, migrated is true, restored is true, `stars` is 2, `note` is `kept`, `quarantine:progress` is `{ "v": 2 }`, the live key is `{ "v": 1, "stars": 2 }`, and both backup slots are unchanged
-
-#### Scenario: No valid backup removes the live value
-
-- **WHEN** the live key is `{ "v": 1 }`, every backup slot is absent, and the caller loads `progress` with that chain
-- **THEN** the result is invalid, `quarantine:progress` is `{ "v": 1 }`, and the live key is absent
-
-#### Scenario: A later invalid value replaces the quarantine
-
-- **WHEN** `quarantine:progress` is `{ "v": 1 }`, every backup slot is absent, and the caller sets the live key to `{ "v": 2 }` and loads `progress` with that chain
-- **THEN** the result is invalid and `quarantine:progress` is `{ "v": 2 }`
 
 ### Requirement: IndexedDB migrates, saves, and restores one document
 
-An older document set in the game's IndexedDB store SHALL load migrated, SHALL save back as the latest version with that older value kept as the newest backup, and SHALL quarantine a later invalid live value and restore that backup.
+An older document set in the game's IndexedDB store SHALL load migrated, SHALL save back as the latest version with that older value kept as the newest backup, and SHALL quarantine a later invalid live value in the next quarantine slot and restore that backup.
 
 #### Scenario: An older IndexedDB document migrates, saves, and restores
 
-- **WHEN** the caller sets `{ "v": 1, "stars": 2 }` under `progress` in database `signalfire`, loads it with that chain, saves the migrated document, sets the live key to `{ "v": 1 }`, and loads `progress` again
-- **THEN** the first load is ok, migrated is true, restored is false, `stars` is 2, and `note` is `kept`; after the save the live key is `{ "v": 2, "stars": 2, "note": "kept" }` and `backup:progress:0` is `{ "v": 1, "stars": 2 }`; the second load is ok, migrated is true, restored is true, and `stars` is 2; `quarantine:progress` is `{ "v": 1 }` and the live key is `{ "v": 1, "stars": 2 }`
+- **WHEN** the caller sets `{ "v": 1, "stars": 2 }` under `progress` in database `signalfire`, loads it on a store whose progress key is bound to that chain, saves the migrated document, sets the live key to `{ "v": 1 }`, and loads `progress` again
+- **THEN** the first load is ok, migrated is true, restored is false, `stars` is 2, and `note` is `kept`; after the save the live key is `{ "v": 2, "stars": 2, "note": "kept" }` and `backup:progress:0` is `{ "v": 1, "stars": 2 }`; the second load is ok, migrated is true, restored is true, and `stars` is 2; `quarantine:progress:0` is `{ "v": 1 }` and the live key is `{ "v": 1, "stars": 2 }`
 
-### Requirement: Writes hold the signalfire-write lock
+### Requirement: IndexedDB stores saved documents
 
-A document load, a document save, a raw set, and a raw delete SHALL each hold the exclusive Web Lock `signalfire-write` until that operation finishes.
+The game's local store SHALL keep values in IndexedDB database `signalfire`, object store `documents`. A second opening of that store SHALL see the same keys. A save SHALL store an independent copy, and a load SHALL return an independent copy.
+
+#### Scenario: A stored profile is in signalfire
+
+- **WHEN** the caller saves the shipped version 1 profile under `profile` and then reads IndexedDB database `signalfire`, object store `documents`, key `profile`
+- **THEN** the stored value equals that profile
+
+#### Scenario: Two openings share a key
+
+- **WHEN** one opening saves the shipped version 1 profile under `profile` and a second opening loads `profile`
+- **THEN** the load returns that profile
+
+#### Scenario: A saved document round-trips as a copy
+
+- **WHEN** the caller saves the shipped version 1 profile under `profile`, changes the object that was saved, loads `profile`, and changes the object that was returned
+- **THEN** both loads return the profile that was saved
+
+### Requirement: Invalid data is appended and the newest valid backup is restored
+
+When the live value fails its own version's schema, the store SHALL append that raw value at the next `quarantine:<key>:<n>` slot, starting at 0, and SHALL leave every earlier slot unchanged. It SHALL restore the newest backup that parses, and the backup slots SHALL stay as they were. When no backup parses, the store SHALL remove the live key and the load SHALL report invalid. A failed migration SHALL leave every stored key unchanged.
+
+#### Scenario: An invalid newer backup is skipped
+
+- **WHEN** the live key is `{ "v": 2 }`, `backup:progress:0` is `{ "v": 1 }`, `backup:progress:1` is `{ "v": 1, "stars": 2 }`, and the caller loads `progress` on that store
+- **THEN** the result is ok, migrated is true, restored is true, `stars` is 2, `note` is `kept`, `quarantine:progress:0` is `{ "v": 2 }`, the live key is `{ "v": 1, "stars": 2 }`, and both backup slots are unchanged
+
+#### Scenario: No valid backup removes the live value
+
+- **WHEN** the live key is `{ "v": 1 }`, every backup slot is absent, and the caller loads `progress` on that store
+- **THEN** the result is invalid, `quarantine:progress:0` is `{ "v": 1 }`, and the live key is absent
+
+#### Scenario: A later invalid value keeps the earlier quarantine
+
+- **WHEN** `quarantine:progress:0` is `{ "v": 1 }`, every backup slot is absent, and the caller sets the live key to `{ "v": 2 }` and loads `progress` on that store
+- **THEN** the result is invalid, `quarantine:progress:0` is `{ "v": 1 }`, and `quarantine:progress:1` is `{ "v": 2 }`
+
+### Requirement: The write lock wait is bounded
+
+A document load and a document save SHALL each hold the exclusive Web Lock `signalfire-write` until that operation finishes. If the lock is not granted within 1000 ms, the operation SHALL finish as busy and SHALL leave the stored keys unchanged.
 
 #### Scenario: A save waits while the lock is held
 
-- **WHEN** a caller holds `signalfire-write` and another caller saves a latest-version document under `profile`
+- **WHEN** a caller holds `signalfire-write` and releases it before 1000 ms, and another caller saves a latest-version document under `profile`
 - **THEN** the save does not finish until the holder releases the lock, and after release the live key is that document
-
-#### Scenario: A raw set waits while the lock is held
-
-- **WHEN** a caller holds `signalfire-write` and another caller sets `{ "stars": 1 }` under `progress`
-- **THEN** the set does not finish until the holder releases the lock, and after release a get of `progress` resolves to `{ "stars": 1 }`
-
-#### Scenario: A raw delete waits while the lock is held
-
-- **WHEN** `progress` is `{ "stars": 1 }`, a caller holds `signalfire-write`, and another caller deletes `progress`
-- **THEN** the delete does not finish until the holder releases the lock, and after release a get of `progress` resolves to `undefined`
 
 #### Scenario: A load that writes a backup waits while the lock is held
 
-- **WHEN** the live key is `{ "v": 1, "stars": 2 }`, a caller holds `signalfire-write`, and another caller loads `progress` with that chain
+- **WHEN** the live key is `{ "v": 1, "stars": 2 }`, a caller holds `signalfire-write` and releases it before 1000 ms, and another caller loads `progress` on that store
 - **THEN** the load does not finish until the holder releases the lock, and after release `backup:progress:0` is `{ "v": 1, "stars": 2 }`
 
-### Requirement: A raw get finishes while the write lock is held
+#### Scenario: A save finishes busy when the lock stays held
 
-A raw get SHALL resolve while another caller holds `signalfire-write`.
-
-#### Scenario: A get does not wait for the write lock
-
-- **WHEN** a caller holds `signalfire-write` and another caller gets `progress`
-- **THEN** the get resolves while the holder still holds the lock
+- **WHEN** a caller holds `signalfire-write` for the whole wait and another caller saves a latest-version document under `profile`
+- **THEN** the save finishes as busy within the wait and the live key is unchanged

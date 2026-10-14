@@ -59,35 +59,6 @@ A caller SHALL format a run id from a millisecond timestamp and 10 entropy bytes
 - **WHEN** the caller checks `01afqcg20004hmasw9nf6yy41j`, `80000000000000000000000000`, or `0000000000000000000000000I`
 - **THEN** each value is rejected as a run id
 
-### Requirement: An older version migrates to the latest
-
-A caller SHALL parse a value through a version chain. An older version SHALL migrate one step at a time to the latest version, and the result SHALL validate as that latest version.
-
-#### Scenario: Version 1 migrates to version 2 and keeps stars
-
-- **WHEN** the caller parses `{ "v": 1, "stars": 2 }` with a chain whose version 1 is that shape and whose version 2 step copies `stars`, sets `v` to 2, and adds `note` of `kept`
-- **THEN** the result is ok and migrated, `v` is 2, `stars` is 2, and `note` is `kept`
-
-#### Scenario: The latest version is not migrated
-
-- **WHEN** the caller parses `{ "v": 2, "stars": 2, "note": "kept" }` with that same chain
-- **THEN** the result is ok, not migrated, and equal to the input
-
-#### Scenario: The same older value migrates the same way twice
-
-- **WHEN** the caller parses `{ "v": 1, "stars": 2 }` twice with that same chain
-- **THEN** both results are equal
-
-#### Scenario: A step that fails the next schema is invalid
-
-- **WHEN** the version 2 step returns `{ "v": 2, "stars": 2 }` and version 2 requires `note`
-- **THEN** the result is invalid and carries no document
-
-#### Scenario: A missing intermediate version is invalid
-
-- **WHEN** the chain defines versions 1 and 3 only, and the caller parses a valid version 1 value
-- **THEN** the result is invalid and carries no document
-
 ### Requirement: A newer version stays newer
 
 A caller SHALL treat an integer `v` greater than the chain's latest version as newer, before judging the rest of the value.
@@ -189,7 +160,7 @@ A version 1 progress document SHALL record, for each played level and tier, star
 
 ### Requirement: A run log version 1 records one run
 
-A version 1 run log SHALL record the run id, level, tier, mode, seed, content version, engine version, start instant, inputs, and a summary.
+A version 1 run log SHALL record the run id, level, tier, mode, seed, content version, engine version as major.minor.patch, start instant, inputs, and a summary.
 
 #### Scenario: The shipped campaign log parses
 
@@ -209,6 +180,16 @@ A version 1 run log SHALL record the run id, level, tier, mode, seed, content ve
 #### Scenario: A bad input, mode, or summary is invalid
 
 - **WHEN** flags are 8, the character is 55296, mode is `practice`, the content version is empty, or the summary has 4 stars
+- **THEN** the result is invalid
+
+#### Scenario: A major.minor.patch engine version is accepted
+
+- **WHEN** engine version is `0.0.0` or `1.2.3`
+- **THEN** each log is accepted
+
+#### Scenario: An engine version without three parts is invalid
+
+- **WHEN** engine version is `0-stand-in`, `1`, `1.2`, or `01.0.0`
 - **THEN** the result is invalid
 
 ### Requirement: The run index version 1 lists kept logs
@@ -238,3 +219,46 @@ A caller SHALL parse each shipped version 1 example of profile, settings, progre
 
 - **WHEN** the caller parses the shipped example of each of those five documents
 - **THEN** each result is ok, not migrated, and `v` is 1
+
+### Requirement: An older version migrates, and a broken step is failed
+
+A caller SHALL parse a value through a version chain. An older version SHALL migrate one step at a time to the latest version, and the result SHALL validate as that latest version. When the value matches its own version's schema and a later step cannot finish, the result SHALL be failed and SHALL carry no document.
+
+#### Scenario: Version 1 migrates to version 2 and keeps stars
+
+- **WHEN** the caller parses `{ "v": 1, "stars": 2 }` with a chain whose version 1 is that shape and whose version 2 step copies `stars`, sets `v` to 2, and adds `note` of `kept`
+- **THEN** the result is ok and migrated, `v` is 2, `stars` is 2, and `note` is `kept`
+
+#### Scenario: The latest version is not migrated
+
+- **WHEN** the caller parses `{ "v": 2, "stars": 2, "note": "kept" }` with that same chain
+- **THEN** the result is ok, not migrated, and equal to the input
+
+#### Scenario: The same older value migrates the same way twice
+
+- **WHEN** the caller parses `{ "v": 1, "stars": 2 }` twice with that same chain
+- **THEN** both results are equal
+
+#### Scenario: A step that fails the next schema is failed
+
+- **WHEN** the version 2 step returns `{ "v": 2, "stars": 2 }` and version 2 requires `note`
+- **THEN** the result is failed, is not invalid, and carries no document
+
+#### Scenario: A missing intermediate version is failed
+
+- **WHEN** the chain defines versions 1 and 3 only, and the caller parses a valid version 1 value
+- **THEN** the result is failed, is not invalid, and carries no document
+
+#### Scenario: A step that throws is failed
+
+- **WHEN** the version 2 step throws and the caller parses a valid version 1 value
+- **THEN** the result is failed, is not invalid, and carries no document
+
+### Requirement: Every shipped version has a fixture
+
+Each version of profile, settings, progress, run log, and run index SHALL have one fixture file, and parsing that fixture through the document's chain SHALL succeed as the latest version.
+
+#### Scenario: Each version file parses
+
+- **WHEN** the caller parses every fixture file of those five documents through that document's chain
+- **THEN** each result is ok, and each version the chain defines has exactly one of those files

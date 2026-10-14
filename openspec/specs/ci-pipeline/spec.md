@@ -22,7 +22,7 @@ GitHub Actions SHALL run the blocking checks on every pull request and on every 
 
 ### Requirement: Install fails when the lockfile does not match
 
-The Install check SHALL run `pnpm install --frozen-lockfile`. When that command fails, Types, Lint, Tests, Build, and End-to-end SHALL NOT pass on that run.
+The Install check SHALL run `pnpm install --frozen-lockfile`. When that command fails, Types, Lint, Tests, Build, and End-to-end SHALL be skipped on that run.
 
 #### Scenario: The lockfile matches the manifest
 
@@ -32,7 +32,7 @@ The Install check SHALL run `pnpm install --frozen-lockfile`. When that command 
 #### Scenario: The lockfile does not match the manifest
 
 - **WHEN** `pnpm install --frozen-lockfile` fails
-- **THEN** the Install check fails, and Types, Lint, Tests, Build, and End-to-end do not pass
+- **THEN** the Install check fails, and Types, Lint, Tests, Build, and End-to-end are skipped
 
 ### Requirement: Types fails on a type error
 
@@ -68,12 +68,12 @@ The Tests check SHALL run `pnpm test`, including the Vitest Node project and the
 
 ### Requirement: Build fails closed
 
-The Build check SHALL run `pnpm build`. When that command fails, End-to-end SHALL NOT pass on that run.
+The Build check SHALL run `pnpm build`. When that command fails, End-to-end SHALL be skipped on that run.
 
 #### Scenario: The production build fails
 
 - **WHEN** `pnpm build` fails
-- **THEN** the Build check fails and End-to-end does not pass
+- **THEN** the Build check fails and End-to-end is skipped
 
 ### Requirement: End-to-end runs the production build
 
@@ -103,39 +103,19 @@ On a pull request, the title check SHALL pass only when `tools/check-commit-msg.
 - **WHEN** the pull request title changes without a new commit
 - **THEN** the title check runs again against the new title
 
-### Requirement: Node and browsers come from the project pins
-
-Project commands SHALL run through pnpm on the Node runtime recorded for `devEngines.runtime` in the lockfile. The workflow SHALL NOT select that Node version with `actions/setup-node`.
-
-Browser install and browser runs SHALL use `pnpm browsers:install`, `pnpm test`, and `pnpm test:e2e`. Chromium SHALL be installed under `node_modules/playwright-core/.local-browsers`. The workflow SHALL NOT install Playwright globally and SHALL NOT download browsers outside that directory.
-
-#### Scenario: The runtime matches the lockfile
-
-- **WHEN** Install passes
-- **THEN** `pnpm exec node --version` is the lockfile's `node@runtime` version
-
-#### Scenario: Chromium stays inside the repo
-
-- **WHEN** `pnpm browsers:install` finishes in CI
-- **THEN** Chromium is under `node_modules/playwright-core/.local-browsers`
-
 ### Requirement: The pnpm store and browsers are cached
 
-The workflow SHALL cache `.pnpm-store` and `node_modules/playwright-core/.local-browsers` between runs.
+The workflow SHALL cache `.pnpm-store` and `node_modules/playwright-core/.local-browsers` between runs. A job SHALL restore the browser directory after `pnpm install` in that job.
 
 #### Scenario: A later run restores both caches
 
 - **WHEN** a run starts after a successful run with the same lockfile and the cache entry is still present
 - **THEN** that run restores `.pnpm-store` and `node_modules/playwright-core/.local-browsers`
 
-### Requirement: Content and bundle checks are not stubbed
+#### Scenario: Tests restores browsers after install
 
-The workflow SHALL NOT run `pnpm content:check` and SHALL NOT run a production-bundle check.
-
-#### Scenario: The workflow has no pending checks
-
-- **WHEN** the workflow runs
-- **THEN** no job invokes `pnpm content:check` and no job checks the production bundle for dev-only modules
+- **WHEN** the Tests job restores a cache entry that contains the browser directory
+- **THEN** that directory is present after `pnpm install` and before `pnpm test`
 
 ### Requirement: Dependabot opens grouped weekly updates
 
@@ -155,3 +135,35 @@ Dependabot SHALL open grouped weekly version updates for the npm ecosystem and g
 
 - **WHEN** Dependabot opens a grouped version-update pull request
 - **THEN** its title passes the pull request title check
+
+### Requirement: pnpm and browsers come from the project commands
+
+Project commands SHALL run through pnpm. The workflow SHALL install that pnpm with `pnpm/action-setup` at major 4, reading the `packageManager` field, and SHALL then run `pnpm install --frozen-lockfile`. Browser install and browser runs SHALL use `pnpm browsers:install`, `pnpm test`, and `pnpm test:e2e`.
+
+#### Scenario: Install uses the pinned pnpm
+
+- **WHEN** the Install check runs
+- **THEN** it installs pnpm with `pnpm/action-setup` and `pnpm install --frozen-lockfile` succeeds
+
+#### Scenario: Tests install Chromium with the project script
+
+- **WHEN** the Tests check runs
+- **THEN** `pnpm browsers:install` succeeds and `pnpm test` runs
+
+### Requirement: Jobs request the permissions they use
+
+The title job SHALL request `contents: read`. Each job that restores or saves the pnpm store or the browser directory SHALL request `contents: read` and `actions: write`.
+
+#### Scenario: The workflow permissions match the jobs
+
+- **WHEN** the workflow file is read
+- **THEN** the title job requests contents read, and each job that uses the cache requests contents read and actions write
+
+### Requirement: The Node version has one source
+
+`devEngines.runtime` in `package.json` SHALL be the Node range. The lockfile SHALL record the resolved runtime. `.node-version` SHALL be that resolved version.
+
+#### Scenario: Lint accepts the derived node version
+
+- **WHEN** `.node-version` equals the lockfile's `node@runtime` version and `pnpm lint` runs on a tree that otherwise passes lint
+- **THEN** `pnpm lint` succeeds

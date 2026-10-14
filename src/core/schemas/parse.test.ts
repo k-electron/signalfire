@@ -76,12 +76,29 @@ test("the same older value migrates the same way twice", () => {
 	expect(chain.parse(input)).toEqual(chain.parse(input));
 });
 
-test("a step that fails the next schema is invalid", () => {
-	expect(brokenStep.parse({ v: 1, stars: 2 })).toEqual({ status: "invalid" });
+test("a step that fails the next schema is failed", () => {
+	expect(brokenStep.parse({ v: 1, stars: 2 })).toEqual({ status: "failed" });
 });
 
-test("a missing intermediate version is invalid", () => {
-	expect(gapped.parse({ v: 1, stars: 2 })).toEqual({ status: "invalid" });
+test("a missing intermediate version is failed", () => {
+	expect(gapped.parse({ v: 1, stars: 2 })).toEqual({ status: "failed" });
+});
+
+test("a step that throws is failed", () => {
+	const throwing = defineDocument({
+		latest: 2,
+		versions: {
+			1: { initial: true, schema: version1 },
+			2: {
+				initial: false,
+				schema: version2,
+				up() {
+					throw new Error("migration broke");
+				},
+			},
+		},
+	});
+	expect(throwing.parse({ v: 1, stars: 2 })).toEqual({ status: "failed" });
 });
 
 test("a future version is newer before the body is checked", () => {

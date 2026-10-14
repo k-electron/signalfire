@@ -205,7 +205,7 @@ test("steps are stored as deltas", () => {
 		migrated: false,
 		document: log,
 	});
-	expect(log.engineVersion).toBe("0-stand-in");
+	expect(log.engineVersion).toBe("0.0.0");
 	expect(log.inputs).toEqual([
 		[0, 98, 0],
 		[2, 98, 1],
@@ -350,11 +350,12 @@ test("content version is stored and not simulated", () => {
 	expect(demoReplay.summary).toEqual(otherReplay.summary);
 });
 
-test("engine version 0.0.0 is refused", () => {
+test("a different major is refused", () => {
 	const log = recordStandInRun("signalfire", [], campaign, createOutbox());
 	const outbox = createOutbox();
+	expect(log.engineVersion).toBe("0.0.0");
 	expect(() =>
-		replayStandInRun({ ...log, engineVersion: "0.0.0" }, outbox),
+		replayStandInRun({ ...log, engineVersion: "1.0.0" }, outbox),
 	).toThrow(RangeError);
 	expect(outbox.drain()).toEqual([]);
 });

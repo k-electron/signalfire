@@ -1,33 +1,48 @@
 import { createStore, get, promisifyRequest, type UseStore } from "idb-keyval";
 import type { Storage } from "../../core/ports/storage";
-import {
-	type Change,
-	createDocumentStore,
-	type LocalStore,
-} from "./document-store";
-import { createWebWriteLock, type WriteLock } from "./write-lock";
+import type { Change, LocalStore } from "../../core/storage/document-store";
+import { createGameStorage } from "../../core/storage/game-storage";
+import { LockBusyError, type WriteLock } from "../../core/storage/write-lock";
 
-export function createLocalStorage(): {
-	readonly raw: Storage;
-	readonly documents: ReturnType<typeof createDocumentStore>;
-} {
-	const lock = createWebWriteLock();
-	const store = createIndexedDbStore(
-		createStore("signalfire", "documents"),
-		lock,
-	);
-	const raw: Storage = {
-		get: (key) => store.get(key),
-		set: (key, value) => store.set(key, value),
-		delete: (key) => store.delete(key),
-	};
-	return { raw, documents: createDocumentStore(store, lock) };
+const WRITE_LOCK_WAIT_MS = 1000;
+
+export function createLocalStorage(): Storage {
+	const { store, lock } = createSignalfireLocalStore();
+	return createGameStorage(store, lock);
 }
 
-function createIndexedDbStore(
-	customStore: UseStore,
-	lock: WriteLock,
-): Storage & LocalStore {
+export function createSignalfireLocalStore(): {
+	readonly store: LocalStore;
+	readonly lock: WriteLock;
+} {
+	const lock = createWebWriteLock();
+	const store = createIndexedDbStore(createStore("signalfire", "documents"));
+	return { store, lock };
+}
+
+function createWebWriteLock(): WriteLock {
+	return {
+		exclusive(run) {
+			return navigator.locks
+				.request(
+					"signalfire-write",
+					{ signal: AbortSignal.timeout(WRITE_LOCK_WAIT_MS) },
+					() => run(),
+				)
+				.catch((error: unknown) => {
+					if (
+						error instanceof DOMException &&
+						(error.name === "AbortError" || error.name === "TimeoutError")
+					) {
+						throw new LockBusyError();
+					}
+					throw error;
+				});
+		},
+	};
+}
+
+function createIndexedDbStore(customStore: UseStore): LocalStore {
 	async function write(changes: readonly Change[]): Promise<void> {
 		if (changes.length === 0) {
 			return;
@@ -49,12 +64,6 @@ function createIndexedDbStore(
 		async get(key) {
 			const value: unknown = await get(key, customStore);
 			return value;
-		},
-		async set(key, value) {
-			await lock.exclusive(() => write([{ type: "set", key, value }]));
-		},
-		async delete(key) {
-			await lock.exclusive(() => write([{ type: "delete", key }]));
 		},
 	};
 }

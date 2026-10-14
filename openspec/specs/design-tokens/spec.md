@@ -62,12 +62,17 @@ The theme constants SHALL use the glass, glow, and focus values from the design 
 
 ### Requirement: Motion
 
-The theme constants SHALL use the motion durations and easings from the design system.
+The theme constants SHALL use the motion durations and easings from the design system. Micro easing SHALL be `ease-out`. Scene easing SHALL be the cubic-bezier control points 1, 0, 0, 1. The generated stylesheet SHALL copy those easing values from the constants.
 
 #### Scenario: Four motion tokens
 
 - **WHEN** the theme constants are read
-- **THEN** `motion-micro` is 100ms ease-out, `motion-standard` is 240ms with spring stiffness 380 and damping 30, `motion-scene` is 650ms expo in-out, and `motion-celebrate` spans 1.2s to 2s
+- **THEN** `motion-micro` is 100ms ease-out, `motion-standard` is 240ms with spring stiffness 380 and damping 30, `motion-scene` is 650ms with cubic-bezier control points 1, 0, 0, 1, and `motion-celebrate` spans 1.2s to 2s
+
+#### Scenario: The stylesheet copies the easing
+
+- **WHEN** `pnpm tokens` writes the stylesheet
+- **THEN** `--ease-micro` is `ease-out` and `--ease-scene` is `cubic-bezier(1, 0, 0, 1)`, both copied from the theme constants
 
 ### Requirement: Stacking layers
 

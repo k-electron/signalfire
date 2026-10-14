@@ -16,7 +16,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 | # | Stage | Status |
 |---|---|---|
 | 0 | Scaffold | Done |
-| 1 | Core foundations | Not started |
+| 1 | Core foundations | Done |
 | 2 | Walking skeleton | Not started |
 | 3 | Thin pass across every system | Not started |
 | 4 | Feel slice | Not started |
@@ -46,10 +46,12 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 - One thin end-to-end path: title, levels 0.1 and 1.1 (waiting lanes), real input judging, scoring, stars, results, save and reload.
 - Visuals are placeholders.
 - Confirm the Atkinson Hyperlegible Mono license file before shipping the font.
+- A live run must record its own run log. Today the kernel re-simulates a list of inputs it is given.
 - **Exit:** the first-run Playwright flow passes on the deployed preview, and outside pull requests open ([Repo Setup](horizontals/02-repo-setup.md)).
 
 ### 3. Thin pass across every system
 
+- Rev-based save conflicts between tabs are not handled yet.
 - Minimal versions of: zone map and gates, hub, telemetry and dossier, repair runs, systems check, cloud sync, settings.
 - Later zones use placeholder levels.
 - Minimal dev tools: debug overlay, command palette, Level Lab with seed and replay ([Dev Tooling](horizontals/09-dev-tooling.md)).

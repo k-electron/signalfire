@@ -20,30 +20,6 @@ The Signalfire component SHALL live at `src/app/app.tsx`. Its browser smoke SHAL
 - **WHEN** the test runners collect harness smokes
 - **THEN** the Node logic smoke, the property smoke, and the end-to-end smoke stay at their current paths, and the component smoke is `src/app/app.browser.test.tsx`
 
-### Requirement: Core imports only core and Zod
-
-A module under `src/core` SHALL pass the boundary check when it imports only `core` or `zod`. It SHALL fail when it imports any other package, including `verzod`, a Node builtin, another layer, or a module at the `src` root.
-
-#### Scenario: Core imports Zod, verzod, and core
-
-- **WHEN** a `src/core` module imports `zod`, `zod/v4`, `verzod`, or a relative module that stays inside `src/core`
-- **THEN** the boundary check passes for `zod`, `zod/v4`, and the relative module, and fails for `verzod`
-
-#### Scenario: Core imports another package
-
-- **WHEN** a `src/core` module imports `react`, `react/jsx-runtime`, `@scope/pkg`, `zodiac`, or `verzod`
-- **THEN** the boundary check fails
-
-#### Scenario: Core imports a Node builtin
-
-- **WHEN** a `src/core` module imports `node:fs` or `fs`
-- **THEN** the boundary check fails
-
-#### Scenario: Core imports another layer or the src root
-
-- **WHEN** a `src/core` module imports `src/engine`, `src/platform`, `src/app`, or a module at the `src` root
-- **THEN** the boundary check fails
-
 ### Requirement: Engine imports only core from src
 
 A module under `src/engine` SHALL pass the boundary check when it imports `core`, other `engine` modules, or an external package other than `react`, `react-dom`, `zustand`, and `xstate`. It SHALL fail when it imports one of those four packages, `app`, `platform`, or a module at the `src` root.
@@ -157,18 +133,9 @@ A `*.test.ts` module SHALL be allowed to import `vitest`, `fast-check`, and `@fa
 - **WHEN** a `src/core` `*.browser.test.tsx` file imports `react`
 - **THEN** the boundary check fails
 
-### Requirement: The check covers missing layer directories
-
-The boundary check SHALL judge `src/core`, `src/engine`, and `src/platform` the same way when those directories are absent from the repository. This change SHALL NOT add source files under those directories.
-
-#### Scenario: A core fixture fails while the directory is absent
-
-- **WHEN** the repository has no `src/core` source file and the check is given a `src/core` module that imports `react`
-- **THEN** the boundary check fails for that module
-
 ### Requirement: Fixtures sit outside src
 
-The modules that prove the rules SHALL live outside `src/`. One clean tree SHALL pass. Each forbidden case in these requirements SHALL fail on its own. Forbidden fixtures SHALL NOT be part of the shipped app or of the ordinary source lint set.
+The modules that prove the rules SHALL live outside `src/`. One clean tree SHALL pass. Each forbidden case in these requirements SHALL fail on its own. The proof SHALL run those fixtures from that outside tree.
 
 #### Scenario: The clean tree passes
 
@@ -193,3 +160,27 @@ The modules that prove the rules SHALL live outside `src/`. One clean tree SHALL
 
 - **WHEN** a module under a layer contains an import this spec forbids and `pnpm lint` runs
 - **THEN** `pnpm lint` fails
+
+### Requirement: Core passes for Zod and fails for other packages
+
+A module under `src/core` SHALL pass the boundary check when it imports only `core` or `zod`. It SHALL fail when it imports any other package, a Node builtin, another layer, or a module at the `src` root.
+
+#### Scenario: Core imports Zod and core
+
+- **WHEN** a `src/core` module imports `zod`, `zod/v4`, or a relative module that stays inside `src/core`
+- **THEN** the boundary check passes for those imports
+
+#### Scenario: Core imports another package
+
+- **WHEN** a `src/core` module imports `react`, `react/jsx-runtime`, `@scope/pkg`, or `zodiac`
+- **THEN** the boundary check fails
+
+#### Scenario: Core imports a Node builtin
+
+- **WHEN** a `src/core` module imports `node:fs` or `fs`
+- **THEN** the boundary check fails
+
+#### Scenario: Core imports another layer or the src root
+
+- **WHEN** a `src/core` module imports `src/engine`, `src/platform`, `src/app`, or a module at the `src` root
+- **THEN** the boundary check fails

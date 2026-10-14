@@ -78,6 +78,15 @@ Audio volumes (master, music, effects, voices), effects intensity, fullscreen pr
 
 Derived (not stored): total stars, rank, unlocked levels, current machine, gate progress.
 
+Version 1 stores the envelope and the fields implemented in `src/core/schemas`. These documented fields wait:
+
+| Field | Stage |
+|---|---|
+| Run-log retention (best and last 3, Courier, Daily Signal) | 2 |
+| `progress.barriersBroken`, `progress.repairStars`, the telemetry document, the meta document, `syncState` | 3 |
+| `progress.storyFlags` | 5 |
+| `profile.equipped`, `progress.mods`, `progress.keylingsRescued`, `progress.codexUnlocked` | 6 |
+
 ### `telemetry`
 
 | Field | Notes |
@@ -110,7 +119,7 @@ One document per kept run, plus an index.
 | `levelId`, `tier`, `mode` | Mode: campaign, repair, systems check, Courier, Daily Signal, Deep Archive |
 | `seed` | Seed used for all randomness in the run |
 | `contentVersion` | Hash of the level definition and content used |
-| `engineVersion` | Simulation version; replays require a matching major version |
+| `engineVersion` | `major.minor.patch`. Replays require a matching major version |
 | `startedAt` | |
 | `inputs` | Compact list of `[stepDelta, character, flags]` for every key down and key up; flags hold Shift side and key-up |
 | `summary` | The run summary, so the log can be shown without replaying it |
@@ -171,10 +180,12 @@ If a document's version is newer than this build understands (for example, cloud
 
 ### Invalid data
 
-If a document fails validation:
+A value is invalid only when it fails the schema of its own version. A migration that cannot finish is not invalid: the store leaves every key unchanged and does not quarantine or delete the document.
 
-1. The raw data is kept under a quarantine key.
-2. The last good backup is loaded (Persistence horizontal keeps backups).
+If a document fails its own version's schema:
+
+1. The raw data is appended at the next `quarantine:<key>:<n>` slot, starting at 0. An earlier slot is left as it is.
+2. The last good backup is loaded (Persistence horizontal keeps backups). An invalid value is not written into the backup ring.
 3. The player sees a short notice; the quarantined data can be attached to a bug report.
 
 ## Risk

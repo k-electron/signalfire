@@ -1,3 +1,5 @@
+import { createGameStorage } from "../storage/game-storage";
+import { createMemoryLocalStore } from "../storage/memory-store";
 import type { AudioOut } from "./audio-out";
 import type { Clock } from "./clock";
 import type { CloudSync } from "./cloud-sync";
@@ -45,7 +47,11 @@ export function createFakeClock(step = 0): FakeClock {
 }
 
 export function createFakeStorage(): Storage {
-	return createMemoryKeyValue();
+	return createGameStorage(createMemoryLocalStore(), {
+		async exclusive(run) {
+			return run();
+		},
+	});
 }
 
 export function createFakeCloudSync(): CloudSync {
@@ -60,7 +66,7 @@ export function createFakeAudioOut(): FakeAudioOut {
 	return createEventSink();
 }
 
-function createMemoryKeyValue(): Storage {
+function createMemoryKeyValue(): CloudSync {
 	const entries = new Map<string, unknown>();
 	return {
 		async get(key) {

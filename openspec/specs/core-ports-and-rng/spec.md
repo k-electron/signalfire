@@ -30,68 +30,19 @@ An in-memory clock SHALL report the current simulation step as an integer, start
 - **WHEN** the caller sets the step to -1, or advances by -1, from step 4
 - **THEN** the call throws RangeError and the reported step stays 4
 
-### Requirement: Local storage round-trips a copy
-
-An in-memory storage SHALL resolve get, set, and delete as promises. A get SHALL resolve to an independent copy of the last value stored for that key.
-
-#### Scenario: A stored document is returned
-
-- **WHEN** a caller stores `{ stars: 1 }` under `progress`
-- **THEN** a get of `progress` resolves to a deeply equal object
-
-#### Scenario: A missing key is absent
-
-- **WHEN** a caller gets `missing`
-- **THEN** the get resolves to `undefined`
-
-#### Scenario: Mutating the stored object does not change the saved value
-
-- **WHEN** a caller stores an object and then changes that object
-- **THEN** a later get still resolves to the value that was stored
-
-#### Scenario: Mutating the loaded object does not change the saved value
-
-- **WHEN** a caller changes an object returned by get
-- **THEN** a later get still resolves to the value that was stored
-
-#### Scenario: Delete removes the key
-
-- **WHEN** a caller deletes `progress` after storing it
-- **THEN** a later get of `progress` resolves to `undefined`
-
-#### Scenario: Delete of a missing key resolves
-
-- **WHEN** a caller deletes a key that was never stored
-- **THEN** the delete resolves and a get of that key resolves to `undefined`
-
-#### Scenario: An uncloneable value is rejected
-
-- **WHEN** a caller stores a function under `progress`
-- **THEN** the set rejects and a get of `progress` resolves to `undefined`
-
-#### Scenario: JSON values round-trip
-
-- **WHEN** a caller stores any JSON value (null, booleans, finite numbers, strings, and arrays and objects of those)
-- **THEN** a get resolves to a deeply equal value
-
-#### Scenario: Two storages do not share entries
-
-- **WHEN** a caller stores a value in one in-memory storage
-- **THEN** a get of that key on a second in-memory storage resolves to `undefined`
-
 ### Requirement: Cloud sync stores values apart from local storage
 
 An in-memory cloud sync SHALL resolve get, set, and delete as promises, and SHALL keep its entries apart from local storage.
 
 #### Scenario: A local write is not in the cloud
 
-- **WHEN** a caller stores `{ stars: 1 }` under `progress` in local storage
-- **THEN** a cloud get of `progress` resolves to `undefined`
+- **WHEN** a caller saves the shipped version 1 profile in local storage
+- **THEN** a cloud get of `profile` resolves to `undefined`
 
 #### Scenario: A cloud value round-trips as a copy
 
 - **WHEN** a caller stores `{ rev: 1 }` under `progress` in the cloud and then changes the object that was stored
-- **THEN** a cloud get resolves to `{ rev: 1 }` and a local get of `progress` resolves to `undefined`
+- **THEN** a cloud get resolves to `{ rev: 1 }` and a local load of `progress` is absent
 
 #### Scenario: Cloud delete removes the key
 
@@ -287,3 +238,37 @@ A labeled fork SHALL be a generator seeded with the parent seed's UTF-16 code un
 
 - **WHEN** a caller forks `content` and `spawn` from the seed `signalfire`
 - **THEN** the two forks' first eight unsigned 32-bit draws are not all equal
+
+### Requirement: Local storage loads and saves a document
+
+An in-memory storage SHALL resolve load and save as promises. A load SHALL return an independent copy of the last document saved for that key. A save SHALL accept only a latest-version document for the key's chain.
+
+#### Scenario: A stored document is returned
+
+- **WHEN** a caller saves the shipped version 1 profile under `profile`
+- **THEN** the save is saved and a load of `profile` returns a deeply equal document
+
+#### Scenario: A missing key is absent
+
+- **WHEN** a caller loads `profile` and nothing has been saved there
+- **THEN** the load is absent
+
+#### Scenario: Mutating the stored object does not change the saved value
+
+- **WHEN** a caller saves the shipped version 1 profile and then changes that object
+- **THEN** a later load still returns the profile that was saved
+
+#### Scenario: Mutating the loaded object does not change the saved value
+
+- **WHEN** a caller changes a document returned by load
+- **THEN** a later load still returns the profile that was saved
+
+#### Scenario: A value that is not the latest document is refused
+
+- **WHEN** a caller saves `{ "stars": 1 }` under `profile`
+- **THEN** the save is invalid and a load of `profile` is absent
+
+#### Scenario: Two storages do not share entries
+
+- **WHEN** a caller saves the shipped version 1 profile in one in-memory storage
+- **THEN** a load of `profile` on a second in-memory storage is absent
