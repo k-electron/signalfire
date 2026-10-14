@@ -1,5 +1,13 @@
+import type { LoadResult, SaveResult } from "../storage/document-store";
+
+export type StorageKey =
+	| "profile"
+	| "settings"
+	| "progress"
+	| "run-index"
+	| `run:${string}`;
+
 export interface Storage {
-	get(key: string): Promise<unknown>;
-	set(key: string, value: unknown): Promise<void>;
-	delete(key: string): Promise<void>;
+	load(key: StorageKey): Promise<LoadResult<unknown>>;
+	save(key: StorageKey, value: unknown): Promise<SaveResult>;
 }

@@ -1,42 +1,4 @@
-import { assign, type SnapshotFrom, type StateMachine, setup } from "xstate";
-
-// XState requires `input` when it is declared. Omitting it means a first run.
-type WithOptionalInput<TMachine> =
-	TMachine extends StateMachine<
-		infer TContext,
-		infer TEvent,
-		infer TChildren,
-		infer TActor,
-		infer TAction,
-		infer TGuard,
-		infer TDelay,
-		infer TStateValue,
-		infer TTag,
-		infer TInput,
-		infer TOutput,
-		infer TEmitted,
-		infer TStateMeta,
-		infer TStateSchema,
-		infer TTransitionMeta
-	>
-		? StateMachine<
-				TContext,
-				TEvent,
-				TChildren,
-				TActor,
-				TAction,
-				TGuard,
-				TDelay,
-				TStateValue,
-				TTag,
-				TInput | undefined,
-				TOutput,
-				TEmitted,
-				TStateMeta,
-				TStateSchema,
-				TTransitionMeta
-			>
-		: never;
+import { assign, type SnapshotFrom, setup } from "xstate";
 
 export type AppFlowEvent =
 	| { type: "ready" }
@@ -54,6 +16,7 @@ export type AppFlowEvent =
 	| { type: "toHub" }
 	| { type: "selectNext" }
 	| { type: "selectPrevious" }
+	| { type: "resume" }
 	| { type: "back" };
 
 type AppFlowContext = {
@@ -198,7 +161,13 @@ const builtAppFlowMachine = setup({
 		level: {
 			on: {
 				finish: "results",
-				back: "zoneMap",
+				back: "pause",
+			},
+		},
+		pause: {
+			on: {
+				back: "level",
+				resume: "level",
 			},
 		},
 		// Back from results opens the zone map. The level is not a parent.
@@ -215,9 +184,7 @@ const builtAppFlowMachine = setup({
 	},
 });
 
-export const appFlowMachine = builtAppFlowMachine as WithOptionalInput<
-	typeof builtAppFlowMachine
->;
+export const appFlowMachine = builtAppFlowMachine;
 
 type AppFlowSnapshot = SnapshotFrom<typeof appFlowMachine>;
 
@@ -238,6 +205,8 @@ function spaceEvent(
 			return { type: "startLevel" };
 		case "level":
 			return { type: "finish" };
+		case "pause":
+			return { type: "resume" };
 		case "results":
 			return resultsItems[context.resultsIndex]?.event ?? null;
 		default:

@@ -7,7 +7,7 @@ import { createRng, type Rng } from "./rng";
  * Stand-in rules for the Stage 1 replay kernel.
  * Judging and scoring replace this match, horizon, target list, and summary.
  */
-export const STAND_IN_ENGINE_VERSION = "0-stand-in";
+export const STAND_IN_ENGINE_VERSION = "0.0.0";
 
 const TARGETS = [97, 98, 99] as const;
 
@@ -128,7 +128,8 @@ export function replayStandInRun(
 	log: RunLogDocument,
 	outbox: Outbox,
 ): { events: readonly DomainEvent[]; summary: StandInSummary } {
-	if (log.engineVersion !== STAND_IN_ENGINE_VERSION) {
+	const major = majorOf(log.engineVersion);
+	if (major !== 0) {
 		throw new RangeError("The engine version does not match.");
 	}
 	const inputs = expand(log.inputs);
@@ -230,6 +231,14 @@ function encode(inputs: readonly StandInInput[]): [number, number, number][] {
 		previous = input.step;
 		return [delta, input.character, input.flags];
 	});
+}
+
+function majorOf(version: string): number {
+	const match = /^(0|[1-9]\d*)\./.exec(version);
+	if (match === null) {
+		throw new RangeError("The engine version does not match.");
+	}
+	return Number(match[1]);
 }
 
 function expand(inputs: RunLogDocument["inputs"]): StandInInput[] {

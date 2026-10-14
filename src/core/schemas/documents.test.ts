@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { expect, test } from "vitest";
 import profileFixture from "./fixtures/profile/v1.json" with { type: "json" };
 import progressFixture from "./fixtures/progress/v1.json" with { type: "json" };
@@ -261,5 +262,52 @@ test("the shipped examples migrate and validate", () => {
 			migrated: false,
 			document: { v: 1 },
 		});
+	}
+});
+
+test("a major.minor.patch engine version is accepted", () => {
+	expect(
+		runLog.parse({ ...runLogFixture, engineVersion: "0.0.0" }).status,
+	).toBe("ok");
+	expect(
+		runLog.parse({ ...runLogFixture, engineVersion: "1.2.3" }).status,
+	).toBe("ok");
+});
+
+test("an engine version without three parts is invalid", () => {
+	for (const engineVersion of ["0-stand-in", "1", "1.2", "01.0.0"]) {
+		expect(runLog.parse({ ...runLogFixture, engineVersion })).toEqual({
+			status: "invalid",
+		});
+	}
+});
+
+test("each version file parses", () => {
+	const fixtures = import.meta.glob("./fixtures/**/v*.json", {
+		eager: true,
+	}) as Record<string, { default: unknown }>;
+	const shipped = [
+		["profile", profile],
+		["settings", settings],
+		["progress", progress],
+		["run-log", runLog],
+		["run-index", runIndex],
+	] as const;
+	for (const [name, parser] of shipped) {
+		const paths = parser.versions.map(
+			(version) => `./fixtures/${name}/v${version}.json`,
+		);
+		expect(paths.map((path) => fixtures[path] !== undefined)).toEqual(
+			paths.map(() => true),
+		);
+		const found = Object.keys(fixtures)
+			.filter((path) => path.startsWith(`./fixtures/${name}/`))
+			.sort();
+		expect(found).toEqual([...paths].sort());
+		for (const path of paths) {
+			const file = fixtures[path];
+			expect(file).toBeDefined();
+			expect(parser.parse(file?.default)).toMatchObject({ status: "ok" });
+		}
 	}
 });

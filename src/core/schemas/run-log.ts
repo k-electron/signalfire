@@ -28,7 +28,7 @@ const runLogSchema = z.strictObject({
 	mode,
 	seed: z.string(),
 	contentVersion: z.string().min(1),
-	engineVersion: z.string().min(1),
+	engineVersion: z.string().regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
 	startedAt: z.iso.datetime({ offset: true }),
 	inputs: z.array(
 		z.tuple([z.int().nonnegative(), codePoint, z.int().min(0).max(7)]),

@@ -23,6 +23,7 @@ export function Hub({
 					type="button"
 					tabIndex={-1}
 					aria-current={index === selectedIndex ? "true" : undefined}
+					className={index === selectedIndex ? "shadow-focus" : undefined}
 					onClick={() => onOpen(item.event)}
 				>
 					{item.label}

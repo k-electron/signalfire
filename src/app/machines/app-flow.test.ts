@@ -1,14 +1,11 @@
 import { expect, test } from "vitest";
 import { type Actor, createActor } from "xstate";
-import { type AppFlowEvent, appFlowMachine } from "./app-flow";
+import { type AppFlowEvent, appFlowMachine, keyToEvent } from "./app-flow";
 
 type Flow = Actor<typeof appFlowMachine>;
 
 function start(input?: { firstRun: boolean }) {
-	const flow =
-		input === undefined
-			? createActor(appFlowMachine)
-			: createActor(appFlowMachine, { input });
+	const flow = createActor(appFlowMachine, { input });
 	flow.start();
 	return flow;
 }
@@ -282,7 +279,7 @@ test("The zone map opens the level", () => {
 	).toBe("level");
 });
 
-test("Back from the level returns to the zone map", () => {
+test("Back from the level opens pause", () => {
 	expect(
 		send(
 			start(firstRun),
@@ -293,7 +290,27 @@ test("Back from the level returns to the zone map", () => {
 			{ type: "startLevel" },
 			{ type: "back" },
 		).value,
-	).toBe("zoneMap");
+	).toBe("pause");
+});
+
+test("Space and Escape on pause return to the level", () => {
+	const flow = start(firstRun);
+	const level = send(
+		flow,
+		{ type: "ready" },
+		{ type: "begin" },
+		{ type: "continue" },
+		{ type: "openZone" },
+		{ type: "startLevel" },
+	);
+	expect(keyToEvent(level, "Escape")).toEqual({ type: "back" });
+	const paused = send(flow, { type: "back" });
+	expect(paused.value).toBe("pause");
+	expect(keyToEvent(paused, " ")).toEqual({ type: "resume" });
+	expect(send(flow, { type: "resume" }).value).toBe("level");
+	const pausedAgain = send(flow, { type: "back" });
+	expect(keyToEvent(pausedAgain, "Escape")).toEqual({ type: "back" });
+	expect(send(flow, { type: "back" }).value).toBe("level");
 });
 
 test("Finish opens results", () => {

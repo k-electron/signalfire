@@ -13,4 +13,4 @@ Logic-domain scenarios map to tests. Tooling, CI, and docs are checked by runnin
 
 ## Consequences
 
-C4, the testing definition of done, the OpenSpec spec rules, and the hermetic sentence in `AGENTS.md` and repo setup say this. Specs already shipped stay as they are.
+C4, the testing definition of done, the OpenSpec spec rules, and the hermetic sentence in `AGENTS.md` and repo setup say this.

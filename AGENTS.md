@@ -82,7 +82,7 @@ Project tooling (build, lint, test, dev servers, browsers) is installed in this 
 | `pnpm build` | Production build |
 | `pnpm preview` | Serve the production build locally |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` / `pnpm format` | Biome check, then the layer-boundary fixture proof, then the token check / Biome fix |
+| `pnpm lint` / `pnpm format` | Biome check, then the layer-boundary fixture proof, then the token check, then the node-version check / Biome fix |
 | `pnpm tokens` | Regenerate theme CSS from `src/core/theme/tokens.ts` |
 | `pnpm test` | Vitest Node and browser projects |
 | `pnpm test:unit` | Vitest Node project (pre-push) |

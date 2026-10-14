@@ -36,7 +36,7 @@ Runs on every pull request and on every push to `main`.
 ## Hosting (Cloudflare Workers)
 
 - Connected to the GitHub repo through Cloudflare's Git integration. The build command is `pnpm build`. The deploy command is `pnpm exec wrangler deploy`. `wrangler.jsonc` uploads `dist/`.
-- `PNPM_VERSION` is the `packageManager` version. `NODE_VERSION` and `.node-version` are the lockfile's exact Node (`26.11.1`). The image must be that Node before `npm` runs, because npm rejects `devEngines.runtime` instead of downloading it. The deploy command is `pnpm exec wrangler deploy`.
+- `PNPM_VERSION` is the `packageManager` version. `NODE_VERSION` and `.node-version` are the lockfile's `node@runtime` entry, which pnpm resolves from `devEngines.runtime`. The image must be that Node before `npm` runs, because npm rejects `devEngines.runtime` instead of downloading it. The deploy command is `pnpm exec wrangler deploy`.
 - **Production:** the `main` branch. Because `main` only accepts merges that passed CI and review, every production deploy has passed every check.
 - **Previews:** every pull request branch gets its own URL, posted on the pull request. Agents use it for screenshots and recordings; Karim uses it to play changes before merge (Testing horizontal).
 - No server code and no environment secrets: the game is fully static, and puter.js runs in the browser.

@@ -1,5 +1,6 @@
-import type { ParseResult } from "../../core/schemas/parse";
-import type { WriteLock } from "./write-lock";
+import type { ParseResult } from "../schemas/parse";
+import { runId } from "../schemas/run-id";
+import { LockBusyError, type WriteLock } from "./write-lock";
 
 export type Change =
 	| { readonly type: "set"; readonly key: string; readonly value: unknown }
@@ -23,38 +24,73 @@ export type LoadResult<T> =
 			readonly document: T;
 	  }
 	| { readonly status: "newer"; readonly version: number }
-	| { readonly status: "invalid" };
+	| { readonly status: "invalid" }
+	| { readonly status: "failed" }
+	| { readonly status: "busy" };
 
 export type SaveResult =
 	| { readonly status: "saved" }
 	| { readonly status: "invalid" }
-	| { readonly status: "newer"; readonly version: number };
+	| { readonly status: "newer"; readonly version: number }
+	| { readonly status: "busy" };
 
-export function createDocumentStore(store: LocalStore, lock: WriteLock) {
+export function createDocumentStore(
+	store: LocalStore,
+	lock: WriteLock,
+	chains: Readonly<Record<string, DocumentChain<unknown>>>,
+	run?: DocumentChain<unknown>,
+) {
 	return {
-		async load<T>(
-			key: string,
-			chain: DocumentChain<T>,
-		): Promise<LoadResult<T>> {
-			assertKey(key);
-			return lock.exclusive(() => loadDocument(store, key, chain));
+		async load(key: string): Promise<LoadResult<unknown>> {
+			const chain = chainFor(key, chains, run);
+			return locked(lock, () => loadDocument(store, key, chain));
 		},
-		async save<T>(
-			key: string,
-			chain: DocumentChain<T>,
-			value: unknown,
-		): Promise<SaveResult> {
-			assertKey(key);
-			return lock.exclusive(() => saveDocument(store, key, chain, value));
+		async save(key: string, value: unknown): Promise<SaveResult> {
+			const chain = chainFor(key, chains, run);
+			return locked(lock, () => saveDocument(store, key, chain, value));
 		},
 	};
 }
 
-async function loadDocument<T>(
+async function locked<T>(
+	lock: WriteLock,
+	run: () => Promise<T>,
+): Promise<T | { status: "busy" }> {
+	try {
+		return await lock.exclusive(run);
+	} catch (error) {
+		if (error instanceof LockBusyError) {
+			return { status: "busy" };
+		}
+		throw error;
+	}
+}
+
+function chainFor(
+	key: string,
+	chains: Readonly<Record<string, DocumentChain<unknown>>>,
+	run: DocumentChain<unknown> | undefined,
+): DocumentChain<unknown> {
+	assertKey(key);
+	const exact = chains[key];
+	if (exact !== undefined) {
+		return exact;
+	}
+	if (run !== undefined && isRunKey(key)) {
+		return run;
+	}
+	throw new RangeError("The document key is not bound to a chain.");
+}
+
+function isRunKey(key: string): boolean {
+	return key.startsWith("run:") && runId.safeParse(key.slice(4)).success;
+}
+
+async function loadDocument(
 	store: LocalStore,
 	key: string,
-	chain: DocumentChain<T>,
-): Promise<LoadResult<T>> {
+	chain: DocumentChain<unknown>,
+): Promise<LoadResult<unknown>> {
 	const live = await store.get(key);
 	if (live === undefined) {
 		return { status: "absent" };
@@ -62,6 +98,9 @@ async function loadDocument<T>(
 	const parsed = chain.parse(live);
 	if (parsed.status === "newer") {
 		return { status: "newer", version: parsed.version };
+	}
+	if (parsed.status === "failed") {
+		return { status: "failed" };
 	}
 	if (parsed.status === "ok" && !parsed.migrated) {
 		return {
@@ -83,15 +122,17 @@ async function loadDocument<T>(
 	return quarantine(store, key, chain, live);
 }
 
-async function saveDocument<T>(
+async function saveDocument(
 	store: LocalStore,
 	key: string,
-	chain: DocumentChain<T>,
+	chain: DocumentChain<unknown>,
 	value: unknown,
 ): Promise<SaveResult> {
 	const live = await store.get(key);
+	let liveStatus: ParseResult<unknown>["status"] | "absent" = "absent";
 	if (live !== undefined) {
 		const stored = chain.parse(live);
+		liveStatus = stored.status;
 		if (stored.status === "newer") {
 			return { status: "newer", version: stored.version };
 		}
@@ -101,7 +142,9 @@ async function saveDocument<T>(
 		return { status: "invalid" };
 	}
 	const changes: Change[] = [];
-	if (live !== undefined) {
+	if (live !== undefined && liveStatus === "invalid") {
+		changes.push(...(await quarantineSlot(store, key, live)));
+	} else if (live !== undefined) {
 		const backup0 = await store.get(backupKey(key, 0));
 		if (!sameValue(live, backup0)) {
 			const backup1 = await store.get(backupKey(key, 1));
@@ -126,20 +169,18 @@ async function backupBeforeMigration(
 	await store.apply(rotate(key, live, backup0, backup1));
 }
 
-async function quarantine<T>(
+async function quarantine(
 	store: LocalStore,
 	key: string,
-	chain: DocumentChain<T>,
+	chain: DocumentChain<unknown>,
 	live: unknown,
-): Promise<LoadResult<T>> {
+): Promise<LoadResult<unknown>> {
 	const backups = [
 		await store.get(backupKey(key, 0)),
 		await store.get(backupKey(key, 1)),
 		await store.get(backupKey(key, 2)),
 	];
-	const changes: Change[] = [
-		{ type: "set", key: quarantineKey(key), value: live },
-	];
+	const changes: Change[] = [...(await quarantineSlot(store, key, live))];
 	for (const backup of backups) {
 		if (backup === undefined) {
 			continue;
@@ -162,6 +203,25 @@ async function quarantine<T>(
 	return { status: "invalid" };
 }
 
+async function quarantineSlot(
+	store: LocalStore,
+	key: string,
+	value: unknown,
+): Promise<Change[]> {
+	let index = 0;
+	for (;;) {
+		const slot = `quarantine:${key}:${index}`;
+		const existing = await store.get(slot);
+		if (existing === undefined) {
+			return [{ type: "set", key: slot, value }];
+		}
+		if (sameValue(existing, value)) {
+			return [];
+		}
+		index += 1;
+	}
+}
+
 function rotate(
 	key: string,
 	previous: unknown,
@@ -181,10 +241,6 @@ function rotate(
 
 function backupKey(key: string, slot: 0 | 1 | 2): string {
 	return `backup:${key}:${slot}`;
-}
-
-function quarantineKey(key: string): string {
-	return `quarantine:${key}`;
 }
 
 function assertKey(key: string): void {
@@ -214,7 +270,7 @@ function sameValue(left: unknown, right: unknown): boolean {
 		const rightKeys = Object.keys(right);
 		return (
 			leftKeys.length === rightKeys.length &&
-			leftKeys.every((key) => sameValue(left[key], right[key]))
+			leftKeys.every((name) => sameValue(left[name], right[name]))
 		);
 	}
 	return false;

@@ -1,6 +1,6 @@
 # Horizontal 01: Constitution
 
-**Version 1.3.0 · Amended 2026-10-12**
+**Version 1.4.0 · Amended 2026-10-13**
 
 The rules for how this project is built. [PHILOSOPHY.md](../PHILOSOPHY.md) defines what we build and why; this document defines how. Every OpenSpec proposal, task, and pull request must comply.
 
@@ -79,8 +79,8 @@ Tooling, CI, and docs are checked by running the command. A green run is the evi
 
 ### C7. Dependencies
 
-- Every new **runtime** dependency is named and justified in its proposal: purpose, size impact, license, and alternatives considered.
-- Development dependencies may be added without proposal justification.
+- Prefer libraries with wide adoption, a long release history, and active maintenance, including support for the current major of their peers. A thin or stale library needs a stated reason in its proposal; otherwise hand-roll the small thing. This applies to runtime and development dependencies.
+- Every new runtime dependency is named and justified in its proposal: purpose, size impact, license, and alternatives considered.
 - Prefer permissive licenses (MIT, Apache-2.0, BSD, ISC).
 
 ### C8. Agent instruction files

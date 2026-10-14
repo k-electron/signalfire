@@ -1,5 +1,5 @@
 import { useMachine } from "@xstate/react";
-import { type KeyboardEvent, lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import {
 	type AppFlowEvent,
 	appFlowMachine,
@@ -11,6 +11,7 @@ import { GalaxyMap } from "./screens/galaxy-map";
 import { Hub } from "./screens/hub";
 import { Level } from "./screens/level";
 import { Onboarding } from "./screens/onboarding";
+import { Pause } from "./screens/pause";
 import { Results } from "./screens/results";
 import { ScreenBoundary } from "./screens/screen-boundary";
 import { Title } from "./screens/title";
@@ -67,21 +68,25 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 		frame.current?.focus();
 	}, [snapshot.value]);
 
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) {
+				return;
+			}
+			const next = keyToEvent(snapshot, event.key);
+			if (next === null) {
+				return;
+			}
+			event.preventDefault();
+			send(next);
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [snapshot, send]);
+
 	if (snapshot.value === "boot") {
 		return null;
 	}
-
-	const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-		if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) {
-			return;
-		}
-		const next = keyToEvent(snapshot, event.key);
-		if (next === null) {
-			return;
-		}
-		event.preventDefault();
-		send(next);
-	};
 
 	const open = (event: AppFlowEvent) => {
 		send(event);
@@ -125,6 +130,9 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 		case "level":
 			screen = <Level />;
 			break;
+		case "pause":
+			screen = <Pause />;
+			break;
 		case "results":
 			screen = (
 				<Results
@@ -144,7 +152,6 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			data-screen={snapshot.value}
 			tabIndex={-1}
 			className="outline-none focus:shadow-focus"
-			onKeyDown={onKeyDown}
 		>
 			<ScreenBoundary
 				key={snapshot.value}
