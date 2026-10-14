@@ -1,0 +1,17 @@
+@keyframes typed-text-flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+}
+
+.typed-text-error {
+	animation-name: typed-text-flicker;
+	animation-duration: var(--motion-micro-duration);
+	/* ease-out is the micro easing. @theme inline does not emit --ease-micro. */
+	animation-timing-function: ease-out;
+	animation-iteration-count: 1;
+}

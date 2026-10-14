@@ -166,6 +166,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/atkinson-hyperlegible-mono':
+        specifier: 5.3.0
+        version: 5.3.0
       '@xstate/react':
         specifier: 6.1.0
         version: 6.1.0(@types/react@19.3.0)(react@19.3.0)(xstate@5.33.2)
@@ -518,6 +521,9 @@ packages:
     resolution: {integrity: sha512-Kgbj2smuq1P4OhGKuPATs5i2fAxNmGbJ/zSmTrzWhQSLUrHREbKWgv9WGbNUOXcx77q6joLVMmTygyXuwP2Bog==}
     peerDependencies:
       vitest: ^4.1.0 || ^5.0.0
+
+  '@fontsource/atkinson-hyperlegible-mono@5.3.0':
+    resolution: {integrity: sha512-7Iha5azCRXJVk4NdxbVdKAE+4p/rMJoW6dslvhktugDFPSp7kxFRGAavBtwtSTrnyNhKXW8w1NHgMnrh/6OshA==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1996,6 +2002,8 @@ snapshots:
     dependencies:
       fast-check: 4.10.2
       vitest: 5.0.3(@vitest/browser-playwright@5.0.3)(@vitest/ui@5.0.3)(vite@8.3.4(esbuild@0.28.2)(jiti@2.7.0))
+
+  '@fontsource/atkinson-hyperlegible-mono@5.3.0': {}
 
   '@img/colour@1.1.0': {}
 

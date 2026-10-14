@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "@fontsource/atkinson-hyperlegible-mono/latin-400.css";
 
 html {
 	background: var(--background);
