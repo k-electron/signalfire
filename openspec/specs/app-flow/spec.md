@@ -515,38 +515,19 @@ A first-run player SHALL be able to move from the title to onboarding, the hub, 
 - **WHEN** the player, on a first run, presses Space on the title, Space on onboarding, 5 on the hub, Escape, 5 again, and then the browser Back button
 - **THEN** the player sees, in order, the onboarding heading, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
 
-### Requirement: The zone map opens the level, and back opens pause
+### Requirement: The zone map opens the level
 
-Asking to start the level from the zone map SHALL open the level. Asking to go back from the level SHALL open pause.
+Asking to start the level from the zone map SHALL open the level. Asking to go back from the level SHALL return to the zone map.
 
 #### Scenario: The zone map opens the level
 
 - **WHEN** the flow is asked to start the level from the zone map
 - **THEN** the flow is the level
 
-#### Scenario: Back from the level opens pause
+#### Scenario: Back from the level opens the zone map
 
 - **WHEN** the flow is asked to go back from the level
-- **THEN** the flow is pause
-
-### Requirement: Pause resumes the level
-
-Pause SHALL show a heading Pause. Pressing Space or Escape on pause SHALL return to the level.
-
-#### Scenario: Pause shows its name
-
-- **WHEN** pause is showing
-- **THEN** the player sees a heading Pause
-
-#### Scenario: Space on pause returns to the level
-
-- **WHEN** the player presses Space on pause
-- **THEN** the player sees the level heading
-
-#### Scenario: Escape on pause returns to the level
-
-- **WHEN** the player presses Escape on pause
-- **THEN** the player sees the level heading
+- **THEN** the flow is the zone map
 
 ### Requirement: The selected item is visible
 
