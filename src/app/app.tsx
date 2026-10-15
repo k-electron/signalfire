@@ -1,5 +1,7 @@
 import { useMachine } from "@xstate/react";
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import type { MissedBar } from "../core/scoring/stars";
+import type { RunSummary } from "../core/sim/waiting-lanes";
 import {
 	type AppFlowEvent,
 	appFlowMachine,
@@ -41,6 +43,10 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 	const [snapshot, send] = useMachine(appFlowMachine, {
 		input: { firstRun },
 	});
+	const [lastRun, setLastRun] = useState<{
+		summary?: RunSummary;
+		missed?: readonly MissedBar[];
+	} | null>(null);
 	const frame = useRef<HTMLElement>(null);
 
 	useEffect(() => {
@@ -69,6 +75,9 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 	}, [snapshot.value]);
 
 	useEffect(() => {
+		if (snapshot.value === "level") {
+			return;
+		}
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) {
 				return;
@@ -128,17 +137,36 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			screen = <LazySettings />;
 			break;
 		case "level":
-			screen = <Level />;
+			screen = (
+				<Level
+					onFinish={(summary, missed) => {
+						setLastRun({ summary, missed });
+						send({ type: "finish" });
+					}}
+					onExit={() => send({ type: "toZoneMap" })}
+				/>
+			);
 			break;
 		case "pause":
-			screen = <Pause />;
+			screen = (
+				<Pause
+					onResume={() => send({ type: "resume" })}
+					onQuit={() => send({ type: "toZoneMap" })}
+				/>
+			);
 			break;
 		case "results":
 			screen = (
 				<Results
+					stars={lastRun?.summary?.stars}
+					score={lastRun?.summary?.score}
+					integrity={lastRun?.summary?.accuracy}
+					velocity={lastRun?.summary?.netWpm}
+					missed={lastRun?.missed}
 					items={resultsItems}
 					selectedIndex={snapshot.context.resultsIndex}
 					onOpen={open}
+					onContinue={() => send({ type: "toZoneMap" })}
 				/>
 			);
 			break;

@@ -47,8 +47,8 @@ While in playing state, the HUD SHALL display live Integrity as an accuracy perc
 - **THEN** Integrity displays 100%, Velocity displays 0 WPM, Score displays 0, and Combo displays 0
 
 #### Scenario: Keystroke updates HUD metrics
-- **WHEN** the player hits the first note correctly
-- **THEN** the HUD updates with Score 10, Combo 1, and positive Velocity
+- **WHEN** the player hits notes correctly
+- **THEN** the HUD updates with Score 10, Combo 1, and active metrics, reaching positive Velocity as notes elapse
 
 ### Requirement: Escape and focus loss pause the level
 

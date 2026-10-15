@@ -160,6 +160,7 @@ const builtAppFlowMachine = setup({
 		},
 		level: {
 			on: {
+				toZoneMap: "zoneMap",
 				finish: "results",
 				back: "pause",
 			},

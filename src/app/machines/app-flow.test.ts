@@ -279,6 +279,20 @@ test("The zone map opens the level", () => {
 	).toBe("level");
 });
 
+test("toZoneMap from the level returns to the zone map", () => {
+	expect(
+		send(
+			start(firstRun),
+			{ type: "ready" },
+			{ type: "begin" },
+			{ type: "continue" },
+			{ type: "openZone" },
+			{ type: "startLevel" },
+			{ type: "toZoneMap" },
+		).value,
+	).toBe("zoneMap");
+});
+
 test("Back from the level opens pause", () => {
 	expect(
 		send(

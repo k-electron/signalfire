@@ -559,3 +559,17 @@ test("replay with the other zone is rejected", () => {
 	);
 	expect(outbox.drain()).toEqual([]);
 });
+
+test("run.metrics returns live integrity percent and velocity WPM", () => {
+	const run = open(level11, "signalfire");
+	const outbox = createOutbox();
+	expect(run.metrics()).toEqual({ integrityPercent: 100, velocityWpm: 0 });
+
+	run.apply(F, 0, outbox);
+	expect(run.metrics().integrityPercent).toBe(100);
+
+	run.advance(120, outbox);
+	run.apply(J, 0, outbox);
+	expect(run.metrics().integrityPercent).toBe(50);
+	expect(run.metrics().velocityWpm).toBeGreaterThan(0);
+});

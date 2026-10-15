@@ -3,6 +3,7 @@ export type HudSnapshot = {
 	readonly combo: number;
 	readonly activeCharacter: number | null;
 	readonly accuracy: number;
+	readonly velocity?: number;
 };
 
 export type HudBridgeOptions = {
