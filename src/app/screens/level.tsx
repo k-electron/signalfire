@@ -87,6 +87,7 @@ export function Level({
 	const combo = useHudStore((s) => s.combo);
 	const accuracy = useHudStore((s) => s.accuracy);
 	const velocity = useHudStore((s) => s.velocity);
+	const activeCharacter = useHudStore((s) => s.activeCharacter);
 
 	const level = campaign.levels[levelId];
 	const zone = level ? campaign.zones[level.zoneId] : undefined;
@@ -196,10 +197,19 @@ export function Level({
 			rev: 0,
 		});
 
+		let finished = false;
 		const loop = createFixedStepLoop((step) => {
+			if (finished) {
+				return;
+			}
 			run.advance(step, outbox);
 			const events = outbox.drain();
 			if (events.length > 0) {
+				for (const event of events) {
+					if (event.type === "LevelEnded") {
+						finished = true;
+					}
+				}
 				handleEvents(events);
 			}
 		});
@@ -216,6 +226,15 @@ export function Level({
 				useHudStore.getState().setSnapshot(snapshot);
 			},
 			minIntervalMs: 50,
+		});
+
+		const initialMetrics = run.metrics();
+		bridge.update({
+			score: 0,
+			combo: 0,
+			activeCharacter: run.activeNote()?.character ?? null,
+			accuracy: initialMetrics.integrityPercent / 100,
+			velocity: initialMetrics.velocityWpm,
 		});
 
 		let destroyed = false;
@@ -397,6 +416,9 @@ export function Level({
 				{/* Minimal In-Level HUD */}
 				<div
 					data-testid="in-level-hud"
+					data-active-char={
+						activeCharacter !== null ? String.fromCharCode(activeCharacter) : ""
+					}
 					className="flex items-center justify-between w-[900px] px-6 py-3 border border-b-0 border-border bg-background/90 text-foreground font-mono rounded-t-radius"
 				>
 					<div className="flex gap-4">

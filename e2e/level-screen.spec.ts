@@ -1,20 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { expect, seedProfile, test } from "./fixtures";
 
 test.describe("Level screen lifecycle", () => {
 	test("plays level 1.1 from briefing through countdown to results with stars", async ({
 		page,
 	}) => {
+		await seedProfile(page);
 		await page.goto("/");
 		await expect(
 			page.getByRole("heading", { name: "Signalfire" }),
 		).toBeVisible();
 
-		// Flow to Level: Title -> Onboarding -> Hub -> Galaxy map -> Zone map -> Level
-		await page.keyboard.press("Space");
-		await expect(
-			page.getByRole("heading", { name: "Onboarding" }),
-		).toBeVisible();
-
+		// Flow to Level: Title -> Hub -> Galaxy map -> Zone map -> Level
 		await page.keyboard.press("Space");
 		await expect(page.getByRole("heading", { name: "Hub" })).toBeVisible();
 
@@ -62,7 +58,6 @@ test.describe("Level screen lifecycle", () => {
 		await expect(page.getByTestId("hud-combo")).toContainText("3");
 
 		// Advance simulation naturally to the end of the level (6000 steps)
-		await page.clock.install();
 		for (let i = 0; i < 200; i++) {
 			await page.clock.fastForward(250);
 		}
@@ -82,17 +77,13 @@ test.describe("Level screen lifecycle", () => {
 	test("pauses mid-level on Escape, verifies pause overlay, and resumes through countdown", async ({
 		page,
 	}) => {
+		await seedProfile(page);
 		await page.goto("/");
 		await expect(
 			page.getByRole("heading", { name: "Signalfire" }),
 		).toBeVisible();
 
-		// Flow to Level: Title -> Onboarding -> Hub -> Galaxy map -> Zone map -> Level
-		await page.keyboard.press("Space");
-		await expect(
-			page.getByRole("heading", { name: "Onboarding" }),
-		).toBeVisible();
-
+		// Flow to Level: Title -> Hub -> Galaxy map -> Zone map -> Level
 		await page.keyboard.press("Space");
 		await expect(page.getByRole("heading", { name: "Hub" })).toBeVisible();
 

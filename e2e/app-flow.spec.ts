@@ -1,11 +1,10 @@
-/** First-run walk from the title to settings and back. */
-import { expect, test } from "./fixtures";
+/** Walk from the title to settings and back for a returning player. */
+import { expect, seedProfile, test } from "./fixtures";
 
 test("Keyboard and browser Back", async ({ page }) => {
+	await seedProfile(page);
 	await page.goto("/");
 	await expect(page.getByRole("heading", { name: "Signalfire" })).toBeVisible();
-	await page.keyboard.press("Space");
-	await expect(page.getByRole("heading", { name: "Onboarding" })).toBeVisible();
 	await page.keyboard.press("Space");
 	await expect(page.getByRole("heading", { name: "Hub" })).toBeVisible();
 	await page.keyboard.press("5");

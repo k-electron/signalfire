@@ -1,7 +1,10 @@
 import { useMachine } from "@xstate/react";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import type { Storage } from "../core/ports/storage";
+import type { ProgressDocument } from "../core/scoring/record-run";
 import type { MissedBar } from "../core/scoring/stars";
 import type { RunSummary } from "../core/sim/waiting-lanes";
+import { createLocalStorage } from "../platform/storage/indexed-db";
 import {
 	type AppFlowEvent,
 	appFlowMachine,
@@ -18,6 +21,12 @@ import { Results } from "./screens/results";
 import { ScreenBoundary } from "./screens/screen-boundary";
 import { Title } from "./screens/title";
 import { ZoneMap } from "./screens/zone-map";
+import {
+	loadBootData,
+	requestStoragePersistence,
+	saveLevelCompletionCheckpoint,
+	saveOnboardingProfileCheckpoint,
+} from "./storage/checkpoints";
 
 const LazyDossier = lazy(() =>
 	import("./screens/dossier").then((module) => ({ default: module.Dossier })),
@@ -39,10 +48,23 @@ function hasTrap(state: unknown) {
 	return state.signalfire === "app-flow";
 }
 
-export function App({ firstRun = true }: { firstRun?: boolean }) {
+export type AppProps = {
+	readonly firstRun?: boolean;
+	readonly storage?: Storage;
+};
+
+export function App({
+	firstRun: initialFirstRun,
+	storage: storageProp,
+}: AppProps = {}) {
+	const storage = useMemo(
+		() => storageProp ?? createLocalStorage(),
+		[storageProp],
+	);
 	const [snapshot, send] = useMachine(appFlowMachine, {
-		input: { firstRun },
+		input: { firstRun: initialFirstRun ?? true },
 	});
+	const [progress, setProgress] = useState<ProgressDocument | null>(null);
 	const [lastRun, setLastRun] = useState<{
 		summary?: RunSummary;
 		missed?: readonly MissedBar[];
@@ -50,8 +72,25 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 	const frame = useRef<HTMLElement>(null);
 
 	useEffect(() => {
-		send({ type: "ready" });
-	}, [send]);
+		let active = true;
+		loadBootData(storage)
+			.then((boot) => {
+				if (!active) return;
+				if (boot.progress) {
+					setProgress(boot.progress);
+				}
+				const isFirstRun =
+					initialFirstRun !== undefined ? initialFirstRun : boot.isFirstRun;
+				send({ type: "ready", firstRun: isFirstRun });
+			})
+			.catch(() => {
+				if (!active) return;
+				send({ type: "ready", firstRun: initialFirstRun ?? true });
+			});
+		return () => {
+			active = false;
+		};
+	}, [storage, send, initialFirstRun]);
 
 	useEffect(() => {
 		// One marker so Back asks the machine to go back, including from the title.
@@ -82,6 +121,11 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) {
 				return;
 			}
+			// When on onboarding, only Escape is handled by app shell to go back to title.
+			// Other keys (arrows, space, f, j) are handled by Onboarding itself.
+			if (snapshot.value === "onboarding" && event.key !== "Escape") {
+				return;
+			}
 			const next = keyToEvent(snapshot, event.key);
 			if (next === null) {
 				return;
@@ -107,7 +151,14 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			screen = <Title />;
 			break;
 		case "onboarding":
-			screen = <Onboarding />;
+			screen = (
+				<Onboarding
+					onComplete={(profile) => {
+						saveOnboardingProfileCheckpoint(storage, profile).catch(() => {});
+						send({ type: "continue" });
+					}}
+				/>
+			);
 			break;
 		case "hub":
 			screen = (
@@ -122,7 +173,12 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			screen = <GalaxyMap />;
 			break;
 		case "zoneMap":
-			screen = <ZoneMap />;
+			screen = (
+				<ZoneMap
+					progress={progress}
+					onStartLevel={(levelId) => send({ type: "startLevel", levelId })}
+				/>
+			);
 			break;
 		case "dossier":
 			screen = <LazyDossier />;
@@ -139,8 +195,27 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 		case "level":
 			screen = (
 				<Level
-					onFinish={(summary, missed) => {
+					key={snapshot.context.levelId}
+					levelId={snapshot.context.levelId}
+					onFinish={(summary, missed, runProgress) => {
 						setLastRun({ summary, missed });
+						if (runProgress) {
+							setProgress(runProgress);
+						}
+						if (snapshot.context.levelId === "level:1.1" && summary) {
+							saveLevelCompletionCheckpoint(storage, {
+								levelId: "level:1.1",
+								summary,
+								zoneHasStarBars: true,
+							})
+								.then((res) => {
+									setProgress(res.progress);
+								})
+								.catch(() => {});
+							if (summary.stars >= 1) {
+								requestStoragePersistence();
+							}
+						}
 						send({ type: "finish" });
 					}}
 					onExit={() => send({ type: "toZoneMap" })}
@@ -170,8 +245,6 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 				/>
 			);
 			break;
-		default:
-			screen = null;
 	}
 
 	return (

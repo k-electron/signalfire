@@ -56,15 +56,42 @@ test("Back from the title stays on the title", () => {
 	);
 });
 
-test("Continue opens the hub", () => {
-	expect(
-		send(
-			start(firstRun),
-			{ type: "ready" },
-			{ type: "begin" },
-			{ type: "continue" },
-		).value,
-	).toBe("hub");
+test("Continue starts level 0.1 on first run", () => {
+	const snapshot = send(
+		start(firstRun),
+		{ type: "ready" },
+		{ type: "begin" },
+		{ type: "continue" },
+	);
+	expect(snapshot.value).toBe("level");
+	expect(snapshot.context.levelId).toBe("level:0.1");
+});
+
+test("Continue opens the hub when returning", () => {
+	const flow = start(returning);
+	send(flow, { type: "ready" }, { type: "begin" }, { type: "openOnboarding" });
+	const snapshot = send(flow, { type: "continue" });
+	expect(snapshot.value).toBe("hub");
+});
+
+test("First run flow advances from level 0.1 through level 1.1 to results and zone map", () => {
+	const flow = start(firstRun);
+	send(flow, { type: "ready" }, { type: "begin" }, { type: "continue" });
+	expect(flow.getSnapshot().value).toBe("level");
+	expect(flow.getSnapshot().context.levelId).toBe("level:0.1");
+
+	// Finishing level 0.1 advances to level 1.1
+	send(flow, { type: "finish" });
+	expect(flow.getSnapshot().value).toBe("level");
+	expect(flow.getSnapshot().context.levelId).toBe("level:1.1");
+
+	// Finishing level 1.1 advances to results
+	send(flow, { type: "finish" });
+	expect(flow.getSnapshot().value).toBe("results");
+
+	// Results continue opens the zone map
+	send(flow, { type: "toZoneMap" });
+	expect(flow.getSnapshot().value).toBe("zoneMap");
 });
 
 test("Back returns to the title", () => {
@@ -81,10 +108,9 @@ test("Back returns to the title", () => {
 test("The hub opens the galaxy map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openGalaxy" },
 		).value,
 	).toBe("galaxyMap");
@@ -93,10 +119,9 @@ test("The hub opens the galaxy map", () => {
 test("The hub opens the zone map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 		).value,
 	).toBe("zoneMap");
@@ -105,10 +130,9 @@ test("The hub opens the zone map", () => {
 test("The hub opens the dossier", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openDossier" },
 		).value,
 	).toBe("dossier");
@@ -117,10 +141,9 @@ test("The hub opens the dossier", () => {
 test("The hub opens the hangar", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openHangar" },
 		).value,
 	).toBe("hangar");
@@ -129,10 +152,9 @@ test("The hub opens the hangar", () => {
 test("The hub opens the codex", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openCodex" },
 		).value,
 	).toBe("codex");
@@ -141,10 +163,9 @@ test("The hub opens the codex", () => {
 test("The hub opens settings", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openSettings" },
 		).value,
 	).toBe("settings");
@@ -152,22 +173,17 @@ test("The hub opens settings", () => {
 
 test("The hub selects the galaxy map first", () => {
 	expect(
-		send(
-			start(firstRun),
-			{ type: "ready" },
-			{ type: "begin" },
-			{ type: "continue" },
-		).context.hubIndex,
+		send(start(returning), { type: "ready" }, { type: "begin" }).context
+			.hubIndex,
 	).toBe(0);
 });
 
 test("Back from the galaxy map returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openGalaxy" },
 			{ type: "back" },
 		).value,
@@ -177,10 +193,9 @@ test("Back from the galaxy map returns to the hub", () => {
 test("Back from the dossier returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openDossier" },
 			{ type: "back" },
 		).value,
@@ -190,10 +205,9 @@ test("Back from the dossier returns to the hub", () => {
 test("Back from the hangar returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openHangar" },
 			{ type: "back" },
 		).value,
@@ -203,10 +217,9 @@ test("Back from the hangar returns to the hub", () => {
 test("Back from the codex returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openCodex" },
 			{ type: "back" },
 		).value,
@@ -216,10 +229,9 @@ test("Back from the codex returns to the hub", () => {
 test("Back from settings returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openSettings" },
 			{ type: "back" },
 		).value,
@@ -229,10 +241,9 @@ test("Back from settings returns to the hub", () => {
 test("The galaxy map opens the zone map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openGalaxy" },
 			{ type: "openZone" },
 		).value,
@@ -242,10 +253,9 @@ test("The galaxy map opens the zone map", () => {
 test("Back returns to the galaxy map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openGalaxy" },
 			{ type: "openZone" },
 			{ type: "back" },
@@ -256,10 +266,9 @@ test("Back returns to the galaxy map", () => {
 test("Back returns to the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "back" },
 		).value,
@@ -269,10 +278,9 @@ test("Back returns to the hub", () => {
 test("The zone map opens the level", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 		).value,
@@ -282,10 +290,9 @@ test("The zone map opens the level", () => {
 test("toZoneMap from the level returns to the zone map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "toZoneMap" },
@@ -296,10 +303,9 @@ test("toZoneMap from the level returns to the zone map", () => {
 test("Back from the level opens pause", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "back" },
@@ -308,12 +314,11 @@ test("Back from the level opens pause", () => {
 });
 
 test("Space and Escape on pause return to the level", () => {
-	const flow = start(firstRun);
+	const flow = start(returning);
 	const level = send(
 		flow,
 		{ type: "ready" },
 		{ type: "begin" },
-		{ type: "continue" },
 		{ type: "openZone" },
 		{ type: "startLevel" },
 	);
@@ -329,10 +334,9 @@ test("Space and Escape on pause return to the level", () => {
 
 test("Finish opens results", () => {
 	const snapshot = send(
-		start(firstRun),
+		start(returning),
 		{ type: "ready" },
 		{ type: "begin" },
-		{ type: "continue" },
 		{ type: "openZone" },
 		{ type: "startLevel" },
 		{ type: "finish" },
@@ -344,10 +348,9 @@ test("Finish opens results", () => {
 test("Back from results opens the zone map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "finish" },
@@ -359,10 +362,9 @@ test("Back from results opens the zone map", () => {
 test("Return to the zone map opens the zone map", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "finish" },
@@ -374,10 +376,9 @@ test("Return to the zone map opens the zone map", () => {
 test("Return to the hub opens the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "finish" },
@@ -387,15 +388,15 @@ test("Return to the hub opens the hub", () => {
 });
 
 test("Back returns to onboarding", () => {
-	expect(
-		send(
-			start(firstRun),
-			{ type: "ready" },
-			{ type: "begin" },
-			{ type: "continue" },
-			{ type: "back" },
-		).value,
-	).toBe("onboarding");
+	const flow = start(returning);
+	send(
+		flow,
+		{ type: "ready" },
+		{ type: "begin" },
+		{ type: "openOnboarding" },
+		{ type: "continue" },
+	);
+	expect(send(flow, { type: "back" }).value).toBe("onboarding");
 });
 
 test("Back returns to the title", () => {
@@ -418,10 +419,9 @@ test("Starting a level from the title stays on the title", () => {
 test("Finishing from the hub stays on the hub", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "finish" },
 		).value,
 	).toBe("hub");
@@ -430,10 +430,9 @@ test("Finishing from the hub stays on the hub", () => {
 test("Beginning again from the level stays on the level", () => {
 	expect(
 		send(
-			start(firstRun),
+			start(returning),
 			{ type: "ready" },
 			{ type: "begin" },
-			{ type: "continue" },
 			{ type: "openZone" },
 			{ type: "startLevel" },
 			{ type: "begin" },
