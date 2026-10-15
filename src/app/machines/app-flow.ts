@@ -1,7 +1,7 @@
 import { assign, type SnapshotFrom, setup } from "xstate";
 
 export type AppFlowEvent =
-	| { type: "ready" }
+	| { type: "ready"; firstRun?: boolean }
 	| { type: "begin" }
 	| { type: "continue" }
 	| { type: "openGalaxy" }
@@ -10,7 +10,8 @@ export type AppFlowEvent =
 	| { type: "openCodex" }
 	| { type: "openSettings" }
 	| { type: "openZone" }
-	| { type: "startLevel" }
+	| { type: "openOnboarding" }
+	| { type: "startLevel"; levelId?: string }
 	| { type: "finish" }
 	| { type: "toZoneMap" }
 	| { type: "toHub" }
@@ -25,6 +26,7 @@ type AppFlowContext = {
 	zoneFrom: "hub" | "galaxyMap" | null;
 	hubIndex: number;
 	resultsIndex: number;
+	levelId: string;
 };
 
 const hubLast = 5;
@@ -92,10 +94,21 @@ const builtAppFlowMachine = setup({
 		zoneFrom: null,
 		hubIndex: 0,
 		resultsIndex: 0,
+		levelId: "level:1.1",
 	}),
 	states: {
 		boot: {
-			on: { ready: "title" },
+			on: {
+				ready: {
+					target: "title",
+					actions: assign({
+						firstRun: ({ context, event }) =>
+							"firstRun" in event && event.firstRun !== undefined
+								? event.firstRun
+								: context.firstRun,
+					}),
+				},
+			},
 		},
 		title: {
 			on: {
@@ -107,7 +120,14 @@ const builtAppFlowMachine = setup({
 		},
 		onboarding: {
 			on: {
-				continue: { target: "hub", actions: "enterHubFromOnboarding" },
+				continue: [
+					{
+						guard: "isFirstRun",
+						target: "level",
+						actions: assign({ levelId: "level:0.1" }),
+					},
+					{ target: "hub", actions: "enterHubFromOnboarding" },
+				],
 				back: "title",
 			},
 		},
@@ -119,6 +139,7 @@ const builtAppFlowMachine = setup({
 				openHangar: "hangar",
 				openCodex: "codex",
 				openSettings: "settings",
+				openOnboarding: "onboarding",
 				openZone: { target: "zoneMap", actions: "openZoneFromHub" },
 				selectNext: { actions: "selectNextHub" },
 				selectPrevious: { actions: "selectPreviousHub" },
@@ -136,7 +157,13 @@ const builtAppFlowMachine = setup({
 		},
 		zoneMap: {
 			on: {
-				startLevel: "level",
+				startLevel: {
+					target: "level",
+					actions: assign({
+						levelId: ({ event }) =>
+							"levelId" in event && event.levelId ? event.levelId : "level:1.1",
+					}),
+				},
 				back: [
 					{
 						guard: "zoneFromGalaxy",
@@ -161,7 +188,15 @@ const builtAppFlowMachine = setup({
 		level: {
 			on: {
 				toZoneMap: "zoneMap",
-				finish: "results",
+				finish: [
+					{
+						guard: ({ context }) =>
+							context.firstRun && context.levelId === "level:0.1",
+						target: "level",
+						actions: assign({ levelId: "level:1.1" }),
+					},
+					{ target: "results" },
+				],
 				back: "pause",
 			},
 		},

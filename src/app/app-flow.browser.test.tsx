@@ -19,11 +19,11 @@ vi.mock("./screens/settings", async (importOriginal) => {
 	};
 });
 
-function mount() {
+function mount(props: { firstRun?: boolean } = { firstRun: true }) {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
-	root.render(<App />);
+	root.render(<App {...props} />);
 	onTestFinished(() => {
 		root.unmount();
 		container.remove();
@@ -42,14 +42,15 @@ async function press(key: string) {
 }
 
 async function toOnboarding() {
-	mount();
+	mount({ firstRun: true });
 	await heading("Signalfire");
 	await press(" ");
 	await heading("Onboarding");
 }
 
 async function toHub() {
-	await toOnboarding();
+	mount({ firstRun: false });
+	await heading("Signalfire");
 	await press(" ");
 	await heading("Hub");
 }
@@ -141,8 +142,19 @@ test("Space on the title begins a first run", async () => {
 	await toOnboarding();
 });
 
-test("Space on onboarding opens the hub", async () => {
+test("Space on onboarding opens the hub outside first run", async () => {
 	await toHub();
+});
+
+test("Completing onboarding during first run starts level 0.1", async () => {
+	await toOnboarding();
+	await press(" ");
+	await press(" ");
+	await press(" ");
+	await press(" ");
+	await press("f");
+	await press("j");
+	await heading("Level");
 });
 
 test("Space on a fresh hub opens the galaxy map", async () => {
@@ -200,10 +212,10 @@ test("Escape on the title stays on the title", async () => {
 	await heading("Signalfire");
 });
 
-test("Escape on the hub returns to onboarding after a first run", async () => {
+test("Escape on the hub returns to the title on a returning visit", async () => {
 	await toHub();
 	await press("{Escape}");
-	await heading("Onboarding");
+	await heading("Signalfire");
 });
 
 test("Escape on settings returns to the hub", async () => {

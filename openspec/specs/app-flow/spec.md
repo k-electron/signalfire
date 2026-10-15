@@ -51,12 +51,17 @@ From the title, asking to begin SHALL open onboarding when the visit is a first 
 
 ### Requirement: Onboarding opens the hub or returns to the title
 
-Asking to continue from onboarding SHALL open the hub. Asking to go back SHALL return to the title.
+Asking to continue from onboarding SHALL start level 0.1 during first run, or open the hub when onboarding is revisited. Asking to go back SHALL return to the title.
 
 #### Scenario: Continue opens the hub
 
-- **WHEN** the flow is asked to continue from onboarding
+- **WHEN** the flow is asked to continue from onboarding when returning
 - **THEN** the flow is the hub
+
+#### Scenario: Continue starts level 0.1 on first run
+
+- **WHEN** the flow is asked to continue from onboarding during a first run
+- **THEN** the flow is the level screen configured for level 0.1
 
 #### Scenario: Back returns to the title
 
@@ -285,8 +290,13 @@ Space SHALL activate the selected action. On the title it begins. On onboarding 
 
 #### Scenario: Space on onboarding opens the hub
 
-- **WHEN** the player presses Space on onboarding
+- **WHEN** the player presses Space on onboarding outside first run
 - **THEN** the player sees the hub heading
+
+#### Scenario: Space on onboarding completes and starts level 0.1
+
+- **WHEN** the player completes onboarding with Space during first run
+- **THEN** the player sees the level screen for level 0.1
 
 #### Scenario: Space on a fresh hub opens the galaxy map
 
@@ -337,7 +347,7 @@ Escape SHALL ask the flow to go back.
 - **WHEN** the player presses Escape on the title
 - **THEN** the player still sees the title heading
 
-#### Scenario: Escape on the hub returns to onboarding after a first run
+#### Scenario: Escape on the hub returns to onboarding when opened from onboarding
 
 - **WHEN** the player reached the hub from onboarding and presses Escape
 - **THEN** the player sees the onboarding heading
@@ -506,14 +516,14 @@ When the screen that is showing fails to render, the player SHALL see the text "
 - **WHEN** the settings screen has failed and the player activates Back
 - **THEN** the player sees the hub heading and does not see "Something went wrong."
 
-### Requirement: A first run can walk to settings and return
+### Requirement: A player can walk to settings and return
 
-A first-run player SHALL be able to move from the title to onboarding, the hub, and settings, then return to the hub by Escape and, after opening settings again, by the browser Back button.
+A player SHALL be able to move from the title to the hub and settings, then return to the hub by Escape and, after opening settings again, by the browser Back button.
 
 #### Scenario: Keyboard and browser Back
 
-- **WHEN** the player, on a first run, presses Space on the title, Space on onboarding, 5 on the hub, Escape, 5 again, and then the browser Back button
-- **THEN** the player sees, in order, the onboarding heading, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
+- **WHEN** the player presses Space on the title, 5 on the hub, Escape, 5 again, and then the browser Back button
+- **THEN** the player sees, in order, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
 
 ### Requirement: The zone map opens the level, and back opens pause
 
@@ -556,3 +566,23 @@ The selected hub item and the selected results item SHALL be painted with the fo
 
 - **WHEN** the galaxy map item is selected on the hub
 - **THEN** that item shows the focus ring and the other hub items do not
+
+### Requirement: First run flow advances from level 0.1 through level 1.1 to results and zone map
+
+When level 0.1 finishes during a first run, the flow SHALL advance to level 1.1 briefing. When level 1.1 finishes, the flow SHALL advance to results. From results, continuing SHALL advance to the zone map.
+
+#### Scenario: Finishing level 0.1 advances to level 1.1
+
+- **WHEN** the flow is at level 0.1 and receives finish
+- **THEN** the flow advances to level 1.1
+
+#### Scenario: Finishing level 1.1 advances to results
+
+- **WHEN** the flow is at level 1.1 and receives finish
+- **THEN** the flow advances to results
+
+#### Scenario: Results continue opens the zone map
+
+- **WHEN** the flow is at results and receives continue
+- **THEN** the flow advances to the zone map
+
