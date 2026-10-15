@@ -64,6 +64,14 @@ export type WaitingLanesRun = {
 	inputs(): readonly { step: number; character: number; flags: number }[];
 	activeNote(): ActiveNote | null;
 	unhitCount(): number;
+	metrics(): {
+		readonly integrityPercent: number;
+		readonly velocityWpm: number;
+	};
+	summary(): {
+		summary: RunSummary;
+		missed: readonly MissedBar[];
+	};
 	finish(outbox: Outbox): {
 		summary: RunSummary;
 		missed: readonly MissedBar[];
@@ -168,6 +176,15 @@ export function createWaitingLanesRun(
 		},
 		unhitCount() {
 			return state.notes.length;
+		},
+		metrics() {
+			return {
+				integrityPercent: integrityPercent(state.judge),
+				velocityWpm: velocityWpm(state.judge),
+			};
+		},
+		summary() {
+			return summaryOf(state);
 		},
 		finish(outbox) {
 			return finish(state, outbox);

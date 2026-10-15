@@ -114,7 +114,9 @@ export class PixiRenderAdapter implements RenderOut {
 			resolution:
 				typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
 			antialias: true,
+			autoStart: false,
 		});
+		app.ticker.stop();
 
 		this.app = app;
 		this.stage = app.stage;
@@ -351,7 +353,8 @@ export class PixiRenderAdapter implements RenderOut {
 
 	destroy(): void {
 		if (this.app !== null) {
-			this.app.destroy(true, { children: true, texture: true });
+			this.app.ticker.stop();
+			this.app.destroy(true, { children: true });
 			this.app = null;
 		}
 		this.stage = null;

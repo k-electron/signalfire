@@ -74,7 +74,7 @@ async function toLevel() {
 
 async function toResults() {
 	await toLevel();
-	await press(" ");
+	await page.getByTestId("dev-finish-level-button").click({ force: true });
 	await heading("Results");
 }
 

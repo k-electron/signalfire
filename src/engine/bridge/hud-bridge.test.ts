@@ -145,4 +145,23 @@ describe("createHudBridge", () => {
 			vi.useRealTimers();
 		}
 	});
+
+	test("forwards velocity alongside accuracy and score", () => {
+		const onSnapshot = vi.fn();
+		const bridge = createHudBridge({
+			onSnapshot,
+			now: () => 1000,
+		});
+
+		const snapshot: HudSnapshot = {
+			score: 50,
+			combo: 5,
+			activeCharacter: 102,
+			accuracy: 0.95,
+			velocity: 24,
+		};
+
+		bridge.update(snapshot);
+		expect(onSnapshot).toHaveBeenCalledWith(snapshot);
+	});
 });
