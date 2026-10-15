@@ -161,13 +161,9 @@ const builtAppFlowMachine = setup({
 		level: {
 			on: {
 				finish: "results",
-				back: "pause",
-			},
-		},
-		pause: {
-			on: {
-				back: "level",
-				resume: "level",
+				toZoneMap: "zoneMap",
+				toHub: { target: "hub", actions: "resetHubIndex" },
+				back: "zoneMap",
 			},
 		},
 		// Back from results opens the zone map. The level is not a parent.
@@ -203,10 +199,6 @@ function spaceEvent(
 			return { type: "openZone" };
 		case "zoneMap":
 			return { type: "startLevel" };
-		case "level":
-			return { type: "finish" };
-		case "pause":
-			return { type: "resume" };
 		case "results":
 			return resultsItems[context.resultsIndex]?.event ?? null;
 		default:
@@ -219,13 +211,21 @@ export function keyToEvent(
 	key: string,
 ): AppFlowEvent | null {
 	const screen = snapshot.value;
+	if (screen === "level") {
+		return null;
+	}
 	if (key === "Escape") {
 		return { type: "back" };
 	}
 	if (key === " ") {
 		return spaceEvent(screen, snapshot.context);
 	}
-	if (screen === "hub" && key.length === 1 && key >= "1" && key <= "5") {
+	if (
+		screen === "hub" &&
+		key.length === 1 &&
+		key >= "1" &&
+		key <= String(hubItems.length)
+	) {
 		return hubItems[Number(key) - 1]?.event ?? null;
 	}
 	if (screen === "results" && key === "1") {

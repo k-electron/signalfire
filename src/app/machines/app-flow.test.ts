@@ -279,7 +279,7 @@ test("The zone map opens the level", () => {
 	).toBe("level");
 });
 
-test("Back from the level opens pause", () => {
+test("Back from the level opens the zone map", () => {
 	expect(
 		send(
 			start(firstRun),
@@ -290,10 +290,38 @@ test("Back from the level opens pause", () => {
 			{ type: "startLevel" },
 			{ type: "back" },
 		).value,
-	).toBe("pause");
+	).toBe("zoneMap");
 });
 
-test("Space and Escape on pause return to the level", () => {
+test("toZoneMap from the level opens the zone map", () => {
+	expect(
+		send(
+			start(firstRun),
+			{ type: "ready" },
+			{ type: "begin" },
+			{ type: "continue" },
+			{ type: "openZone" },
+			{ type: "startLevel" },
+			{ type: "toZoneMap" },
+		).value,
+	).toBe("zoneMap");
+});
+
+test("toHub from the level opens the hub", () => {
+	expect(
+		send(
+			start(firstRun),
+			{ type: "ready" },
+			{ type: "begin" },
+			{ type: "continue" },
+			{ type: "openZone" },
+			{ type: "startLevel" },
+			{ type: "toHub" },
+		).value,
+	).toBe("hub");
+});
+
+test("keyToEvent on the level returns null for gameplay keys", () => {
 	const flow = start(firstRun);
 	const level = send(
 		flow,
@@ -303,14 +331,20 @@ test("Space and Escape on pause return to the level", () => {
 		{ type: "openZone" },
 		{ type: "startLevel" },
 	);
-	expect(keyToEvent(level, "Escape")).toEqual({ type: "back" });
-	const paused = send(flow, { type: "back" });
-	expect(paused.value).toBe("pause");
-	expect(keyToEvent(paused, " ")).toEqual({ type: "resume" });
-	expect(send(flow, { type: "resume" }).value).toBe("level");
-	const pausedAgain = send(flow, { type: "back" });
-	expect(keyToEvent(pausedAgain, "Escape")).toEqual({ type: "back" });
-	expect(send(flow, { type: "back" }).value).toBe("level");
+	expect(keyToEvent(level, " ")).toBeNull();
+	expect(keyToEvent(level, "Escape")).toBeNull();
+});
+
+test("keyToEvent on the hub maps numeric keys to items", () => {
+	const hub = send(
+		start(firstRun),
+		{ type: "ready" },
+		{ type: "begin" },
+		{ type: "continue" },
+	);
+	expect(keyToEvent(hub, "1")).toEqual({ type: "openGalaxy" });
+	expect(keyToEvent(hub, "6")).toEqual({ type: "openZone" });
+	expect(keyToEvent(hub, "7")).toBeNull();
 });
 
 test("Finish opens results", () => {

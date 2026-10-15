@@ -1,5 +1,7 @@
 import { useMachine } from "@xstate/react";
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import type { MissedBar } from "../core/scoring/stars";
+import type { RunSummary } from "../core/sim/waiting-lanes";
 import {
 	type AppFlowEvent,
 	appFlowMachine,
@@ -9,9 +11,8 @@ import {
 } from "./machines/app-flow";
 import { GalaxyMap } from "./screens/galaxy-map";
 import { Hub } from "./screens/hub";
-import { Level } from "./screens/level";
+import { formatMissedBar, Level } from "./screens/level";
 import { Onboarding } from "./screens/onboarding";
-import { Pause } from "./screens/pause";
 import { Results } from "./screens/results";
 import { ScreenBoundary } from "./screens/screen-boundary";
 import { Title } from "./screens/title";
@@ -41,6 +42,10 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 	const [snapshot, send] = useMachine(appFlowMachine, {
 		input: { firstRun },
 	});
+	const [lastRun, setLastRun] = useState<{
+		summary?: RunSummary;
+		missed?: readonly MissedBar[];
+	}>({});
 	const frame = useRef<HTMLElement>(null);
 
 	useEffect(() => {
@@ -128,14 +133,26 @@ export function App({ firstRun = true }: { firstRun?: boolean }) {
 			screen = <LazySettings />;
 			break;
 		case "level":
-			screen = <Level />;
-			break;
-		case "pause":
-			screen = <Pause />;
+			screen = (
+				<Level
+					onFinish={(summary, missed) => {
+						setLastRun({ summary, missed });
+						send({ type: "finish" });
+					}}
+					onQuit={() => send({ type: "back" })}
+					onContinue={() => send({ type: "toZoneMap" })}
+					onToHub={() => send({ type: "toHub" })}
+				/>
+			);
 			break;
 		case "results":
 			screen = (
 				<Results
+					stars={lastRun.summary?.stars ?? 0}
+					score={lastRun.summary?.score ?? 0}
+					accuracy={lastRun.summary?.accuracy ?? 1}
+					netWpm={lastRun.summary?.netWpm ?? 0}
+					missedMessage={formatMissedBar(lastRun.missed)}
 					items={resultsItems}
 					selectedIndex={snapshot.context.resultsIndex}
 					onOpen={open}

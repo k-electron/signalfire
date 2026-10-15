@@ -235,6 +235,17 @@ test("advancing past the end stops on the last step", () => {
 	expect(outbox.drain()).toEqual([{ type: "LevelEnded", step: 5999 }]);
 });
 
+test("finish after advancing past the end returns summary without duplicate LevelEnded", () => {
+	const outbox = createOutbox();
+	const run = open(level11, "signalfire");
+	run.advance(6000, outbox);
+	expect(outbox.drain()).toEqual([{ type: "LevelEnded", step: 5999 }]);
+	const { summary } = run.finish(outbox);
+	expect(summary).toBeDefined();
+	expect(outbox.drain()).toEqual([]);
+	expect(() => run.finish(outbox)).toThrow(RangeError);
+});
+
 test("a second finish is rejected", () => {
 	const outbox = createOutbox();
 	const run = open(level11, "signalfire");

@@ -90,6 +90,7 @@ type StoredInput = {
 type State = {
 	step: number;
 	finished: boolean;
+	finalized: boolean;
 	rng: Rng;
 	unit: UnitCursor | null;
 	notes: Note[];
@@ -135,6 +136,7 @@ export function createWaitingLanesRun(
 	const state: State = {
 		step: 0,
 		finished: false,
+		finalized: false,
 		rng: createRng(seed).fork("waiting-lanes"),
 		unit: null,
 		notes: [],
@@ -290,6 +292,9 @@ function codesOf(unit: string): number[] {
 }
 
 function advance(state: State, toStep: number, outbox: Outbox): void {
+	if (state.finished) {
+		return;
+	}
 	assertPlaying(state);
 	if (!Number.isSafeInteger(toStep) || toStep < 0) {
 		throw new RangeError("The step must be a non-negative safe integer.");
@@ -338,9 +343,14 @@ function finish(
 	state: State,
 	outbox: Outbox,
 ): { summary: RunSummary; missed: readonly MissedBar[]; log: RunLogDocument } {
-	assertPlaying(state);
-	state.step = state.lastStep;
-	end(state, outbox);
+	if (state.finalized) {
+		throw new RangeError("The run is finished.");
+	}
+	if (!state.finished) {
+		state.step = state.lastStep;
+		end(state, outbox);
+	}
+	state.finalized = true;
 	const { summary, missed } = summaryOf(state);
 	const parsed = runLog.parse(
 		document(state.seed, encode(state.inputs), state.identity, summary),

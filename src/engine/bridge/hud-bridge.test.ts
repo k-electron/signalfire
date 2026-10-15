@@ -16,11 +16,34 @@ describe("createHudBridge", () => {
 			combo: 1,
 			activeCharacter: 102,
 			accuracy: 1,
+			netWpm: 0,
 		};
 
 		bridge.update(snapshot1);
 		expect(onSnapshot).toHaveBeenCalledTimes(1);
 		expect(onSnapshot).toHaveBeenCalledWith(snapshot1);
+	});
+
+	test("includes netWpm (Velocity) in snapshot emissions", () => {
+		const onSnapshot = vi.fn();
+		const bridge = createHudBridge({
+			onSnapshot,
+			now: () => 1000,
+			minIntervalMs: 50,
+		});
+
+		const snapshot: HudSnapshot = {
+			score: 10,
+			combo: 1,
+			activeCharacter: 102,
+			accuracy: 1,
+			netWpm: 15,
+		};
+
+		bridge.update(snapshot);
+		expect(onSnapshot).toHaveBeenCalledWith(
+			expect.objectContaining({ netWpm: 15 }),
+		);
 	});
 
 	test("throttles rapid updates within 50 ms window", () => {
@@ -37,18 +60,21 @@ describe("createHudBridge", () => {
 			combo: 1,
 			activeCharacter: 102,
 			accuracy: 1,
+			netWpm: 0,
 		};
 		const snapshot2: HudSnapshot = {
 			score: 20,
 			combo: 2,
 			activeCharacter: 106,
 			accuracy: 1,
+			netWpm: 0,
 		};
 		const snapshot3: HudSnapshot = {
 			score: 30,
 			combo: 3,
 			activeCharacter: 32,
 			accuracy: 1,
+			netWpm: 0,
 		};
 
 		// First update at 1000 ms emits immediately
@@ -87,6 +113,7 @@ describe("createHudBridge", () => {
 			combo: 1,
 			activeCharacter: 102,
 			accuracy: 1,
+			netWpm: 0,
 		});
 		expect(onSnapshot).toHaveBeenCalledTimes(1);
 
@@ -96,6 +123,7 @@ describe("createHudBridge", () => {
 			combo: 2,
 			activeCharacter: 106,
 			accuracy: 1,
+			netWpm: 0,
 		};
 		bridge.update(pending);
 		expect(onSnapshot).toHaveBeenCalledTimes(1);
@@ -121,6 +149,7 @@ describe("createHudBridge", () => {
 				combo: 1,
 				activeCharacter: 102,
 				accuracy: 1,
+				netWpm: 0,
 			});
 			expect(onSnapshot).toHaveBeenCalledTimes(1);
 
@@ -130,6 +159,7 @@ describe("createHudBridge", () => {
 				combo: 2,
 				activeCharacter: 106,
 				accuracy: 1,
+				netWpm: 12,
 			};
 			bridge.update(pending);
 			expect(onSnapshot).toHaveBeenCalledTimes(1);

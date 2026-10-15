@@ -6,6 +6,7 @@ export type HudState = {
 	combo: number;
 	activeCharacter: number | null;
 	accuracy: number;
+	netWpm: number;
 	setSnapshot(snapshot: HudSnapshot): void;
 	reset(): void;
 };
@@ -15,6 +16,7 @@ export const useHudStore = create<HudState>((set) => ({
 	combo: 0,
 	activeCharacter: null,
 	accuracy: 1,
+	netWpm: 0,
 	setSnapshot: (snapshot) => set(snapshot),
 	reset: () =>
 		set({
@@ -22,5 +24,6 @@ export const useHudStore = create<HudState>((set) => ({
 			combo: 0,
 			activeCharacter: null,
 			accuracy: 1,
+			netWpm: 0,
 		}),
 }));

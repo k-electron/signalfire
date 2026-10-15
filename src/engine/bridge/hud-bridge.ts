@@ -3,6 +3,7 @@ export type HudSnapshot = {
 	readonly combo: number;
 	readonly activeCharacter: number | null;
 	readonly accuracy: number;
+	readonly netWpm: number;
 };
 
 export type HudBridgeOptions = {

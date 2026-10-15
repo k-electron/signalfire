@@ -114,6 +114,7 @@ export class PixiRenderAdapter implements RenderOut {
 			resolution:
 				typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
 			antialias: true,
+			autoStart: false,
 		});
 
 		this.app = app;
@@ -296,6 +297,7 @@ export class PixiRenderAdapter implements RenderOut {
 				note.container.alpha = 1.0;
 			}
 		}
+		this.app?.render();
 	}
 
 	getLanesCount(): number {

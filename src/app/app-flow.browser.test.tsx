@@ -69,12 +69,12 @@ async function toZoneFromGalaxy() {
 async function toLevel() {
 	await toZoneFromGalaxy();
 	await press(" ");
-	await heading("Level");
+	await heading("First Light");
 }
 
 async function toResults() {
 	await toLevel();
-	await press(" ");
+	await page.getByTestId("finish-level").click();
 	await heading("Results");
 }
 
@@ -169,7 +169,7 @@ test("Space on the zone map opens the level", async () => {
 	await toLevel();
 });
 
-test("Space on the level opens results", async () => {
+test("Finishing the level opens results", async () => {
 	await toResults();
 });
 
