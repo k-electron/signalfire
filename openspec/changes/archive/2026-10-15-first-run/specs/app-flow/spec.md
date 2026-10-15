@@ -62,6 +62,15 @@ Space SHALL activate the selected action. On the title it begins. On onboarding 
 - **WHEN** the player presses Space on settings
 - **THEN** the player still sees the settings heading
 
+### Requirement: A player can walk to settings and return
+
+A player SHALL be able to move from the title to the hub and settings, then return to the hub by Escape and, after opening settings again, by the browser Back button.
+
+#### Scenario: Keyboard and browser Back
+- **WHEN** the player presses Space on the title, 5 on the hub, Escape, 5 again, and then the browser Back button
+- **THEN** the player sees, in order, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
+
+
 ## ADDED Requirements
 
 ### Requirement: First run flow advances from level 0.1 through level 1.1 to results and zone map

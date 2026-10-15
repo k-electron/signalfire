@@ -347,7 +347,7 @@ Escape SHALL ask the flow to go back.
 - **WHEN** the player presses Escape on the title
 - **THEN** the player still sees the title heading
 
-#### Scenario: Escape on the hub returns to onboarding after a first run
+#### Scenario: Escape on the hub returns to onboarding when opened from onboarding
 
 - **WHEN** the player reached the hub from onboarding and presses Escape
 - **THEN** the player sees the onboarding heading
@@ -516,14 +516,14 @@ When the screen that is showing fails to render, the player SHALL see the text "
 - **WHEN** the settings screen has failed and the player activates Back
 - **THEN** the player sees the hub heading and does not see "Something went wrong."
 
-### Requirement: A first run can walk to settings and return
+### Requirement: A player can walk to settings and return
 
-A first-run player SHALL be able to move from the title to onboarding, the hub, and settings, then return to the hub by Escape and, after opening settings again, by the browser Back button.
+A player SHALL be able to move from the title to the hub and settings, then return to the hub by Escape and, after opening settings again, by the browser Back button.
 
 #### Scenario: Keyboard and browser Back
 
-- **WHEN** the player, on a first run, presses Space on the title, Space on onboarding, 5 on the hub, Escape, 5 again, and then the browser Back button
-- **THEN** the player sees, in order, the onboarding heading, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
+- **WHEN** the player presses Space on the title, 5 on the hub, Escape, 5 again, and then the browser Back button
+- **THEN** the player sees, in order, the hub heading, the settings heading, the hub heading, the settings heading, and the hub heading
 
 ### Requirement: The zone map opens the level, and back opens pause
 
