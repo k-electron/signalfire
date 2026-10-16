@@ -20,8 +20,8 @@
 ## 4. Verification and Stage Exit
 
 - [x] 4.1 Run `pnpm check` and ensure typecheck, lint, content check, unit/browser tests, and production build all pass cleanly.
-- [ ] 4.2 Run the first-run Playwright suite (`e2e/first-run.spec.ts`) against the deployed pull request preview URL and capture execution output.
-- [ ] 4.3 Open the pull request with filled template, listing preview test evidence, GitHub settings, and asking Karim to approve the Stage 2 exit.
+- [x] 4.2 Run the first-run Playwright suite (`e2e/first-run.spec.ts`) against the deployed pull request preview URL and capture execution output.
+- [x] 4.3 Open the pull request with filled template, listing preview test evidence, GitHub settings, and asking Karim to approve the Stage 2 exit.
 
 ## Workflow follow-up
 
