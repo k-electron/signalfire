@@ -17,7 +17,7 @@ https://signalfire.k-electron.workers.dev/
 
 ## Status
 
-Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold) and [Stage 1](docs/ROADMAP.md) (core foundations) have exited.
+Pre-alpha. [Stage 0](docs/ROADMAP.md) (scaffold), [Stage 1](docs/ROADMAP.md) (core foundations), and [Stage 2](docs/ROADMAP.md) (walking skeleton) have exited.
 
 ## How this project is built
 
@@ -44,11 +44,11 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm check` runs typecheck, lint, tests, and build. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. Content checks and ladle arrive with later tasks. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
+`pnpm check` runs typecheck, lint, content check, tests, and build. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `ladle` arrives with a later task. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
 
 ## Contributing
 
-[Bug reports](https://github.com/k-electron/signalfire/issues/new?template=01-bug-report.yml), [ideas](https://github.com/k-electron/signalfire/issues/new?template=02-idea.yml), and [typing-content reports](https://github.com/k-electron/signalfire/issues/new?template=03-typing-content-report.yml) are open. Pull requests from outside contributors are not accepted yet. See [CONTRIBUTING.md](CONTRIBUTING.md).
+[Bug reports](https://github.com/k-electron/signalfire/issues/new?template=01-bug-report.yml), [ideas](https://github.com/k-electron/signalfire/issues/new?template=02-idea.yml), and [typing-content reports](https://github.com/k-electron/signalfire/issues/new?template=03-typing-content-report.yml) are open. Pull requests from outside contributors are open through OpenSpec and the constitution. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Privacy
 

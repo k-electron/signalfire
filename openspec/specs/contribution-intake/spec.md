@@ -2,7 +2,7 @@
 
 ## Purpose
 
-GitHub shows the pull request fields and the three issue forms, and the public pages say how to report and that outside pull requests wait until the walking skeleton.
+GitHub shows the pull request fields and the three issue forms, and the public pages say how to report and how outside contributors submit pull requests.
 
 ## Requirements
 
@@ -42,14 +42,14 @@ Choosing Typing-content report SHALL open a form that requires the word or phras
 - **WHEN** a person opens a new issue and chooses Typing-content report
 - **THEN** the form requires the word or phrase and a choice of offensive, wrong, or both, and asks where it appeared
 
-### Requirement: CONTRIBUTING tells outsiders how to report
+### Requirement: CONTRIBUTING tells outsiders how to contribute and report
 
-`CONTRIBUTING.md` SHALL say that outside pull requests are not accepted until the walking skeleton stage exits, why, and how to open a bug report, an idea, and a typing-content report.
+`CONTRIBUTING.md` SHALL explain how outside contributors submit pull requests following OpenSpec (propose → apply → review) and the constitution, and SHALL explain how to open a bug report, an idea, and a typing-content report.
 
 #### Scenario: An outside contributor reads CONTRIBUTING
 
 - **WHEN** someone outside the project reads `CONTRIBUTING.md`
-- **THEN** it says outside pull requests are not accepted until Roadmap stage 2 exits, because the walking skeleton is not in place and that is when the OpenSpec flow opens to them, and it tells them to use the bug report, idea, and typing-content report issues
+- **THEN** it explains that pull requests are accepted through OpenSpec and the constitution, and provides links and instructions for bug reports, ideas, and typing-content reports
 
 ### Requirement: The README says what the game is
 
@@ -80,12 +80,12 @@ The README SHALL give `pnpm install` and `pnpm dev` as the local run commands.
 
 ### Requirement: The README says how to contribute
 
-The README contributing section SHALL name bug, idea, and typing-content issues, say that outside pull requests are not accepted yet, and link `CONTRIBUTING.md`.
+The README contributing section SHALL name bug, idea, and typing-content issues, invite outside pull requests, and link `CONTRIBUTING.md`.
 
 #### Scenario: A visitor looks for how to contribute
 
 - **WHEN** a visitor reads the README contributing section
-- **THEN** it names those three issue types, says outside pull requests are not accepted yet, and links `CONTRIBUTING.md`
+- **THEN** it names those three issue types, welcomes outside pull requests, and links `CONTRIBUTING.md`
 
 ### Requirement: The README privacy note matches the device
 
@@ -114,11 +114,11 @@ The README play section SHALL give `https://signalfire.k-electron.workers.dev/`.
 - **WHEN** a visitor reads the README play section
 - **THEN** it gives `https://signalfire.k-electron.workers.dev/`
 
-### Requirement: The README states Stages 0 and 1
+### Requirement: The README states Stages 0, 1, and 2
 
-The README status section SHALL say the project is pre-alpha and that Stages 0 and 1 have exited.
+The README status section SHALL say the project is pre-alpha and that Stages 0, 1, and 2 have exited.
 
 #### Scenario: A visitor reads the status
 
 - **WHEN** a visitor reads the README status section
-- **THEN** it says pre-alpha and that Stages 0 and 1 have exited
+- **THEN** it says pre-alpha and that Stages 0, 1, and 2 have exited

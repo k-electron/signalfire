@@ -4,7 +4,8 @@ import {
 	type ProgressDocument,
 	recordCadetRun,
 } from "../../core/scoring/record-run";
-import type { RunSummary } from "../../core/sim/waiting-lanes";
+import { type RetainLog, retainRuns } from "../../core/scoring/retention";
+import type { RunLogDocument, RunSummary } from "../../core/sim/waiting-lanes";
 import { createLocalStorage } from "../../platform/storage/indexed-db";
 
 export type ProfileDocument = {
@@ -87,6 +88,7 @@ export async function saveLevelCompletionCheckpoint(
 		levelId: string;
 		summary: RunSummary;
 		zoneHasStarBars: boolean;
+		runLog?: RunLogDocument;
 	},
 ): Promise<{
 	readonly progress: ProgressDocument;
@@ -126,31 +128,33 @@ export async function saveLevelCompletionCheckpoint(
 	await storage.save("progress", updatedProgress);
 
 	// Persist run log
-	const runId = generateRunId();
-	const runLogDoc = {
-		v: 1 as const,
-		updatedAt: now,
-		rev: 0,
-		runId,
-		levelId: input.levelId,
-		tier: "cadet" as const,
-		mode: "campaign" as const,
-		seed: "signalfire",
-		contentVersion: "demo",
-		engineVersion: "0.1.0",
-		startedAt: now,
-		inputs: [] as readonly (readonly [number, number, number])[],
-		summary: {
-			accuracy: input.summary.accuracy,
-			netWpm: input.summary.netWpm,
-			score: input.summary.score,
-			stars: input.summary.stars,
-			medals: [] as readonly string[],
-		},
-	};
+	const runLogDoc: RunLogDocument = input.runLog
+		? { ...input.runLog, updatedAt: now }
+		: {
+				v: 1,
+				updatedAt: now,
+				rev: 0,
+				runId: generateRunId(),
+				levelId: input.levelId,
+				tier: "cadet",
+				mode: "campaign",
+				seed: "signalfire",
+				contentVersion: "demo",
+				engineVersion: "0.0.0",
+				startedAt: now,
+				inputs: [],
+				summary: {
+					accuracy: input.summary.accuracy,
+					netWpm: input.summary.netWpm,
+					score: input.summary.score,
+					stars: input.summary.stars,
+					medals: [],
+				},
+			};
+	const runId = runLogDoc.runId;
 	await storage.save(`run:${runId}`, runLogDoc);
 
-	// Persist run index
+	// Persist run index using best + last 3 retention per level and tier
 	const indexResult = await storage.load("run-index");
 	const existingIndex =
 		indexResult.status === "ok"
@@ -174,20 +178,38 @@ export async function saveLevelCompletionCheckpoint(
 					}[],
 				};
 
+	const candidateLogs: RetainLog[] = [];
+	for (const entry of existingIndex.kept) {
+		if (entry.runId === runId) {
+			continue;
+		}
+		const loadedRun = await storage.load(`run:${entry.runId}`);
+		if (loadedRun.status === "ok") {
+			candidateLogs.push({
+				runId: loadedRun.document.runId,
+				levelId: loadedRun.document.levelId,
+				tier: loadedRun.document.tier,
+				mode: loadedRun.document.mode,
+				startedAt: loadedRun.document.startedAt,
+				score: loadedRun.document.summary.score,
+			});
+		}
+	}
+	candidateLogs.push({
+		runId: runLogDoc.runId,
+		levelId: runLogDoc.levelId,
+		tier: runLogDoc.tier,
+		mode: runLogDoc.mode,
+		startedAt: runLogDoc.startedAt,
+		score: runLogDoc.summary.score,
+	});
+	const retention = retainRuns(candidateLogs);
+
 	const updatedIndex = {
 		...existingIndex,
 		updatedAt: now,
 		rev: existingIndex.rev + 1,
-		kept: [
-			...existingIndex.kept,
-			{
-				runId,
-				levelId: input.levelId,
-				tier: "cadet" as const,
-				mode: "campaign" as const,
-				kind: "best" as const,
-			},
-		],
+		kept: retention.kept,
 	};
 	await storage.save("run-index", updatedIndex);
 
@@ -217,7 +239,7 @@ export async function requestStoragePersistence(): Promise<boolean> {
 	return false;
 }
 
-function generateRunId(): string {
+export function generateRunId(): string {
 	const entropy = new Uint8Array(10);
 	if (typeof crypto !== "undefined" && crypto.getRandomValues) {
 		crypto.getRandomValues(entropy);

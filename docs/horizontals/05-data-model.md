@@ -83,10 +83,9 @@ Version 1 stores the envelope and the fields implemented in `src/core/schemas`. 
 
 | Field | Stage |
 |---|---|
-| Run-log retention (best and last 3, Courier, Daily Signal) | 2 |
 | `progress.barriersBroken`, `progress.repairStars`, the telemetry document, the meta document, `syncState` | 3 |
 | `progress.storyFlags` | 5 |
-| `profile.equipped`, `progress.mods`, `progress.keylingsRescued`, `progress.codexUnlocked` | 6 |
+| `profile.equipped`, `progress.mods`, `progress.keylingsRescued`, `progress.codexUnlocked`, Courier and Daily Signal run-log retention | 6 |
 
 ### `telemetry`
 

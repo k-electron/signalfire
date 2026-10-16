@@ -17,7 +17,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 |---|---|---|
 | 0 | Scaffold | Done |
 | 1 | Core foundations | Done |
-| 2 | Walking skeleton | Not started |
+| 2 | Walking skeleton | Done |
 | 3 | Thin pass across every system | Not started |
 | 4 | Feel slice | Not started |
 | 5 | Campaign, zone by zone | Not started |
@@ -45,8 +45,8 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 
 - One thin end-to-end path: title, levels 0.1 and 1.1 (waiting lanes), real input judging, scoring, stars, results, save and reload.
 - Visuals are placeholders.
-- Confirm the Atkinson Hyperlegible Mono license file before shipping the font.
-- A live run must record its own run log. Today the kernel re-simulates a list of inputs it is given.
+- Atkinson Hyperlegible Mono is self-hosted (`THIRD_PARTY_NOTICES.md` carries its OFL-1.1 license).
+- A live run records its own run log.
 - **Exit:** the first-run Playwright flow passes on the deployed preview, and outside pull requests open ([Repo Setup](horizontals/02-repo-setup.md)).
 
 ### 3. Thin pass across every system
