@@ -13,6 +13,7 @@ Stage 2 (Walking skeleton) is implemented: a complete first-run path (title, onb
 
 - `docs/ROADMAP.md`: Stage 2 exit criteria and status table update.
 - `docs/horizontals/02-repo-setup.md`: Contributions section opening pull requests to outside contributors, git workflow, and GitHub settings.
+- `docs/horizontals/05-data-model.md`: Run-log retention (best and last 3 per level and tier) at level completion checkpoint.
 - `docs/horizontals/10-ci-cd-and-hosting.md`: Cloudflare Workers PR preview verification and GitHub Actions workflow approval policies.
 - `docs/horizontals/01-constitution.md`: Human gate approval for stage exit (C3).
 
@@ -31,8 +32,9 @@ None. Zero new runtime dependencies are added.
 - **Documentation & Intake**:
   - Update `CONTRIBUTING.md` to announce that outside pull requests are open and explain how outside contributors follow the OpenSpec propose → apply → review flow and adhere to the constitution.
   - Update `README.md` status to declare Stage 2 exited alongside Stages 0 and 1, and update the contributing section to invite pull requests.
-  - Update `docs/ROADMAP.md` stage table to mark Stage 2 as **Done**.
-- **Stage 2 Verification**: Audit all sentences in `docs/ROADMAP.md` for Stage 2 against the code to confirm full alignment.
+  - Update `docs/ROADMAP.md` stage table to mark Stage 2 as **Done** and update Stage 2 bullets to present tense.
+  - Update `docs/horizontals/05-data-model.md` deferred fields table so Stage 2 run-log retention is no longer listed as waiting on Stage 2.
+- **Stage 2 Verification & Live Run-Log Checkpoint**: Audit all sentences in `docs/ROADMAP.md` for Stage 2 against the code; wire `Level` and `saveLevelCompletionCheckpoint` to persist the live `WaitingLanesRun` run log (with `generateRunId()` and `level.contentVersion`) and apply `retainRuns` (best + last 3 per level and tier) when updating `run-index`.
 - **GitHub Repository Settings**:
   - Set GitHub Actions fork pull request workflow approval policy to `all_external_contributors` so that outside contributors require workflow run approval before Actions run.
   - Verify and document repository branch protection rules on `main` (requiring CI checks and review).
@@ -49,7 +51,8 @@ None.
 ## Impact
 
 - `playwright.config.ts`: Added support for `PLAYWRIGHT_BASE_URL` and conditional local web server spawning.
-- `CONTRIBUTING.md`, `README.md`, `docs/ROADMAP.md`: Updated contribution instructions, status, and roadmap stage completion.
+- `src/core/sim/waiting-lanes.ts`, `src/app/screens/level.tsx`, `src/app/app.tsx`, `src/app/storage/checkpoints.ts`: Wired live `WaitingLanesRun` run log and `retainRuns` into level completion checkpoint persistence.
+- `CONTRIBUTING.md`, `README.md`, `docs/ROADMAP.md`, `docs/horizontals/05-data-model.md`: Updated contribution instructions, status, and roadmap stage completion.
 - GitHub configuration: Actions fork PR approval policy set to `all_external_contributors`.
 - APIs / dependencies: No change to APIs or runtime dependencies.
 
