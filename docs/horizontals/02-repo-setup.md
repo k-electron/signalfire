@@ -8,7 +8,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 |---|---|
 | Hosting | GitHub, public |
 | License | MIT for code and creative content |
-| Contributions | Issues open now (bug report, idea, typing-content report). Discussions stay off until that GitHub setting is on. Pull requests from outside contributors open after the walking skeleton |
+| Contributions | Issues open (bug report, idea, typing-content report). Pull requests from outside contributors are open through OpenSpec and the constitution. Discussions stay off until that GitHub setting is on |
 | Shape | Single app package with clear internal folders |
 | Package manager | pnpm, version pinned |
 | Lint and format | Biome |
@@ -29,8 +29,8 @@ How the repository is hosted, laid out, licensed, and worked in.
 
 ## Contributions
 
-- **Now:** Issues are open: bug report, idea, and typing-content report. `CONTRIBUTING.md` explains that outside pull requests are not yet accepted and why, and how to open each issue type. Discussions stay off until the GitHub setting is turned on. Until then, ideas use the idea issue.
-- **After the walking skeleton:** pull requests open to outside contributors, who follow the same OpenSpec propose → apply flow and the constitution.
+- Issues are open: bug report, idea, and typing-content report. Discussions stay off until that GitHub setting is on. Until then, ideas use the idea issue.
+- Pull requests are open to outside contributors, who follow the same OpenSpec propose → apply → review flow and the constitution.
 - Issue templates: bug report, idea, typing-content report (for an offensive or wrong word in a list).
 
 ## Top-level layout
@@ -81,7 +81,7 @@ How the repository is hosted, laid out, licensed, and worked in.
 - Dependency versions are locked by `pnpm-lock.yaml`; CI installs with a frozen lockfile.
 - Project tooling (build, lint, test, dev servers, browsers) is installed in this repo and run through pnpm scripts or `pnpm exec`. Do not install it globally. The OpenSpec CLI is the exception: it is installed globally, outside this repo, and is not a `package.json` dependency.
   - Use `pnpm`, not `npm` or `npx`. npm refuses to run in this repo because `devEngines` is set.
-  - Run tests and browsers through the pnpm scripts (`pnpm test`, `pnpm test:e2e`, `pnpm browsers:install`). They set `PLAYWRIGHT_BROWSERS_PATH=0` so Chromium installs inside `node_modules`. Do not run `playwright` or `vitest` directly through `pnpm exec` for browser work.
+  - Run tests and browsers through the pnpm scripts (`pnpm test`, `pnpm test:e2e`, `pnpm browsers:install`). They set `PLAYWRIGHT_BROWSERS_PATH=0` so Chromium installs inside `node_modules`. Do not run `playwright` or `vitest` directly through `pnpm exec` for browser work, except when testing against a deployed preview URL (`PLAYWRIGHT_BASE_URL=<url> PLAYWRIGHT_BROWSERS_PATH=0 pnpm exec playwright test e2e/first-run.spec.ts`).
   - Hermetic is a guideline, not an audit. Install through pnpm into this repo and don't install tools globally. Checking the path the script wrote is enough. Don't scan or inventory the home directory, global caches, or PATH.
 
 ## Scripts

@@ -2,9 +2,14 @@
 
 ## Pull requests
 
-Pull requests from outside contributors are not accepted yet. They open when [Roadmap](docs/ROADMAP.md) stage 2 exits.
+Pull requests from outside contributors are open. All contributions follow OpenSpec and the [constitution](docs/horizontals/01-constitution.md):
 
-That stage is the walking skeleton. It is not in place. Until it exits, code changes stay inside the project and follow OpenSpec: propose, Karim approves, apply, review. After it exits, outside contributors use that same flow and the [constitution](docs/horizontals/01-constitution.md).
+1. **Propose:** Propose changes using OpenSpec (`/opsx:propose` or your agent's equivalent) under `openspec/changes/<name>/`. Propose one capability per change.
+2. **Approval:** Karim approves the proposal before implementation begins.
+3. **Apply:** Work on branch `change/<name>`. Logic is built test-first. Keep changes concise and focused.
+4. **Review:** Open a pull request using the pull request template. Ensure CI is green. Karim reviews all pull requests before squash-merging.
+
+Exempt from proposals (pull request only, branch `fix/<slug>`): typo and wording fixes, formatting, and dependency patch updates.
 
 ## Bug reports
 

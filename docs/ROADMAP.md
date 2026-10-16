@@ -17,7 +17,7 @@ The roadmap sets sequence only. If it conflicts with the philosophy, constitutio
 |---|---|---|
 | 0 | Scaffold | Done |
 | 1 | Core foundations | Done |
-| 2 | Walking skeleton | Not started |
+| 2 | Walking skeleton | Done |
 | 3 | Thin pass across every system | Not started |
 | 4 | Feel slice | Not started |
 | 5 | Campaign, zone by zone | Not started |
