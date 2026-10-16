@@ -12,6 +12,7 @@ import { scoreEvents } from "../../core/scoring/score";
 import type { MissedBar } from "../../core/scoring/stars";
 import {
 	createWaitingLanesRun,
+	type RunLogDocument,
 	type RunSummary,
 } from "../../core/sim/waiting-lanes";
 import { createHudBridge } from "../../engine/bridge/hud-bridge";
@@ -29,6 +30,7 @@ import {
 	levelKeyToEvent,
 	levelLifecycleMachine,
 } from "../machines/level-lifecycle";
+import { generateRunId } from "../storage/checkpoints";
 import { useHudStore } from "../stores/hud";
 import { Pause } from "./pause";
 import { Results } from "./results";
@@ -40,6 +42,7 @@ export type LevelProps = {
 		summary?: RunSummary,
 		missed?: readonly MissedBar[],
 		progress?: ProgressDocument,
+		runLog?: RunLogDocument,
 	) => void;
 	readonly onExit?: () => void;
 	readonly skipBriefing?: boolean;
@@ -186,14 +189,15 @@ export function Level({
 		}
 
 		const outbox = createOutbox();
+		const now = new Date().toISOString();
 		const run = createWaitingLanesRun(level, zone, tuning, seed, {
-			runId: "01AFQCG20004HMASW9NF6YY41J",
+			runId: generateRunId(),
 			levelId: level.id,
 			tier: "cadet",
 			mode: "campaign",
-			contentVersion: "demo",
-			startedAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
+			contentVersion: level.contentVersion,
+			startedAt: now,
+			updatedAt: now,
 			rev: 0,
 		});
 
@@ -283,7 +287,12 @@ export function Level({
 						summary: finished.summary,
 						missed: finished.missed,
 					});
-					onFinish?.(finished.summary, finished.missed, updatedProgress);
+					onFinish?.(
+						finished.summary,
+						finished.missed,
+						updatedProgress,
+						finished.log,
+					);
 				}
 			}
 

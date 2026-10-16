@@ -52,7 +52,7 @@ export type RunSummary = {
 	readonly medals: readonly string[];
 };
 
-type RunLogDocument = Extract<
+export type RunLogDocument = Extract<
 	ReturnType<typeof runLog.parse>,
 	{ status: "ok" }
 >["document"];
@@ -71,6 +71,7 @@ export type WaitingLanesRun = {
 	summary(): {
 		summary: RunSummary;
 		missed: readonly MissedBar[];
+		log: RunLogDocument;
 	};
 	finish(outbox: Outbox): {
 		summary: RunSummary;
@@ -358,14 +359,7 @@ function finish(
 	assertPlaying(state);
 	state.step = state.lastStep;
 	end(state, outbox);
-	const { summary, missed } = summaryOf(state);
-	const parsed = runLog.parse(
-		document(state.seed, encode(state.inputs), state.identity, summary),
-	);
-	if (parsed.status !== "ok") {
-		throw new RangeError("The run log is invalid.");
-	}
-	return { summary, missed, log: parsed.document };
+	return summaryOf(state);
 }
 
 function emit(state: State, outbox: Outbox, event: DomainEvent): void {
@@ -393,6 +387,7 @@ function activeNote(state: State): ActiveNote | null {
 function summaryOf(state: State): {
 	summary: RunSummary;
 	missed: readonly MissedBar[];
+	log: RunLogDocument;
 } {
 	const attempts = attemptCounts(state.judge);
 	const netWpm = velocityWpm(state.judge);
@@ -403,16 +398,24 @@ function summaryOf(state: State): {
 		netWpm,
 		starBars: state.starBars,
 	});
+	const summary: RunSummary = {
+		accuracy:
+			attempts.firstAttempts === 0 ? 1 : integrityPercent(state.judge) / 100,
+		netWpm,
+		score: scoreEvents(state.events),
+		stars: award.stars,
+		medals: [],
+	};
+	const parsed = runLog.parse(
+		document(state.seed, encode(state.inputs), state.identity, summary),
+	);
+	if (parsed.status !== "ok") {
+		throw new RangeError("The run log is invalid.");
+	}
 	return {
-		summary: {
-			accuracy:
-				attempts.firstAttempts === 0 ? 1 : integrityPercent(state.judge) / 100,
-			netWpm,
-			score: scoreEvents(state.events),
-			stars: award.stars,
-			medals: [],
-		},
+		summary,
 		missed: award.missed,
+		log: parsed.document,
 	};
 }
 

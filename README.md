@@ -44,7 +44,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm check` runs typecheck, lint, tests, and build. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. Content checks and ladle arrive with later tasks. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
+`pnpm check` runs typecheck, lint, content check, tests, and build. Browser tests and end-to-end need `pnpm browsers:install` after `pnpm install`. `ladle` arrives with a later task. The full command list is in [`AGENTS.md`](AGENTS.md#commands).
 
 ## Contributing
 

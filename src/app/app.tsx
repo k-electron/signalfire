@@ -197,7 +197,7 @@ export function App({
 				<Level
 					key={snapshot.context.levelId}
 					levelId={snapshot.context.levelId}
-					onFinish={(summary, missed, runProgress) => {
+					onFinish={(summary, missed, runProgress, runLogDoc) => {
 						setLastRun({ summary, missed });
 						if (runProgress) {
 							setProgress(runProgress);
@@ -207,6 +207,7 @@ export function App({
 								levelId: "level:1.1",
 								summary,
 								zoneHasStarBars: true,
+								runLog: runLogDoc,
 							})
 								.then((res) => {
 									setProgress(res.progress);
